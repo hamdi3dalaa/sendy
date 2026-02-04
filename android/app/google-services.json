@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "341347912772",
+    "project_id": "sendy-fc0ed",
+    "storage_bucket": "sendy-fc0ed.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:341347912772:android:3e25502b4cb83eb1b24011",
+        "android_client_info": {
+          "package_name": "com.example.sendy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDM7F710kjbjPZ96QS_lxFIs6QtZu657EY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
