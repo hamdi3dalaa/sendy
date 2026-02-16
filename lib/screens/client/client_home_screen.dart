@@ -1,12 +1,14 @@
 // lib/screens/client/client_home_screen.dart
-// FIXED: Removed auto-load, added manual refresh button
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sendy/l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/client_provider.dart';
 import 'restaurants_list_screen.dart';
 import 'my_orders_screen.dart';
+import 'search_screen.dart';
+import 'profile_screen.dart';
+import 'cart_screen.dart';
 
 class ClientHomeScreen extends StatefulWidget {
   const ClientHomeScreen({Key? key}) : super(key: key);
@@ -18,39 +20,55 @@ class ClientHomeScreen extends StatefulWidget {
 class _ClientHomeScreenState extends State<ClientHomeScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _screens = [
-    const RestaurantsListScreen(),
-    const MyOrdersScreen(),
-  ];
-
   @override
   void initState() {
     super.initState();
-    // ✅ REMOVED: Don't auto-load, let RestaurantsListScreen handle it
-    // The child screen will load when needed
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authProvider = context.read<AuthProvider>();
+      final clientProvider = context.read<ClientProvider>();
+      if (authProvider.currentUser != null) {
+        clientProvider.loadFavorites(authProvider.currentUser!.uid);
+        clientProvider.loadAddresses(authProvider.currentUser!.uid);
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
+    final l10n = AppLocalizations.of(context)!;
+
+    final List<Widget> screens = [
+      const RestaurantsListScreen(),
+      const SearchScreen(),
+      const MyOrdersScreen(),
+      const ProfileScreen(),
+    ];
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('SENDY'),
         backgroundColor: const Color(0xFFFF5722),
+        foregroundColor: Colors.white,
         actions: [
-          // Cart icon with badge
           Stack(
             children: [
               IconButton(
                 icon: const Icon(Icons.shopping_cart),
                 onPressed: () {
-                  // Navigate to cart
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Panier - Fonctionnalité à venir'),
-                    ),
-                  );
+                  final clientProvider = context.read<ClientProvider>();
+                  if (clientProvider.cart.isNotEmpty) {
+                    final restaurantId = clientProvider.cart.values.first.menuItem.restaurantId;
+                    clientProvider.getRestaurantById(restaurantId).then((restaurant) {
+                      if (restaurant != null && mounted) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CartScreen(restaurant: restaurant),
+                          ),
+                        );
+                      }
+                    });
+                  }
                 },
               ),
               Positioned(
@@ -85,13 +103,12 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
               ),
             ],
           ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => authProvider.signOut(),
-          ),
         ],
       ),
-      body: _screens[_selectedIndex],
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: screens,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (index) {
@@ -99,15 +116,25 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
             _selectedIndex = index;
           });
         },
+        type: BottomNavigationBarType.fixed,
         selectedItemColor: const Color(0xFFFF5722),
-        items: const [
+        unselectedItemColor: Colors.grey,
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.restaurant),
-            label: 'Restaurants',
+            icon: const Icon(Icons.home),
+            label: l10n.home,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.receipt_long),
-            label: 'Mes Commandes',
+            icon: const Icon(Icons.search),
+            label: l10n.search,
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.receipt_long),
+            label: l10n.myOrders,
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.person),
+            label: l10n.profile,
           ),
         ],
       ),

@@ -224,9 +224,9 @@ class InvoiceService {
               children: [
                 _buildTableCell(item.name),
                 _buildTableCell(item.quantity.toString()),
-                _buildTableCell('${item.price.toStringAsFixed(2)} DH'),
+                _buildTableCell('${item.price.toStringAsFixed(2)} DHs'),
                 _buildTableCell(
-                    '${(item.price * item.quantity).toStringAsFixed(2)} DH'),
+                    '${(item.price * item.quantity).toStringAsFixed(2)} DHs'),
               ],
             )),
       ],
@@ -263,7 +263,7 @@ class InvoiceService {
             ),
           ),
           pw.Text(
-            '${amount.toStringAsFixed(2)} DH',
+            '${amount.toStringAsFixed(2)} DHs',
             style: pw.TextStyle(
               fontSize: isTotal ? 14 : 12,
               fontWeight: isTotal ? pw.FontWeight.bold : pw.FontWeight.normal,

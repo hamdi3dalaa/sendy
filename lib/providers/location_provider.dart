@@ -90,7 +90,7 @@ class LocationProvider with ChangeNotifier {
     _positionStream = Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.high,
-        distanceFilter: 10,
+        distanceFilter: 50,
       ),
     ).listen(
       (Position position) {

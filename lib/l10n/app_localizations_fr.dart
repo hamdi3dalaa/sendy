@@ -130,5 +130,434 @@ class AppLocalizationsFr extends AppLocalizations {
   String get clientComment => 'Commentaire du client';
 
   @override
-  String get dhs => 'DH';
+  String get dhs => 'DHs';
+
+  @override
+  String get home => 'Accueil';
+
+  @override
+  String get search => 'Rechercher';
+
+  @override
+  String get myOrders => 'Mes Commandes';
+
+  @override
+  String get profile => 'Profil';
+
+  @override
+  String get searchRestaurants => 'Rechercher un restaurant...';
+
+  @override
+  String get searchRestaurantsAndDishes => 'Rechercher restaurants et plats...';
+
+  @override
+  String get restaurants => 'Restaurants';
+
+  @override
+  String get categories => 'Categories';
+
+  @override
+  String get featuredRestaurants => 'Restaurants populaires';
+
+  @override
+  String get allRestaurants => 'Tous les restaurants';
+
+  @override
+  String get noRestaurantsAvailable => 'Aucun restaurant disponible';
+
+  @override
+  String get restaurantsWillAppear => 'Les restaurants apparaitront ici une fois approuves';
+
+  @override
+  String get noResultsFound => 'Aucun resultat trouve';
+
+  @override
+  String get tryAnotherSearch => 'Essayez un autre terme de recherche';
+
+  @override
+  String get discoverRestaurants => 'Decouvrez nos restaurants';
+
+  @override
+  String get tapToLoadRestaurants => 'Appuyez sur le bouton pour charger les restaurants disponibles';
+
+  @override
+  String get loadRestaurants => 'Charger les restaurants';
+
+  @override
+  String get loadingRestaurants => 'Chargement des restaurants...';
+
+  @override
+  String get dishes => 'plats';
+
+  @override
+  String get dish => 'plat';
+
+  @override
+  String get all => 'Tous';
+
+  @override
+  String get myCart => 'Mon Panier';
+
+  @override
+  String get emptyCart => 'Votre panier est vide';
+
+  @override
+  String get addDishesToOrder => 'Ajoutez des plats pour commander';
+
+  @override
+  String get viewMenu => 'Voir le menu';
+
+  @override
+  String get deliveryAddress => 'Adresse de livraison';
+
+  @override
+  String get enterFullAddress => 'Entrez votre adresse complete...';
+
+  @override
+  String get commentOptional => 'Commentaire (optionnel)';
+
+  @override
+  String get specialInstructions => 'Instructions speciales, allergies...';
+
+  @override
+  String get summary => 'Resume';
+
+  @override
+  String get pay => 'Payer';
+
+  @override
+  String get enterDeliveryAddress => 'Veuillez entrer votre adresse de livraison';
+
+  @override
+  String get orderPlacedSuccess => 'Commande passee avec succes!';
+
+  @override
+  String get addedToCart => 'Ajoute au panier';
+
+  @override
+  String get removedFromCart => 'Retire du panier';
+
+  @override
+  String get perUnit => '/ unite';
+
+  @override
+  String get noDishesAvailable => 'Aucun plat disponible';
+
+  @override
+  String get error => 'Erreur';
+
+  @override
+  String get retry => 'Reessayer';
+
+  @override
+  String get noOrders => 'Aucune commande';
+
+  @override
+  String get ordersWillAppear => 'Vos commandes apparaitront ici';
+
+  @override
+  String get orderNumber => 'Commande';
+
+  @override
+  String get articles => 'articles';
+
+  @override
+  String get article => 'article';
+
+  @override
+  String get others => 'autres';
+
+  @override
+  String get other => 'autre';
+
+  @override
+  String get pending => 'En attente';
+
+  @override
+  String get accepted => 'Acceptee';
+
+  @override
+  String get inProgress => 'En cours';
+
+  @override
+  String get delivered => 'Livree';
+
+  @override
+  String get cancelled => 'Annulee';
+
+  @override
+  String get language => 'Langue';
+
+  @override
+  String get french => 'Francais';
+
+  @override
+  String get arabic => 'Arabe';
+
+  @override
+  String get switchLanguage => 'Changer la langue';
+
+  @override
+  String get settings => 'Parametres';
+
+  @override
+  String get logout => 'Deconnexion';
+
+  @override
+  String get logoutConfirm => 'Voulez-vous vraiment vous deconnecter ?';
+
+  @override
+  String get cancel => 'Annuler';
+
+  @override
+  String get favorites => 'Favoris';
+
+  @override
+  String get addToFavorites => 'Ajouter aux favoris';
+
+  @override
+  String get removeFromFavorites => 'Retirer des favoris';
+
+  @override
+  String get noFavorites => 'Aucun favori';
+
+  @override
+  String get favoritesWillAppear => 'Vos restaurants favoris apparaitront ici';
+
+  @override
+  String get rateOrder => 'Evaluer la commande';
+
+  @override
+  String get rateYourExperience => 'Evaluez votre experience';
+
+  @override
+  String get writeReview => 'Ecrire un avis (optionnel)';
+
+  @override
+  String get submitReview => 'Soumettre l\'avis';
+
+  @override
+  String get reviewSubmitted => 'Avis soumis avec succes!';
+
+  @override
+  String get reviews => 'Avis';
+
+  @override
+  String get noReviews => 'Aucun avis';
+
+  @override
+  String get savedAddresses => 'Adresses enregistrees';
+
+  @override
+  String get addAddress => 'Ajouter une adresse';
+
+  @override
+  String get editAddress => 'Modifier l\'adresse';
+
+  @override
+  String get deleteAddress => 'Supprimer l\'adresse';
+
+  @override
+  String get addressLabel => 'Nom de l\'adresse (ex: Maison, Bureau)';
+
+  @override
+  String get addressDeleted => 'Adresse supprimee';
+
+  @override
+  String get selectAddress => 'Choisir une adresse';
+
+  @override
+  String get addNewAddress => 'Ajouter une nouvelle adresse';
+
+  @override
+  String get noSavedAddresses => 'Aucune adresse enregistree';
+
+  @override
+  String get promoCode => 'Code promo';
+
+  @override
+  String get enterPromoCode => 'Entrez votre code promo';
+
+  @override
+  String get apply => 'Appliquer';
+
+  @override
+  String get promoApplied => 'Code promo applique!';
+
+  @override
+  String get discount => 'Remise';
+
+  @override
+  String get removePromo => 'Retirer le code promo';
+
+  @override
+  String get promotions => 'Promotions';
+
+  @override
+  String get trackOrder => 'Suivre la commande';
+
+  @override
+  String get estimatedDelivery => 'Livraison estimee';
+
+  @override
+  String arrivingIn(String minutes) => 'Arrive dans ~$minutes min';
+
+  @override
+  String get orderPlaced => 'Commande passee';
+
+  @override
+  String get orderPickedUp => 'Commande recuperee';
+
+  @override
+  String get onTheWay => 'En route';
+
+  @override
+  String get callDelivery => 'Appeler le livreur';
+
+  @override
+  String get deliveryPersonName => 'Nom du livreur';
+
+  @override
+  String get deliveryPersonPhone => 'Tel du livreur';
+
+  @override
+  String get locationInitializing => 'Initialisation de la localisation...';
+
+  @override
+  String get locationError => 'Erreur de localisation';
+
+  @override
+  String get deliverySpace => 'Espace Livreur';
+
+  @override
+  String get available => 'Disponible';
+
+  @override
+  String get unavailable => 'Indisponible';
+
+  @override
+  String get canReceiveOrders => 'Vous pouvez recevoir des commandes';
+
+  @override
+  String get activateToReceiveOrders => 'Activez pour recevoir des commandes';
+
+  @override
+  String get currentPosition => 'Position actuelle';
+
+  @override
+  String get positionRequired => 'Position requise';
+
+  @override
+  String get positionRequiredDescription => 'La localisation est necessaire pour recevoir des commandes';
+
+  @override
+  String get refresh => 'Actualiser';
+
+  @override
+  String get openSettings => 'Ouvrir les parametres';
+
+  @override
+  String get restaurantSpace => 'Espace Restaurant';
+
+  @override
+  String get myMenu => 'Mon Menu';
+
+  @override
+  String get manageMenu => 'Gerer le menu';
+
+  @override
+  String get createMenu => 'Creer mon menu';
+
+  @override
+  String get noMenuItems => 'Aucun plat dans votre menu';
+
+  @override
+  String get startAddingDishes => 'Commencez par ajouter vos plats';
+
+  @override
+  String get approvedItems => 'Approuves';
+
+  @override
+  String get pendingItems => 'En attente';
+
+  @override
+  String get rejectedItems => 'Rejetes';
+
+  @override
+  String get availableItems => 'disponibles';
+
+  @override
+  String get pendingApprovalWarning => 'en attente d\'approbation';
+
+  @override
+  String get rejectedWarning => 'Verifiez les raisons';
+
+  @override
+  String get adminPanel => 'Tableau de Bord Admin';
+
+  @override
+  String get manageApprovalsAndConfig => 'Gerer les approbations et configurations';
+
+  @override
+  String get pendingUsers => 'Utilisateurs en attente';
+
+  @override
+  String get deliveryPersons => 'Livreurs';
+
+  @override
+  String get pendingDishes => 'Plats en attente';
+
+  @override
+  String get dishesToValidate => 'plats a valider';
+
+  @override
+  String get appConfig => 'Configuration App';
+
+  @override
+  String get appConfigSubtitle => 'Twilio, OTP, et autres parametres';
+
+  @override
+  String get totalPending => 'Total en attente';
+
+  @override
+  String get noActiveOrders => 'Aucune commande active';
+
+  @override
+  String get ordersSection => 'Commandes';
+
+  @override
+  String get acceptedOrders => 'Acceptees';
+
+  @override
+  String get inDelivery => 'En livraison';
+
+  @override
+  String get fastFood => 'Fast Food';
+
+  @override
+  String get moroccan => 'Marocain';
+
+  @override
+  String get pizza => 'Pizza';
+
+  @override
+  String get sushi => 'Sushi';
+
+  @override
+  String get burger => 'Burger';
+
+  @override
+  String get chicken => 'Poulet';
+
+  @override
+  String get tacos => 'Tacos';
+
+  @override
+  String get desserts => 'Desserts';
+
+  @override
+  String get recentSearches => 'Recherches recentes';
+
+  @override
+  String get admin => 'Administrateur';
 }
