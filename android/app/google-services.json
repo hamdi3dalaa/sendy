@@ -12,7 +12,16 @@
           "package_name": "com.example.sendy"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "341347912772-lv2556es6rllkgo0g0vqk84a0v2gplg3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.sendy",
+            "certificate_hash": "62ebc536b82b43d3aa7bac6509e1d45717b417d5"
+          }
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDM7F710kjbjPZ96QS_lxFIs6QtZu657EY"

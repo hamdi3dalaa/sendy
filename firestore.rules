@@ -1,0 +1,31 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // App config - read for all, write for admin only
+    match /app_config/{configId} {
+      allow read: if true;
+      allow write: if request.auth != null && 
+                     get(/databases/$(database)/documents/users/$(request.auth.uid)).data.userType == 'admin';
+    }
+    
+    // OTP codes - no direct access
+    match /otp_codes/{phoneNumber} {
+      allow read: if false;
+      allow write: if false;
+    }
+    
+    // OTP logs - admin only
+    match /otp_logs/{logId} {
+      allow read: if request.auth != null && 
+                    get(/databases/$(database)/documents/users/$(request.auth.uid)).data.userType == 'admin';
+      allow write: if false;
+    }
+    
+    // Users
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}

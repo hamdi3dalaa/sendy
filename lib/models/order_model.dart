@@ -1,4 +1,6 @@
-// lib/models/order_model.dart (Updated)
+// lib/models/order_model.dart
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 enum OrderStatus { pending, accepted, inProgress, delivered, cancelled }
 
 enum PaymentMethod { cash, card }
@@ -54,34 +56,75 @@ class OrderModel {
     this.deliveryAddress,
   });
 
+  // ✅ Universal DateTime parser (same as MenuItem)
+  static DateTime _parseDateTime(dynamic value) {
+    if (value == null) return DateTime.now();
+
+    try {
+      if (value is Timestamp) {
+        return value.toDate();
+      }
+      if (value is int) {
+        return DateTime.fromMillisecondsSinceEpoch(value);
+      }
+      if (value is String) {
+        return DateTime.parse(value);
+      }
+      if (value is Map) {
+        final seconds = value['_seconds'] ?? value['seconds'];
+        if (seconds != null) {
+          return DateTime.fromMillisecondsSinceEpoch(seconds * 1000);
+        }
+      }
+    } catch (e) {
+      print('⚠️ Error parsing DateTime in OrderModel: $e');
+    }
+
+    return DateTime.now();
+  }
+
+  static DateTime? _parseDateTimeNullable(dynamic value) {
+    if (value == null) return null;
+    return _parseDateTime(value);
+  }
+
   factory OrderModel.fromMap(Map<String, dynamic> map) {
-    return OrderModel(
-      orderId: map['orderId'] ?? '',
-      clientId: map['clientId'] ?? '',
-      restaurantId: map['restaurantId'] ?? '',
-      deliveryPersonId: map['deliveryPersonId'],
-      status: OrderStatus.values[map['status'] ?? 0],
-      items: (map['items'] as List).map((e) => OrderItem.fromMap(e)).toList(),
-      deliveryLocation: map['deliveryLocation'] ?? {},
-      restaurantLocation: map['restaurantLocation'] ?? {},
-      currentDeliveryLocation: map['currentDeliveryLocation'],
-      createdAt: DateTime.parse(map['createdAt']),
-      acceptedAt:
-          map['acceptedAt'] != null ? DateTime.parse(map['acceptedAt']) : null,
-      deliveredAt: map['deliveredAt'] != null
-          ? DateTime.parse(map['deliveredAt'])
-          : null,
-      subtotal: (map['subtotal'] ?? 0).toDouble(),
-      deliveryFee: (map['deliveryFee'] ?? 14.0).toDouble(),
-      serviceFee: (map['serviceFee'] ?? 2.0).toDouble(),
-      total: (map['total'] ?? 0).toDouble(),
-      paymentMethod: PaymentMethod.values[map['paymentMethod'] ?? 0],
-      paymentStatus: PaymentStatus.values[map['paymentStatus'] ?? 0],
-      clientComment: map['clientComment'],
-      clientName: map['clientName'],
-      clientPhone: map['clientPhone'],
-      deliveryAddress: map['deliveryAddress'],
-    );
+    try {
+      return OrderModel(
+        orderId: map['orderId'] ?? '',
+        clientId: map['clientId'] ?? '',
+        restaurantId: map['restaurantId'] ?? '',
+        deliveryPersonId: map['deliveryPersonId'],
+        status: OrderStatus.values[map['status'] ?? 0],
+        items: (map['items'] as List? ?? [])
+            .map((e) => OrderItem.fromMap(e as Map<String, dynamic>))
+            .toList(),
+        deliveryLocation:
+            map['deliveryLocation'] as Map<String, dynamic>? ?? {},
+        restaurantLocation:
+            map['restaurantLocation'] as Map<String, dynamic>? ?? {},
+        currentDeliveryLocation:
+            map['currentDeliveryLocation'] as Map<String, dynamic>?,
+        createdAt: _parseDateTime(map['createdAt']),
+        acceptedAt: _parseDateTimeNullable(map['acceptedAt']),
+        deliveredAt: _parseDateTimeNullable(map['deliveredAt']),
+        subtotal: (map['subtotal'] ?? 0).toDouble(),
+        deliveryFee: (map['deliveryFee'] ?? 14.0).toDouble(),
+        serviceFee: (map['serviceFee'] ?? 2.0).toDouble(),
+        total: (map['total'] ?? 0).toDouble(),
+        paymentMethod: PaymentMethod.values[map['paymentMethod'] ?? 0],
+        paymentStatus: PaymentStatus.values[map['paymentStatus'] ?? 0],
+        clientComment: map['clientComment'],
+        clientName: map['clientName'],
+        clientPhone: map['clientPhone'],
+        deliveryAddress: map['deliveryAddress'],
+      );
+    } catch (e, stackTrace) {
+      print('❌ Error parsing OrderModel: $e');
+      print('Stack trace: $stackTrace');
+      print('Order data: $map');
+      rethrow;
+    }
   }
 
   Map<String, dynamic> toMap() {
@@ -110,6 +153,57 @@ class OrderModel {
       'deliveryAddress': deliveryAddress,
     };
   }
+
+  OrderModel copyWith({
+    String? orderId,
+    String? clientId,
+    String? restaurantId,
+    String? deliveryPersonId,
+    OrderStatus? status,
+    List<OrderItem>? items,
+    Map<String, dynamic>? deliveryLocation,
+    Map<String, dynamic>? restaurantLocation,
+    Map<String, dynamic>? currentDeliveryLocation,
+    DateTime? createdAt,
+    DateTime? acceptedAt,
+    DateTime? deliveredAt,
+    double? subtotal,
+    double? deliveryFee,
+    double? serviceFee,
+    double? total,
+    PaymentMethod? paymentMethod,
+    PaymentStatus? paymentStatus,
+    String? clientComment,
+    String? clientName,
+    String? clientPhone,
+    String? deliveryAddress,
+  }) {
+    return OrderModel(
+      orderId: orderId ?? this.orderId,
+      clientId: clientId ?? this.clientId,
+      restaurantId: restaurantId ?? this.restaurantId,
+      deliveryPersonId: deliveryPersonId ?? this.deliveryPersonId,
+      status: status ?? this.status,
+      items: items ?? this.items,
+      deliveryLocation: deliveryLocation ?? this.deliveryLocation,
+      restaurantLocation: restaurantLocation ?? this.restaurantLocation,
+      currentDeliveryLocation:
+          currentDeliveryLocation ?? this.currentDeliveryLocation,
+      createdAt: createdAt ?? this.createdAt,
+      acceptedAt: acceptedAt ?? this.acceptedAt,
+      deliveredAt: deliveredAt ?? this.deliveredAt,
+      subtotal: subtotal ?? this.subtotal,
+      deliveryFee: deliveryFee ?? this.deliveryFee,
+      serviceFee: serviceFee ?? this.serviceFee,
+      total: total ?? this.total,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
+      paymentStatus: paymentStatus ?? this.paymentStatus,
+      clientComment: clientComment ?? this.clientComment,
+      clientName: clientName ?? this.clientName,
+      clientPhone: clientPhone ?? this.clientPhone,
+      deliveryAddress: deliveryAddress ?? this.deliveryAddress,
+    );
+  }
 }
 
 class OrderItem {
@@ -137,5 +231,17 @@ class OrderItem {
       'quantity': quantity,
       'price': price,
     };
+  }
+
+  OrderItem copyWith({
+    String? name,
+    int? quantity,
+    double? price,
+  }) {
+    return OrderItem(
+      name: name ?? this.name,
+      quantity: quantity ?? this.quantity,
+      price: price ?? this.price,
+    );
   }
 }

@@ -1,6 +1,6 @@
 // lib/screens/orders/order_details_screen.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:sendy/l10n/app_localizations.dart';
 import '../../models/order_model.dart';
 import '../../services/invoice_service.dart';
 import 'package:intl/intl.dart';

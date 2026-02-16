@@ -1,7 +1,7 @@
 // lib/screens/delivery/delivery_home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:sendy/l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/location_provider.dart';
 
@@ -18,13 +18,20 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
   @override
   void initState() {
     super.initState();
-    _initializeLocation();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeLocation();
+    });
   }
 
   Future<void> _initializeLocation() async {
-    final locationProvider =
-        Provider.of<LocationProvider>(context, listen: false);
-    await locationProvider.initializeLocation();
+    if (!mounted) return;
+
+    final locationProvider = context.read<LocationProvider>();
+
+    if (!locationProvider.isInitializing &&
+        locationProvider.currentPosition == null) {
+      await locationProvider.initializeLocation();
+    }
   }
 
   @override
@@ -44,79 +51,193 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
           ),
         ],
       ),
-      body: Center(
+      body: _buildBody(context, locationProvider, l10n),
+    );
+  }
+
+  Widget _buildBody(
+    BuildContext context,
+    LocationProvider locationProvider,
+    AppLocalizations l10n,
+  ) {
+    if (locationProvider.isInitializing) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF5722)),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Initialisation de la localisation...',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (locationProvider.error != null) {
+      return Center(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(
-                Icons.delivery_dining,
-                size: 100,
-                color: Color(0xFFFF5722),
+                Icons.location_off,
+                size: 80,
+                color: Colors.red,
               ),
               const SizedBox(height: 20),
               Text(
-                'Espace Livreur',
-                style: Theme.of(context).textTheme.headlineMedium,
+                'Erreur de localisation',
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
-              const SizedBox(height: 40),
-
-              // Availability Toggle
-              Card(
-                child: SwitchListTile(
-                  title: Text(
-                    _isAvailable ? 'Disponible' : 'Indisponible',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+              const SizedBox(height: 10),
+              Text(
+                locationProvider.error!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.grey),
+              ),
+              const SizedBox(height: 30),
+              ElevatedButton.icon(
+                onPressed: () => locationProvider.initializeLocation(),
+                icon: const Icon(Icons.refresh),
+                label: const Text('Réessayer'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFF5722),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 30,
+                    vertical: 15,
                   ),
-                  subtitle: Text(
-                    _isAvailable
-                        ? 'Vous pouvez recevoir des commandes'
-                        : 'Activez pour recevoir des commandes',
-                  ),
-                  value: _isAvailable,
-                  activeColor: const Color(0xFFFF5722),
-                  onChanged: (value) {
-                    setState(() {
-                      _isAvailable = value;
-                      if (_isAvailable) {
-                        locationProvider.startTracking();
-                      } else {
-                        locationProvider.stopTracking();
-                      }
-                    });
+                ),
+              ),
+              const SizedBox(height: 10),
+              if (locationProvider.error!.contains('paramètres'))
+                TextButton.icon(
+                  onPressed: () {
+                    if (locationProvider.error!.contains('définitivement')) {
+                      locationProvider.openAppSettings();
+                    } else {
+                      locationProvider.openLocationSettings();
+                    }
                   },
+                  icon: const Icon(Icons.settings),
+                  label: const Text('Ouvrir les paramètres'),
                 ),
-              ),
-              const SizedBox(height: 20),
-
-              // Current Location
-              if (locationProvider.currentPosition != null)
-                Card(
-                  child: ListTile(
-                    leading:
-                        const Icon(Icons.location_on, color: Color(0xFFFF5722)),
-                    title: const Text('Position actuelle'),
-                    subtitle: Text(
-                      'Lat: ${locationProvider.currentPosition!.latitude.toStringAsFixed(4)}\n'
-                      'Lng: ${locationProvider.currentPosition!.longitude.toStringAsFixed(4)}',
-                    ),
-                  ),
-                ),
-              const SizedBox(height: 20),
-
-              // Orders count placeholder
-              Text(
-                l10n.orders,
-                style: const TextStyle(fontSize: 18, color: Colors.grey),
-              ),
             ],
           ),
         ),
+      );
+    }
+
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.delivery_dining,
+              size: 100,
+              color: Color(0xFFFF5722),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Espace Livreur',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            const SizedBox(height: 40),
+            Card(
+              elevation: 4,
+              child: SwitchListTile(
+                title: Text(
+                  _isAvailable ? 'Disponible' : 'Indisponible',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                subtitle: Text(
+                  _isAvailable
+                      ? 'Vous pouvez recevoir des commandes'
+                      : 'Activez pour recevoir des commandes',
+                ),
+                value: _isAvailable,
+                activeColor: const Color(0xFFFF5722),
+                onChanged: locationProvider.currentPosition == null
+                    ? null
+                    : (value) {
+                        setState(() {
+                          _isAvailable = value;
+                          if (_isAvailable) {
+                            locationProvider.startTracking();
+                          } else {
+                            locationProvider.stopTracking();
+                          }
+                        });
+                      },
+              ),
+            ),
+            const SizedBox(height: 20),
+            if (locationProvider.currentPosition != null)
+              Card(
+                elevation: 4,
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.location_on,
+                    color: Color(0xFFFF5722),
+                  ),
+                  title: const Text('Position actuelle'),
+                  subtitle: Text(
+                    'Lat: ${locationProvider.currentPosition!.latitude.toStringAsFixed(4)}\n'
+                    'Lng: ${locationProvider.currentPosition!.longitude.toStringAsFixed(4)}',
+                  ),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.refresh),
+                    onPressed: () => locationProvider.initializeLocation(),
+                    tooltip: 'Actualiser',
+                  ),
+                ),
+              )
+            else
+              Card(
+                elevation: 4,
+                color: Colors.orange.shade50,
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.location_searching,
+                    color: Colors.orange,
+                  ),
+                  title: const Text('Position requise'),
+                  subtitle: const Text(
+                    'La localisation est nécessaire pour recevoir des commandes',
+                  ),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.refresh),
+                    onPressed: () => locationProvider.initializeLocation(),
+                  ),
+                ),
+              ),
+            const SizedBox(height: 20),
+            Text(
+              l10n.orders,
+              style: const TextStyle(fontSize: 18, color: Colors.grey),
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    if (_isAvailable) {
+      context.read<LocationProvider>().stopTracking();
+    }
+    super.dispose();
   }
 }

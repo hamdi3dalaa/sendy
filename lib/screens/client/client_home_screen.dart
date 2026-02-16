@@ -1,25 +1,89 @@
 // lib/screens/client/client_home_screen.dart
+// FIXED: Removed auto-load, added manual refresh button
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/client_provider.dart';
+import 'restaurants_list_screen.dart';
+import 'my_orders_screen.dart';
 
-class ClientHomeScreen extends StatelessWidget {
+class ClientHomeScreen extends StatefulWidget {
   const ClientHomeScreen({Key? key}) : super(key: key);
 
   @override
+  State<ClientHomeScreen> createState() => _ClientHomeScreenState();
+}
+
+class _ClientHomeScreenState extends State<ClientHomeScreen> {
+  int _selectedIndex = 0;
+
+  final List<Widget> _screens = [
+    const RestaurantsListScreen(),
+    const MyOrdersScreen(),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    // ✅ REMOVED: Don't auto-load, let RestaurantsListScreen handle it
+    // The child screen will load when needed
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final authProvider = Provider.of<AuthProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.appTitle),
+        title: const Text('SENDY'),
         backgroundColor: const Color(0xFFFF5722),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.language),
-            onPressed: () => _showLanguageDialog(context, authProvider),
+          // Cart icon with badge
+          Stack(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.shopping_cart),
+                onPressed: () {
+                  // Navigate to cart
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Panier - Fonctionnalité à venir'),
+                    ),
+                  );
+                },
+              ),
+              Positioned(
+                right: 8,
+                top: 8,
+                child: Consumer<ClientProvider>(
+                  builder: (context, clientProvider, _) {
+                    final count = clientProvider.cartItemCount;
+                    if (count == 0) return const SizedBox();
+                    return Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
+                      child: Text(
+                        count.toString(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
           IconButton(
             icon: const Icon(Icons.logout),
@@ -27,74 +91,25 @@ class ClientHomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.shopping_bag,
-              size: 100,
-              color: Color(0xFFFF5722),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Bienvenue Client!',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            const SizedBox(height: 10),
-            Text(
-              l10n.orders,
-              style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 40),
-            ElevatedButton.icon(
-              onPressed: () {
-                // Navigate to order screen
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.newOrder)),
-                );
-              },
-              icon: const Icon(Icons.add_shopping_cart),
-              label: Text(l10n.newOrder),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF5722),
-                foregroundColor: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showLanguageDialog(BuildContext context, AuthProvider authProvider) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Select Language / اختر اللغة'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Text('🇫🇷', style: TextStyle(fontSize: 30)),
-              title: const Text('Français'),
-              onTap: () {
-                authProvider.changeLanguage('fr');
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Text('🇸🇦', style: TextStyle(fontSize: 30)),
-              title: const Text('العربية'),
-              onTap: () {
-                authProvider.changeLanguage('ar');
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
+      body: _screens[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        selectedItemColor: const Color(0xFFFF5722),
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.restaurant),
+            label: 'Restaurants',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.receipt_long),
+            label: 'Mes Commandes',
+          ),
+        ],
       ),
     );
   }
