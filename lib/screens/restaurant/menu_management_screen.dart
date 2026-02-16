@@ -1,6 +1,7 @@
 // lib/screens/restaurant/menu_management_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sendy/l10n/app_localizations.dart';
 import '../../providers/menu_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/menu_item_model.dart';
@@ -34,12 +35,13 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final authProvider = Provider.of<AuthProvider>(context);
     final menuProvider = Provider.of<MenuProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gestion du Menu'),
+        title: Text(l10n.menuManagement),
         backgroundColor: const Color(0xFFFF5722),
       ),
       body: menuProvider.isLoading
@@ -61,13 +63,14 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
           }
         },
         icon: const Icon(Icons.add),
-        label: const Text('Ajouter un plat'),
+        label: Text(l10n.addDish),
         backgroundColor: const Color(0xFFFF5722),
       ),
     );
   }
 
   Widget _buildMenuList(MenuProvider menuProvider, AuthProvider authProvider) {
+    final l10n = AppLocalizations.of(context)!;
     if (menuProvider.menuItems.isEmpty) {
       return Center(
         child: Column(
@@ -75,14 +78,14 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
           children: [
             Icon(Icons.restaurant_menu, size: 80, color: Colors.grey[400]),
             const SizedBox(height: 16),
-            const Text(
-              'Aucun plat dans le menu',
-              style: TextStyle(fontSize: 18, color: Colors.grey),
+            Text(
+              l10n.noDishesInMenu,
+              style: const TextStyle(fontSize: 18, color: Colors.grey),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Ajoutez votre premier plat',
-              style: TextStyle(color: Colors.grey),
+            Text(
+              l10n.addFirstDish,
+              style: const TextStyle(color: Colors.grey),
             ),
           ],
         ),
@@ -93,14 +96,14 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
       length: 3,
       child: Column(
         children: [
-          const TabBar(
-            labelColor: Color(0xFFFF5722),
+          TabBar(
+            labelColor: const Color(0xFFFF5722),
             unselectedLabelColor: Colors.grey,
-            indicatorColor: Color(0xFFFF5722),
+            indicatorColor: const Color(0xFFFF5722),
             tabs: [
-              Tab(text: 'Approuvés'),
-              Tab(text: 'En attente'),
-              Tab(text: 'Rejetés'),
+              Tab(text: l10n.approvedItems),
+              Tab(text: l10n.pendingItems),
+              Tab(text: l10n.rejectedItems),
             ],
           ),
           Expanded(
@@ -118,11 +121,12 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
   }
 
   Widget _buildItemsList(List<MenuItem> items, AuthProvider authProvider) {
+    final l10n = AppLocalizations.of(context)!;
     if (items.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
-          'Aucun plat dans cette catégorie',
-          style: TextStyle(color: Colors.grey),
+          l10n.noDishesInCategory,
+          style: const TextStyle(color: Colors.grey),
         ),
       );
     }
@@ -138,6 +142,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
   }
 
   Widget _buildMenuItem(MenuItem item, AuthProvider authProvider) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
       elevation: 2,
@@ -185,7 +190,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${item.price.toStringAsFixed(2)} €',
+                  '${item.price.toStringAsFixed(2)} ${l10n.dhs}',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Color(0xFFFF5722),
@@ -196,7 +201,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                   Padding(
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
-                      'Raison: ${item.rejectionReason}',
+                      '${l10n.reason}: ${item.rejectionReason}',
                       style: const TextStyle(
                         color: Colors.red,
                         fontSize: 12,
@@ -205,7 +210,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                   ),
               ],
             ),
-            trailing: _buildStatusBadge(item.status),
+            trailing: _buildStatusBadge(item.status, l10n),
           ),
           if (item.status == MenuItemStatus.approved)
             Padding(
@@ -215,7 +220,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                 children: [
                   Row(
                     children: [
-                      const Text('Disponible'),
+                      Text(l10n.available),
                       Switch(
                         value: item.isAvailable,
                         activeColor: const Color(0xFFFF5722),
@@ -273,7 +278,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
     );
   }
 
-  Widget _buildStatusBadge(MenuItemStatus status) {
+  Widget _buildStatusBadge(MenuItemStatus status, AppLocalizations l10n) {
     Color color;
     String text;
     IconData icon;
@@ -281,17 +286,17 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
     switch (status) {
       case MenuItemStatus.approved:
         color = Colors.green;
-        text = 'Approuvé';
+        text = l10n.approved;
         icon = Icons.check_circle;
         break;
       case MenuItemStatus.pending:
         color = Colors.orange;
-        text = 'En attente';
+        text = l10n.pending;
         icon = Icons.pending;
         break;
       case MenuItemStatus.rejected:
         color = Colors.red;
-        text = 'Rejeté';
+        text = l10n.rejected;
         icon = Icons.cancel;
         break;
     }

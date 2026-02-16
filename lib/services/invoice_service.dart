@@ -3,10 +3,11 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import '../models/order_model.dart';
+import '../l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 class InvoiceService {
-  static Future<void> generateAndDownloadInvoice(OrderModel order) async {
+  static Future<void> generateAndDownloadInvoice(OrderModel order, AppLocalizations l10n) async {
     final pdf = pw.Document();
 
     pdf.addPage(
@@ -32,7 +33,7 @@ class InvoiceService {
                         ),
                       ),
                       pw.Text(
-                        'Service de livraison',
+                        l10n.deliveryService,
                         style: const pw.TextStyle(fontSize: 12),
                       ),
                     ],
@@ -41,7 +42,7 @@ class InvoiceService {
                     crossAxisAlignment: pw.CrossAxisAlignment.end,
                     children: [
                       pw.Text(
-                        'FACTURE',
+                        l10n.invoiceTitle,
                         style: pw.TextStyle(
                           fontSize: 24,
                           fontWeight: pw.FontWeight.bold,
@@ -73,16 +74,16 @@ class InvoiceService {
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
                     pw.Text(
-                      'Informations Client',
+                      l10n.clientInfo,
                       style: pw.TextStyle(
                         fontSize: 14,
                         fontWeight: pw.FontWeight.bold,
                       ),
                     ),
                     pw.SizedBox(height: 5),
-                    pw.Text('Nom: ${order.clientName ?? "Client"}'),
-                    pw.Text('Téléphone: ${order.clientPhone ?? "N/A"}'),
-                    pw.Text('Adresse: ${order.deliveryAddress ?? "N/A"}'),
+                    pw.Text('${l10n.name}: ${order.clientName ?? l10n.client}'),
+                    pw.Text('${l10n.phone}: ${order.clientPhone ?? "N/A"}'),
+                    pw.Text('${l10n.address}: ${order.deliveryAddress ?? "N/A"}'),
                   ],
                 ),
               ),
@@ -103,7 +104,7 @@ class InvoiceService {
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
                       pw.Text(
-                        'Commentaire du client:',
+                        '${l10n.clientComment}:',
                         style: pw.TextStyle(
                           fontSize: 12,
                           fontWeight: pw.FontWeight.bold,
@@ -123,14 +124,14 @@ class InvoiceService {
 
               // Items Table
               pw.Text(
-                'Détails de la commande',
+                l10n.orderDetails,
                 style: pw.TextStyle(
                   fontSize: 16,
                   fontWeight: pw.FontWeight.bold,
                 ),
               ),
               pw.SizedBox(height: 10),
-              _buildItemsTable(order),
+              _buildItemsTable(order, l10n),
               pw.SizedBox(height: 20),
 
               // Total Section
@@ -140,13 +141,14 @@ class InvoiceService {
                   width: 250,
                   child: pw.Column(
                     children: [
-                      _buildTotalRow('Sous-total', order.subtotal),
-                      _buildTotalRow('Frais de livraison', order.deliveryFee),
-                      _buildTotalRow('Frais de service', order.serviceFee),
+                      _buildTotalRow(l10n.subtotal, order.subtotal, l10n),
+                      _buildTotalRow(l10n.deliveryFee, order.deliveryFee, l10n),
+                      _buildTotalRow(l10n.serviceFee, order.serviceFee, l10n),
                       pw.Divider(thickness: 2),
                       _buildTotalRow(
-                        'TOTAL',
+                        l10n.total,
                         order.total,
+                        l10n,
                         isTotal: true,
                       ),
                     ],
@@ -167,13 +169,13 @@ class InvoiceService {
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   children: [
                     pw.Text(
-                      'Mode de paiement:',
+                      '${l10n.paymentMode}:',
                       style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                     ),
                     pw.Text(
                       order.paymentMethod == PaymentMethod.cash
-                          ? 'Espèces à la livraison'
-                          : 'Carte bancaire',
+                          ? l10n.cashOnDeliveryInvoice
+                          : l10n.cardPaymentInvoice,
                     ),
                   ],
                 ),
@@ -184,7 +186,7 @@ class InvoiceService {
               pw.Divider(),
               pw.Center(
                 child: pw.Text(
-                  'Merci d\'avoir choisi Sendy!',
+                  l10n.thankYou,
                   style: pw.TextStyle(
                     fontSize: 12,
                     fontStyle: pw.FontStyle.italic,
@@ -203,7 +205,7 @@ class InvoiceService {
     );
   }
 
-  static pw.Widget _buildItemsTable(OrderModel order) {
+  static pw.Widget _buildItemsTable(OrderModel order, AppLocalizations l10n) {
     return pw.Table(
       border: pw.TableBorder.all(color: PdfColors.grey400),
       children: [
@@ -213,10 +215,10 @@ class InvoiceService {
             color: PdfColor.fromHex('#FF5722'),
           ),
           children: [
-            _buildTableCell('Article', isHeader: true),
-            _buildTableCell('Qté', isHeader: true),
-            _buildTableCell('Prix Unit.', isHeader: true),
-            _buildTableCell('Total', isHeader: true),
+            _buildTableCell(l10n.articleHeader, isHeader: true),
+            _buildTableCell(l10n.qty, isHeader: true),
+            _buildTableCell(l10n.unitPrice, isHeader: true),
+            _buildTableCell(l10n.total, isHeader: true),
           ],
         ),
         // Items
@@ -224,9 +226,9 @@ class InvoiceService {
               children: [
                 _buildTableCell(item.name),
                 _buildTableCell(item.quantity.toString()),
-                _buildTableCell('${item.price.toStringAsFixed(2)} DHs'),
+                _buildTableCell('${item.price.toStringAsFixed(2)} ${l10n.dhs}'),
                 _buildTableCell(
-                    '${(item.price * item.quantity).toStringAsFixed(2)} DHs'),
+                    '${(item.price * item.quantity).toStringAsFixed(2)} ${l10n.dhs}'),
               ],
             )),
       ],
@@ -248,7 +250,7 @@ class InvoiceService {
     );
   }
 
-  static pw.Widget _buildTotalRow(String label, double amount,
+  static pw.Widget _buildTotalRow(String label, double amount, AppLocalizations l10n,
       {bool isTotal = false}) {
     return pw.Padding(
       padding: const pw.EdgeInsets.symmetric(vertical: 4),
@@ -263,7 +265,7 @@ class InvoiceService {
             ),
           ),
           pw.Text(
-            '${amount.toStringAsFixed(2)} DHs',
+            '${amount.toStringAsFixed(2)} ${l10n.dhs}',
             style: pw.TextStyle(
               fontSize: isTotal ? 14 : 12,
               fontWeight: isTotal ? pw.FontWeight.bold : pw.FontWeight.normal,

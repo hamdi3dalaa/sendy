@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../providers/menu_provider.dart';
 import '../../providers/auth_provider.dart';
+import 'package:sendy/l10n/app_localizations.dart';
 
 class AddMenuItemScreen extends StatefulWidget {
   const AddMenuItemScreen({Key? key}) : super(key: key);
@@ -49,6 +50,7 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
   }
 
   Future<void> _pickImage() async {
+    final l10n = AppLocalizations.of(context)!;
     // Dismiss keyboard before opening picker
     FocusScope.of(context).unfocus();
 
@@ -59,13 +61,13 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
     final pickedFile = await showDialog<XFile?>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Choisir une image'),
+        title: Text(l10n.chooseImage),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: const Text('Prendre une photo'),
+              title: Text(l10n.takePhoto),
               onTap: () async {
                 Navigator.pop(
                   context,
@@ -80,7 +82,7 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: const Text('Choisir dans la galerie'),
+              title: Text(l10n.chooseFromGallery),
               onTap: () async {
                 Navigator.pop(
                   context,
@@ -106,6 +108,7 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
   }
 
   Future<void> _submitForm() async {
+    final l10n = AppLocalizations.of(context)!;
     // Dismiss keyboard
     FocusScope.of(context).unfocus();
 
@@ -119,7 +122,7 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
     if (restaurantId == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Erreur: Utilisateur non connecté')),
+          SnackBar(content: Text(l10n.userNotConnected)),
         );
       }
       return;
@@ -145,16 +148,16 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
 
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content:
-                Text('Plat ajouté ! En attente d\'approbation par l\'admin.'),
+                Text(l10n.dishAddedPending),
             backgroundColor: Colors.orange,
-            duration: Duration(seconds: 3),
+            duration: const Duration(seconds: 3),
           ),
         );
         Navigator.pop(context, true);
       } else {
-        final error = context.read<MenuProvider>().error ?? 'Erreur inconnue';
+        final error = context.read<MenuProvider>().error ?? l10n.unknownError;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(error),
@@ -168,12 +171,13 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       // Dismiss keyboard when tapping outside
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Ajouter un plat'),
+          title: Text(l10n.addDish),
           backgroundColor: const Color(0xFFFF5722),
         ),
         body: SingleChildScrollView(
@@ -209,12 +213,12 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
                                   size: 50, color: Colors.grey[600]),
                               const SizedBox(height: 8),
                               Text(
-                                'Ajouter une photo',
+                                l10n.addPhoto,
                                 style: TextStyle(color: Colors.grey[600]),
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                '(En attente d\'approbation)',
+                                l10n.pendingApprovalNote,
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Colors.orange[700],
@@ -230,10 +234,10 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
                 TextFormField(
                   controller: _nameController,
                   focusNode: _nameFocus,
-                  decoration: const InputDecoration(
-                    labelText: 'Nom du plat *',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.restaurant),
+                  decoration: InputDecoration(
+                    labelText: l10n.dishName,
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.restaurant),
                   ),
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (_) {
@@ -241,10 +245,10 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
                   },
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Veuillez entrer un nom';
+                      return l10n.enterNameValidation;
                     }
                     if (value.trim().length < 3) {
-                      return 'Le nom doit contenir au moins 3 caractères';
+                      return l10n.nameTooShort;
                     }
                     return null;
                   },
@@ -255,10 +259,10 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
                 TextFormField(
                   controller: _descriptionController,
                   focusNode: _descriptionFocus,
-                  decoration: const InputDecoration(
-                    labelText: 'Description *',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.description),
+                  decoration: InputDecoration(
+                    labelText: l10n.descriptionRequired,
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.description),
                     alignLabelWithHint: true,
                   ),
                   maxLines: 3,
@@ -268,10 +272,10 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
                   },
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Veuillez entrer une description';
+                      return l10n.enterDescriptionValidation;
                     }
                     if (value.trim().length < 10) {
-                      return 'La description doit contenir au moins 10 caractères';
+                      return l10n.descriptionTooShort;
                     }
                     return null;
                   },
@@ -281,10 +285,10 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
                 // Category
                 DropdownButtonFormField<String>(
                   value: _selectedCategory,
-                  decoration: const InputDecoration(
-                    labelText: 'Catégorie',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.category),
+                  decoration: InputDecoration(
+                    labelText: l10n.category,
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.category),
                   ),
                   items: _categories.map((category) {
                     return DropdownMenuItem(
@@ -306,10 +310,10 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
                 TextFormField(
                   controller: _priceController,
                   focusNode: _priceFocus,
-                  decoration: const InputDecoration(
-                    labelText: 'Prix (€) *',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.euro),
+                  decoration: InputDecoration(
+                    labelText: l10n.priceRequired,
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.euro),
                   ),
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
@@ -319,15 +323,15 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
                   },
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Veuillez entrer un prix';
+                      return l10n.enterPriceValidation;
                     }
                     final price =
                         double.tryParse(value.trim().replaceAll(',', '.'));
                     if (price == null) {
-                      return 'Prix invalide';
+                      return l10n.invalidPrice;
                     }
                     if (price <= 0) {
-                      return 'Le prix doit être supérieur à 0';
+                      return l10n.pricePositive;
                     }
                     return null;
                   },
@@ -345,7 +349,7 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            'Votre plat sera vérifié par un administrateur avant d\'être publié.',
+                            l10n.dishVerificationNote,
                             style: TextStyle(
                               fontSize: 13,
                               color: Colors.orange[900],
@@ -379,9 +383,9 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
                                 AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                         )
-                      : const Text(
-                          'Ajouter le plat',
-                          style: TextStyle(
+                      : Text(
+                          l10n.addTheDish,
+                          style: const TextStyle(
                               fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                 ),

@@ -560,4 +560,232 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get admin => 'Administrateur';
+
+  @override
+  String get menuManagement => 'Gestion du Menu';
+
+  @override
+  String get addDish => 'Ajouter un plat';
+
+  @override
+  String get noDishesInMenu => 'Aucun plat dans le menu';
+
+  @override
+  String get addFirstDish => 'Ajoutez votre premier plat';
+
+  @override
+  String get noDishesInCategory => 'Aucun plat dans cette categorie';
+
+  @override
+  String get confirmDeletion => 'Confirmer la suppression';
+
+  @override
+  String confirmDeleteDishMessage(String name) => 'Voulez-vous vraiment supprimer "$name" ?';
+
+  @override
+  String get delete => 'Supprimer';
+
+  @override
+  String get dishDeletedSuccess => 'Plat supprime avec succes';
+
+  @override
+  String get noPendingDishes => 'Aucun plat en attente';
+
+  @override
+  String get pendingStatusLabel => 'EN ATTENTE';
+
+  @override
+  String get description => 'Description';
+
+  @override
+  String get price => 'Prix';
+
+  @override
+  String get category => 'Categorie';
+
+  @override
+  String get createdOn => 'Cree le';
+
+  @override
+  String get tapToEnlarge => 'Toucher l\'image pour agrandir';
+
+  @override
+  String get noImage => 'Aucune image';
+
+  @override
+  String get imageLoadError => 'Erreur de chargement';
+
+  @override
+  String get noImageWarning => 'Ce plat n\'a pas d\'image. Recommande de demander au restaurant d\'en ajouter une.';
+
+  @override
+  String get confirmApproval => 'Confirmer l\'approbation';
+
+  @override
+  String get confirmApproveDish => 'Voulez-vous approuver ce plat ?';
+
+  @override
+  String get approve => 'Approuver';
+
+  @override
+  String get reject => 'Rejeter';
+
+  @override
+  String get dishApprovedSuccess => 'Plat approuve avec succes';
+
+  @override
+  String get dishRejected => 'Plat rejete';
+
+  @override
+  String get rejectDish => 'Rejeter le plat';
+
+  @override
+  String get rejectionReason => 'Raison du rejet *';
+
+  @override
+  String get rejectionReasonHint => 'Ex: Image de mauvaise qualite, titre inapproprie...';
+
+  @override
+  String get enterReason => 'Veuillez entrer une raison';
+
+  @override
+  String get dishName => 'Nom du plat *';
+
+  @override
+  String get descriptionRequired => 'Description *';
+
+  @override
+  String get priceRequired => 'Prix (DHs) *';
+
+  @override
+  String get addPhoto => 'Ajouter une photo';
+
+  @override
+  String get pendingApprovalNote => '(En attente d\'approbation)';
+
+  @override
+  String get enterNameValidation => 'Veuillez entrer un nom';
+
+  @override
+  String get nameTooShort => 'Le nom doit contenir au moins 3 caracteres';
+
+  @override
+  String get enterDescriptionValidation => 'Veuillez entrer une description';
+
+  @override
+  String get descriptionTooShort => 'La description doit contenir au moins 10 caracteres';
+
+  @override
+  String get enterPriceValidation => 'Veuillez entrer un prix';
+
+  @override
+  String get invalidPrice => 'Prix invalide';
+
+  @override
+  String get pricePositive => 'Le prix doit etre superieur a 0';
+
+  @override
+  String get dishAddedPending => 'Plat ajoute ! En attente d\'approbation par l\'admin.';
+
+  @override
+  String get unknownError => 'Erreur inconnue';
+
+  @override
+  String get addTheDish => 'Ajouter le plat';
+
+  @override
+  String get dishVerificationNote => 'Votre plat sera verifie par un administrateur avant d\'etre publie.';
+
+  @override
+  String get chooseImage => 'Choisir une image';
+
+  @override
+  String get takePhoto => 'Prendre une photo';
+
+  @override
+  String get chooseFromGallery => 'Choisir dans la galerie';
+
+  @override
+  String get editDish => 'Modifier le plat';
+
+  @override
+  String get changePhoto => 'Changer la photo';
+
+  @override
+  String get newPhoto => 'Nouvelle photo';
+
+  @override
+  String get newPhotoPending => 'La nouvelle photo sera en attente d\'approbation';
+
+  @override
+  String get dishModifiedPending => 'Plat modifie ! Nouvelle photo en attente d\'approbation.';
+
+  @override
+  String get dishModifiedSuccess => 'Plat modifie avec succes !';
+
+  @override
+  String get modificationError => 'Erreur lors de la modification';
+
+  @override
+  String get saveChanges => 'Enregistrer les modifications';
+
+  @override
+  String get userNotConnected => 'Erreur: Utilisateur non connecte';
+
+  @override
+  String get reason => 'Raison';
+
+  @override
+  String get manageMyMenu => 'Gerer mon menu';
+
+  @override
+  String get deliveryService => 'Service de livraison';
+
+  @override
+  String get invoiceTitle => 'FACTURE';
+
+  @override
+  String get clientInfo => 'Informations Client';
+
+  @override
+  String get name => 'Nom';
+
+  @override
+  String get phone => 'Telephone';
+
+  @override
+  String get address => 'Adresse';
+
+  @override
+  String get articleHeader => 'Article';
+
+  @override
+  String get qty => 'Qte';
+
+  @override
+  String get unitPrice => 'Prix Unit.';
+
+  @override
+  String get paymentMode => 'Mode de paiement';
+
+  @override
+  String get cashOnDeliveryInvoice => 'Especes a la livraison';
+
+  @override
+  String get cardPaymentInvoice => 'Carte bancaire';
+
+  @override
+  String get thankYou => 'Merci d\'avoir choisi Sendy!';
+
+  @override
+  String promoMinOrder(String amount) => 'Commande minimum: $amount DHs';
+
+  @override
+  String get promoExpired => 'Code promo expire';
+
+  @override
+  String get promoInvalid => 'Code promo invalide';
+
+  @override
+  String get validationError => 'Erreur de validation';
 }

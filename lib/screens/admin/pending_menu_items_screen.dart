@@ -5,6 +5,7 @@ import '../../providers/admin_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/menu_item_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:sendy/l10n/app_localizations.dart';
 
 class PendingMenuItemsScreen extends StatefulWidget {
   const PendingMenuItemsScreen({Key? key}) : super(key: key);
@@ -36,12 +37,13 @@ class _PendingMenuItemsScreenState extends State<PendingMenuItemsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final adminProvider = Provider.of<AdminProvider>(context);
     final items = adminProvider.pendingMenuItems;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Plats en attente'),
+        title: Text(l10n.pendingDishes),
         backgroundColor: const Color(0xFFFF5722),
       ),
       body: items.isEmpty
@@ -53,7 +55,7 @@ class _PendingMenuItemsScreenState extends State<PendingMenuItemsScreen> {
                       size: 80, color: Colors.grey[400]),
                   const SizedBox(height: 16),
                   Text(
-                    'Aucun plat en attente',
+                    l10n.noPendingDishes,
                     style: TextStyle(fontSize: 18, color: Colors.grey[600]),
                   ),
                 ],
@@ -67,7 +69,7 @@ class _PendingMenuItemsScreenState extends State<PendingMenuItemsScreen> {
                 return _MenuItemApprovalCard(
                   menuItem: item,
                   restaurantName:
-                      _restaurantNames[item.restaurantId] ?? 'Chargement...',
+                      _restaurantNames[item.restaurantId] ?? '...',
                 );
               },
             ),
@@ -86,6 +88,7 @@ class _MenuItemApprovalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 4,
@@ -139,9 +142,9 @@ class _MenuItemApprovalCard extends StatelessWidget {
                     color: Colors.orange.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Text(
-                    'EN ATTENTE',
-                    style: TextStyle(
+                  child: Text(
+                    l10n.pendingStatusLabel,
+                    style: const TextStyle(
                       color: Colors.orange,
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
@@ -169,12 +172,12 @@ class _MenuItemApprovalCard extends StatelessWidget {
                   ),
                   errorWidget: (context, url, error) => Container(
                     color: Colors.grey[200],
-                    child: const Column(
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.error, size: 50, color: Colors.red),
-                        SizedBox(height: 8),
-                        Text('Erreur de chargement'),
+                        const Icon(Icons.error, size: 50, color: Colors.red),
+                        const SizedBox(height: 8),
+                        Text(l10n.imageLoadError),
                       ],
                     ),
                   ),
@@ -189,7 +192,7 @@ class _MenuItemApprovalCard extends StatelessWidget {
                   Icon(Icons.zoom_in, size: 16, color: Colors.grey[600]),
                   const SizedBox(width: 4),
                   Text(
-                    'Toucher l\'image pour agrandir',
+                    l10n.tapToEnlarge,
                     style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                   ),
                 ],
@@ -206,7 +209,7 @@ class _MenuItemApprovalCard extends StatelessWidget {
                       size: 60, color: Colors.grey[400]),
                   const SizedBox(height: 8),
                   Text(
-                    'Aucune image',
+                    l10n.noImage,
                     style: TextStyle(color: Colors.grey[600]),
                   ),
                 ],
@@ -222,9 +225,9 @@ class _MenuItemApprovalCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Description
-                const Text(
-                  'Description',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                Text(
+                  l10n.description,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -238,8 +241,8 @@ class _MenuItemApprovalCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _buildInfoCard(
-                        'Prix',
-                        '${menuItem.price.toStringAsFixed(2)} €',
+                        l10n.price,
+                        '${menuItem.price.toStringAsFixed(2)} ${l10n.dhs}',
                         Icons.euro,
                         Colors.green,
                       ),
@@ -247,7 +250,7 @@ class _MenuItemApprovalCard extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _buildInfoCard(
-                        'Catégorie',
+                        l10n.category,
                         menuItem.category,
                         Icons.category,
                         Colors.blue,
@@ -258,7 +261,7 @@ class _MenuItemApprovalCard extends StatelessWidget {
                 const SizedBox(height: 12),
                 _buildInfoRow(
                   Icons.calendar_today,
-                  'Créé le',
+                  l10n.createdOn,
                   _formatDate(menuItem.createdAt),
                 ),
               ],
@@ -279,10 +282,10 @@ class _MenuItemApprovalCard extends StatelessWidget {
                 children: [
                   Icon(Icons.warning_amber, color: Colors.orange[700]),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'Ce plat n\'a pas d\'image. Recommandé de demander au restaurant d\'en ajouter une.',
-                      style: TextStyle(fontSize: 12),
+                      l10n.noImageWarning,
+                      style: const TextStyle(fontSize: 12),
                     ),
                   ),
                 ],
@@ -301,7 +304,7 @@ class _MenuItemApprovalCard extends StatelessWidget {
                   child: OutlinedButton.icon(
                     onPressed: () => _showRejectDialog(context),
                     icon: const Icon(Icons.close),
-                    label: const Text('Rejeter'),
+                    label: Text(l10n.reject),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.red,
                       side: const BorderSide(color: Colors.red),
@@ -314,7 +317,7 @@ class _MenuItemApprovalCard extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: () => _approveMenuItem(context),
                     icon: const Icon(Icons.check),
-                    label: const Text('Approuver'),
+                    label: Text(l10n.approve),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       foregroundColor: Colors.white,
@@ -429,33 +432,34 @@ class _MenuItemApprovalCard extends StatelessWidget {
   }
 
   Future<void> _approveMenuItem(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Confirmer l\'approbation'),
+        title: Text(l10n.confirmApproval),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Voulez-vous approuver ce plat ?'),
+            Text(l10n.confirmApproveDish),
             const SizedBox(height: 12),
             Text(
               menuItem.name,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            Text('Prix: ${menuItem.price.toStringAsFixed(2)} €'),
-            Text('Restaurant: $restaurantName'),
+            Text('${l10n.price}: ${menuItem.price.toStringAsFixed(2)} ${l10n.dhs}'),
+            Text('${l10n.restaurant}: $restaurantName'),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Annuler'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-            child: const Text('Approuver'),
+            child: Text(l10n.approve),
           ),
         ],
       ),
@@ -472,8 +476,8 @@ class _MenuItemApprovalCard extends StatelessWidget {
 
       if (success && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Plat approuvé avec succès'),
+          SnackBar(
+            content: Text(l10n.dishApprovedSuccess),
             backgroundColor: Colors.green,
           ),
         );
@@ -482,12 +486,13 @@ class _MenuItemApprovalCard extends StatelessWidget {
   }
 
   void _showRejectDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final reasonController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Rejeter le plat'),
+        title: Text(l10n.rejectDish),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -501,10 +506,10 @@ class _MenuItemApprovalCard extends StatelessWidget {
             const SizedBox(height: 16),
             TextField(
               controller: reasonController,
-              decoration: const InputDecoration(
-                labelText: 'Raison du rejet *',
-                border: OutlineInputBorder(),
-                hintText: 'Ex: Image de mauvaise qualité, titre inapproprié...',
+              decoration: InputDecoration(
+                labelText: l10n.rejectionReason,
+                border: const OutlineInputBorder(),
+                hintText: l10n.rejectionReasonHint,
               ),
               maxLines: 3,
             ),
@@ -513,14 +518,14 @@ class _MenuItemApprovalCard extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () async {
               if (reasonController.text.trim().isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Veuillez entrer une raison'),
+                  SnackBar(
+                    content: Text(l10n.enterReason),
                     backgroundColor: Colors.red,
                   ),
                 );
@@ -541,15 +546,15 @@ class _MenuItemApprovalCard extends StatelessWidget {
 
               if (success && context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Plat rejeté'),
+                  SnackBar(
+                    content: Text(l10n.dishRejected),
                     backgroundColor: Colors.orange,
                   ),
                 );
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Rejeter'),
+            child: Text(l10n.reject),
           ),
         ],
       ),

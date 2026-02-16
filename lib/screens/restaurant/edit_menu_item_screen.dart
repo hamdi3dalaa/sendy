@@ -6,6 +6,7 @@ import 'dart:io';
 import '../../providers/menu_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/menu_item_model.dart';
+import 'package:sendy/l10n/app_localizations.dart';
 
 class EditMenuItemScreen extends StatefulWidget {
   final MenuItem menuItem;
@@ -56,17 +57,18 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
   }
 
   Future<void> _pickImage() async {
+    final l10n = AppLocalizations.of(context)!;
     final picker = ImagePicker();
     final pickedFile = await showDialog<XFile?>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Changer la photo'),
+        title: Text(l10n.changePhoto),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: const Text('Prendre une photo'),
+              title: Text(l10n.takePhoto),
               onTap: () async {
                 Navigator.pop(
                   context,
@@ -76,7 +78,7 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: const Text('Choisir dans la galerie'),
+              title: Text(l10n.chooseFromGallery),
               onTap: () async {
                 Navigator.pop(
                   context,
@@ -97,6 +99,7 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
   }
 
   Future<void> _submitForm() async {
+    final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -106,7 +109,7 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
 
     if (restaurantId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erreur: Utilisateur non connecté')),
+        SnackBar(content: Text(l10n.userNotConnected)),
       );
       return;
     }
@@ -134,8 +137,8 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
         SnackBar(
           content: Text(
             _newImageFile != null
-                ? 'Plat modifié ! Nouvelle photo en attente d\'approbation.'
-                : 'Plat modifié avec succès !',
+                ? l10n.dishModifiedPending
+                : l10n.dishModifiedSuccess,
           ),
           backgroundColor: _newImageFile != null ? Colors.orange : Colors.green,
         ),
@@ -143,8 +146,8 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
       Navigator.pop(context, true);
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Erreur lors de la modification'),
+        SnackBar(
+          content: Text(l10n.modificationError),
           backgroundColor: Colors.red,
         ),
       );
@@ -153,9 +156,10 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Modifier le plat'),
+        title: Text(l10n.editDish),
         backgroundColor: const Color(0xFFFF5722),
       ),
       body: SingleChildScrollView(
@@ -195,9 +199,9 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
                                   color: Colors.orange,
                                   borderRadius: BorderRadius.circular(4),
                                 ),
-                                child: const Text(
-                                  'Nouvelle photo',
-                                  style: TextStyle(
+                                child: Text(
+                                  l10n.newPhoto,
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
@@ -235,7 +239,7 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
-                                            'Changer la photo',
+                                            l10n.changePhoto,
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontWeight: FontWeight.bold,
@@ -255,7 +259,7 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
                                     size: 50, color: Colors.grey[600]),
                                 const SizedBox(height: 8),
                                 Text(
-                                  'Ajouter une photo',
+                                  l10n.addPhoto,
                                   style: TextStyle(color: Colors.grey[600]),
                                 ),
                               ],
@@ -270,7 +274,7 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(8),
                       child: Text(
-                        'La nouvelle photo sera en attente d\'approbation',
+                        l10n.newPhotoPending,
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.orange[900],
@@ -285,17 +289,17 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
               // Name
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nom du plat *',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.restaurant),
+                decoration: InputDecoration(
+                  labelText: l10n.dishName,
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.restaurant),
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Veuillez entrer un nom';
+                    return l10n.enterNameValidation;
                   }
                   if (value.trim().length < 3) {
-                    return 'Le nom doit contenir au moins 3 caractères';
+                    return l10n.nameTooShort;
                   }
                   return null;
                 },
@@ -305,18 +309,18 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
               // Description
               TextFormField(
                 controller: _descriptionController,
-                decoration: const InputDecoration(
-                  labelText: 'Description *',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.description),
+                decoration: InputDecoration(
+                  labelText: l10n.descriptionRequired,
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.description),
                 ),
                 maxLines: 3,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Veuillez entrer une description';
+                    return l10n.enterDescriptionValidation;
                   }
                   if (value.trim().length < 10) {
-                    return 'La description doit contenir au moins 10 caractères';
+                    return l10n.descriptionTooShort;
                   }
                   return null;
                 },
@@ -326,10 +330,10 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
               // Category
               DropdownButtonFormField<String>(
                 value: _selectedCategory,
-                decoration: const InputDecoration(
-                  labelText: 'Catégorie',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.category),
+                decoration: InputDecoration(
+                  labelText: l10n.category,
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.category),
                 ),
                 items: _categories.map((category) {
                   return DropdownMenuItem(
@@ -350,23 +354,23 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
               // Price
               TextFormField(
                 controller: _priceController,
-                decoration: const InputDecoration(
-                  labelText: 'Prix (€) *',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.euro),
+                decoration: InputDecoration(
+                  labelText: l10n.priceRequired,
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.euro),
                 ),
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Veuillez entrer un prix';
+                    return l10n.enterPriceValidation;
                   }
                   final price = double.tryParse(value.trim());
                   if (price == null) {
-                    return 'Prix invalide';
+                    return l10n.invalidPrice;
                   }
                   if (price <= 0) {
-                    return 'Le prix doit être supérieur à 0';
+                    return l10n.pricePositive;
                   }
                   return null;
                 },
@@ -394,9 +398,9 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
                               AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
                       )
-                    : const Text(
-                        'Enregistrer les modifications',
-                        style: TextStyle(
+                    : Text(
+                        l10n.saveChanges,
+                        style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),
               ),

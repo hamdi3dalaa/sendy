@@ -144,7 +144,7 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _refreshMenu,
-            tooltip: 'Actualiser',
+            tooltip: l10n.refresh,
           ),
           if (_isLoggingOut)
             const Padding(
@@ -162,7 +162,7 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
             IconButton(
               icon: const Icon(Icons.logout),
               onPressed: _handleLogout,
-              tooltip: 'Déconnexion',
+              tooltip: l10n.logout,
             ),
         ],
       ),
@@ -180,7 +180,7 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
         onPressed: _navigateToMenuManagement,
         backgroundColor: const Color(0xFFFF5722),
         icon: const Icon(Icons.menu_book),
-        label: const Text('Gérer le menu'),
+        label: Text(l10n.manageMenu),
       ),
     );
   }
@@ -220,9 +220,9 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 10),
-                const Text(
-                  'Espace Restaurant',
-                  style: TextStyle(fontSize: 18, color: Colors.grey),
+                Text(
+                  l10n.restaurantSpace,
+                  style: const TextStyle(fontSize: 18, color: Colors.grey),
                 ),
               ],
             ),
@@ -249,7 +249,7 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                       ),
                       const SizedBox(width: 12),
                       Text(
-                        'Mon Menu',
+                        l10n.myMenu,
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
@@ -283,19 +283,19 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         _buildStatColumn(
-                          label: 'Approuvés',
+                          label: l10n.approvedItems,
                           count: approvedCount,
                           color: Colors.green,
                           icon: Icons.check_circle,
                         ),
                         _buildStatColumn(
-                          label: 'En attente',
+                          label: l10n.pendingItems,
                           count: pendingCount,
                           color: Colors.orange,
                           icon: Icons.pending,
                         ),
                         _buildStatColumn(
-                          label: 'Rejetés',
+                          label: l10n.rejectedItems,
                           count: rejectedCount,
                           color: Colors.red,
                           icon: Icons.cancel,
@@ -340,7 +340,7 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                             ),
                             const SizedBox(height: 12),
                             Text(
-                              'Aucun plat dans votre menu',
+                              l10n.noMenuItems,
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.grey[600],
@@ -348,7 +348,7 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Commencez par ajouter vos plats',
+                              l10n.startAddingDishes,
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey[500],
@@ -366,7 +366,7 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                     onPressed: _navigateToMenuManagement,
                     icon: const Icon(Icons.edit),
                     label: Text(
-                      totalItems > 0 ? 'Gérer mon menu' : 'Créer mon menu',
+                      totalItems > 0 ? l10n.manageMyMenu : l10n.createMenu,
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFFF5722),
@@ -459,7 +459,7 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                       ),
                       const SizedBox(width: 12),
                       Text(
-                        'Commandes',
+                        l10n.ordersSection,
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),

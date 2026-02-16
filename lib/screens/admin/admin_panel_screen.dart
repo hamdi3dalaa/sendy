@@ -1,5 +1,6 @@
 // lib/screens/admin/admin_panel_screen.dart
 import 'package:flutter/material.dart';
+import 'package:sendy/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../../providers/admin_provider.dart';
 import '../../providers/auth_provider.dart';
@@ -36,21 +37,22 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
     final adminProvider = Provider.of<AdminProvider>(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Admin Panel'),
+        title: Text(l10n.adminPanel),
         backgroundColor: const Color(0xFFFF5722),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadData,
-            tooltip: 'Actualiser',
+            tooltip: l10n.refresh,
           ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () => authProvider.signOut(),
-            tooltip: 'Déconnexion',
+            tooltip: l10n.logout,
           ),
         ],
       ),
@@ -78,7 +80,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                             ),
                             const SizedBox(height: 12),
                             Text(
-                              'Tableau de Bord Admin',
+                              l10n.adminPanel,
                               style: Theme.of(context)
                                   .textTheme
                                   .headlineSmall
@@ -89,7 +91,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Gérer les approbations et configurations',
+                              l10n.manageApprovalsAndConfig,
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.9),
                               ),
@@ -102,13 +104,13 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
 
                     // Pending Users Section
                     _buildSectionCard(
-                      title: 'Utilisateurs en attente',
+                      title: l10n.pendingUsers,
                       icon: Icons.people,
                       iconColor: Colors.blue,
                       count: adminProvider.pendingUsers.length,
                       children: [
                         _buildStatTile(
-                          'Livreurs',
+                          l10n.deliveryPersons,
                           adminProvider.pendingDelivery.length,
                           Icons.delivery_dining,
                           Colors.orange,
@@ -116,7 +118,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                         ),
                         const Divider(height: 1),
                         _buildStatTile(
-                          'Restaurants',
+                          l10n.restaurants,
                           adminProvider.pendingRestaurants.length,
                           Icons.restaurant,
                           Colors.green,
@@ -128,7 +130,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
 
                     // Pending Menu Items
                     _buildSectionCard(
-                      title: 'Plats en attente',
+                      title: l10n.pendingDishes,
                       icon: Icons.menu_book,
                       iconColor: Colors.purple,
                       count: adminProvider.pendingMenuItems.length,
@@ -137,7 +139,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                           leading:
                               const Icon(Icons.fastfood, color: Colors.purple),
                           title: Text(
-                            '${adminProvider.pendingMenuItems.length} plat${adminProvider.pendingMenuItems.length > 1 ? 's' : ''} à valider',
+                            '${adminProvider.pendingMenuItems.length} ${l10n.dishesToValidate}',
                           ),
                           trailing:
                               const Icon(Icons.arrow_forward_ios, size: 16),
@@ -157,8 +159,8 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
 
                     // Configuration
                     _buildActionCard(
-                      title: 'Configuration App',
-                      subtitle: 'Twilio, OTP, et autres paramètres',
+                      title: l10n.appConfig,
+                      subtitle: l10n.appConfigSubtitle,
                       icon: Icons.settings,
                       iconColor: const Color(0xFFFF5722),
                       onTap: () {
@@ -178,7 +180,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                       children: [
                         Expanded(
                           child: _buildQuickStatCard(
-                            'Total en attente',
+                            l10n.totalPending,
                             (adminProvider.pendingUsers.length +
                                     adminProvider.pendingMenuItems.length)
                                 .toString(),
@@ -189,7 +191,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                         const SizedBox(width: 16),
                         Expanded(
                           child: _buildQuickStatCard(
-                            'Livreurs',
+                            l10n.deliveryPersons,
                             adminProvider.pendingDelivery.length.toString(),
                             Icons.delivery_dining,
                             Colors.blue,
@@ -202,7 +204,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                       children: [
                         Expanded(
                           child: _buildQuickStatCard(
-                            'Restaurants',
+                            l10n.restaurants,
                             adminProvider.pendingRestaurants.length.toString(),
                             Icons.restaurant,
                             Colors.green,
@@ -211,7 +213,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                         const SizedBox(width: 16),
                         Expanded(
                           child: _buildQuickStatCard(
-                            'Plats',
+                            l10n.dishes,
                             adminProvider.pendingMenuItems.length.toString(),
                             Icons.fastfood,
                             Colors.purple,
@@ -384,5 +386,3 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
     ).then((_) => _loadData());
   }
 }
-
-// Add this import at the top

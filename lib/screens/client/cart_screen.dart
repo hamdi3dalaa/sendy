@@ -9,6 +9,7 @@ import '../../providers/order_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/order_model.dart';
 import 'package:uuid/uuid.dart';
+import 'package:sendy/l10n/app_localizations.dart';
 
 class CartScreen extends StatefulWidget {
   final RestaurantModel restaurant;
@@ -25,7 +26,9 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   final TextEditingController _commentController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _promoController = TextEditingController();
   bool _isLoading = false;
+  String? _promoError;
 
   double get _deliveryFee => 14.0;
   double get _serviceFee => 2.0;
@@ -34,11 +37,12 @@ class _CartScreenState extends State<CartScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mon Panier'),
+        title: Text(AppLocalizations.of(context)!.myCart),
         backgroundColor: const Color(0xFFFF5722),
       ),
       body: Consumer<ClientProvider>(
         builder: (context, clientProvider, child) {
+          final l10n = AppLocalizations.of(context)!;
           final cartItems = clientProvider.cart.values.toList();
 
           if (cartItems.isEmpty) {
@@ -46,7 +50,8 @@ class _CartScreenState extends State<CartScreen> {
           }
 
           final subtotal = clientProvider.cartTotal;
-          final total = subtotal + _deliveryFee + _serviceFee;
+          final promoDiscount = clientProvider.promoDiscount;
+          final total = subtotal + _deliveryFee + _serviceFee - promoDiscount;
 
           return Column(
             children: [
@@ -76,8 +81,8 @@ class _CartScreenState extends State<CartScreen> {
                           controller: _addressController,
                           maxLines: 2,
                           decoration: InputDecoration(
-                            labelText: 'Adresse de livraison *',
-                            hintText: 'Entrez votre adresse complète...',
+                            labelText: '${l10n.deliveryAddress} *',
+                            hintText: l10n.enterFullAddress,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -94,8 +99,8 @@ class _CartScreenState extends State<CartScreen> {
                           controller: _commentController,
                           maxLines: 3,
                           decoration: InputDecoration(
-                            labelText: 'Commentaire (optionnel)',
-                            hintText: 'Instructions spéciales, allergies...',
+                            labelText: l10n.commentOptional,
+                            hintText: l10n.specialInstructions,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -105,8 +110,11 @@ class _CartScreenState extends State<CartScreen> {
                         ),
                       ),
 
+                      // Promo Code
+                      _buildPromoCodeSection(subtotal, clientProvider),
+
                       // Price Summary
-                      _buildPriceSummary(subtotal, total),
+                      _buildPriceSummary(subtotal, total, promoDiscount),
 
                       const SizedBox(height: 100), // Space for bottom button
                     ],
@@ -124,6 +132,7 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Widget _buildEmptyCart() {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -135,7 +144,7 @@ class _CartScreenState extends State<CartScreen> {
           ),
           const SizedBox(height: 24),
           Text(
-            'Votre panier est vide',
+            l10n.emptyCart,
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -144,7 +153,7 @@ class _CartScreenState extends State<CartScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Ajoutez des plats pour commander',
+            l10n.addDishesToOrder,
             style: TextStyle(
               fontSize: 14,
               color: Colors.grey[500],
@@ -154,7 +163,7 @@ class _CartScreenState extends State<CartScreen> {
           ElevatedButton.icon(
             onPressed: () => Navigator.pop(context),
             icon: const Icon(Icons.restaurant_menu),
-            label: const Text('Voir le menu'),
+            label: Text(l10n.viewMenu),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFFF5722),
               foregroundColor: Colors.white,
@@ -170,6 +179,7 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Widget _buildRestaurantHeader() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -199,8 +209,8 @@ class _CartScreenState extends State<CartScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Restaurant',
+                Text(
+                  l10n.restaurant,
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey,
@@ -221,7 +231,86 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  Widget _buildPriceSummary(double subtotal, double total) {
+  Widget _buildPromoCodeSection(double subtotal, ClientProvider clientProvider) {
+    final l10n = AppLocalizations.of(context)!;
+    final appliedPromo = clientProvider.appliedPromo;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (appliedPromo != null)
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.green[50],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.green[300]!),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.green[700], size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      '${l10n.promoApplied} -${clientProvider.promoDiscount.toStringAsFixed(2)} ${l10n.dhs}',
+                      style: TextStyle(color: Colors.green[700], fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      clientProvider.clearPromo();
+                      _promoController.clear();
+                      setState(() => _promoError = null);
+                    },
+                    child: Icon(Icons.close, color: Colors.green[700], size: 20),
+                  ),
+                ],
+              ),
+            )
+          else
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _promoController,
+                    decoration: InputDecoration(
+                      hintText: l10n.enterPromoCode,
+                      prefixIcon: const Icon(Icons.local_offer, color: Color(0xFFFF5722)),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      errorText: _promoError,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (_promoController.text.trim().isEmpty) return;
+                    final result = await clientProvider.validatePromoCode(
+                      _promoController.text.trim(),
+                      subtotal,
+                    );
+                    setState(() => _promoError = result);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF5722),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: Text(l10n.apply),
+                ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPriceSummary(double subtotal, double total, double promoDiscount) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       margin: const EdgeInsets.all(16),
       elevation: 2,
@@ -233,21 +322,32 @@ class _CartScreenState extends State<CartScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Résumé',
-              style: TextStyle(
+            Text(
+              l10n.summary,
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 16),
-            _buildPriceRow('Sous-total', subtotal),
+            _buildPriceRow(l10n.subtotal, subtotal),
             const SizedBox(height: 8),
-            _buildPriceRow('Frais de livraison', _deliveryFee),
+            _buildPriceRow(l10n.deliveryFee, _deliveryFee),
             const SizedBox(height: 8),
-            _buildPriceRow('Frais de service', _serviceFee),
+            _buildPriceRow(l10n.serviceFee, _serviceFee),
+            if (promoDiscount > 0) ...[
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(l10n.discount, style: TextStyle(fontSize: 16, color: Colors.green[700])),
+                  Text('-${promoDiscount.toStringAsFixed(2)} ${l10n.dhs}',
+                      style: TextStyle(fontSize: 16, color: Colors.green[700], fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ],
             const Divider(height: 24, thickness: 2),
-            _buildPriceRow('Total', total, isTotal: true),
+            _buildPriceRow(l10n.total, total, isTotal: true),
           ],
         ),
       ),
@@ -255,6 +355,7 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Widget _buildPriceRow(String label, double amount, {bool isTotal = false}) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -266,7 +367,7 @@ class _CartScreenState extends State<CartScreen> {
           ),
         ),
         Text(
-          '${amount.toStringAsFixed(2)} €',
+          '${amount.toStringAsFixed(2)} ${l10n.dhs}',
           style: TextStyle(
             fontSize: isTotal ? 20 : 16,
             fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
@@ -278,6 +379,7 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Widget _buildCheckoutButton(List<CartItem> cartItems, double total) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -319,7 +421,7 @@ class _CartScreenState extends State<CartScreen> {
                       const Icon(Icons.payment, size: 24),
                       const SizedBox(width: 12),
                       Text(
-                        'Payer ${total.toStringAsFixed(2)} €',
+                        '${l10n.pay} ${total.toStringAsFixed(2)} ${l10n.dhs}',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -334,10 +436,11 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Future<void> _placeOrder(List<CartItem> cartItems, double total) async {
+    final l10n = AppLocalizations.of(context)!;
     if (_addressController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez entrer votre adresse de livraison'),
+        SnackBar(
+          content: Text(l10n.enterDeliveryAddress),
           backgroundColor: Colors.red,
         ),
       );
@@ -389,12 +492,12 @@ class _CartScreenState extends State<CartScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Row(
               children: [
                 Icon(Icons.check_circle, color: Colors.white),
                 SizedBox(width: 12),
-                Text('Commande passée avec succès!'),
+                Text(l10n.orderPlacedSuccess),
               ],
             ),
             backgroundColor: Colors.green,
@@ -407,7 +510,7 @@ class _CartScreenState extends State<CartScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur: $e'),
+            content: Text('${l10n.error}: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -434,6 +537,7 @@ class _CartItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       shape: RoundedRectangleBorder(
@@ -490,7 +594,7 @@ class _CartItemCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${cartItem.menuItem.price.toStringAsFixed(2)} € / unité',
+                    '${cartItem.menuItem.price.toStringAsFixed(2)} ${l10n.dhs} ${l10n.perUnit}',
                     style: TextStyle(
                       fontSize: 13,
                       color: Colors.grey[600],
@@ -540,7 +644,7 @@ class _CartItemCard extends StatelessWidget {
                       const Spacer(),
                       // Total Price
                       Text(
-                        '${cartItem.totalPrice.toStringAsFixed(2)} €',
+                        '${cartItem.totalPrice.toStringAsFixed(2)} ${l10n.dhs}',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
@@ -561,8 +665,8 @@ class _CartItemCard extends StatelessWidget {
                     .read<ClientProvider>()
                     .removeFromCart(cartItem.menuItem.id);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Retiré du panier'),
+                  SnackBar(
+                    content: Text(l10n.removedFromCart),
                     duration: Duration(seconds: 1),
                   ),
                 );

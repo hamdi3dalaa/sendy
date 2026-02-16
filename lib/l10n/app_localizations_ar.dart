@@ -559,4 +559,232 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get admin => 'المسؤول';
+
+  @override
+  String get menuManagement => 'إدارة القائمة';
+
+  @override
+  String get addDish => 'إضافة طبق';
+
+  @override
+  String get noDishesInMenu => 'لا توجد أطباق في القائمة';
+
+  @override
+  String get addFirstDish => 'أضف أول طبق لك';
+
+  @override
+  String get noDishesInCategory => 'لا توجد أطباق في هذه الفئة';
+
+  @override
+  String get confirmDeletion => 'تأكيد الحذف';
+
+  @override
+  String confirmDeleteDishMessage(String name) => 'هل تريد حقا حذف "$name" ؟';
+
+  @override
+  String get delete => 'حذف';
+
+  @override
+  String get dishDeletedSuccess => 'تم حذف الطبق بنجاح';
+
+  @override
+  String get noPendingDishes => 'لا توجد أطباق في الانتظار';
+
+  @override
+  String get pendingStatusLabel => 'في الانتظار';
+
+  @override
+  String get description => 'الوصف';
+
+  @override
+  String get price => 'السعر';
+
+  @override
+  String get category => 'الفئة';
+
+  @override
+  String get createdOn => 'تم الإنشاء في';
+
+  @override
+  String get tapToEnlarge => 'اضغط على الصورة لتكبيرها';
+
+  @override
+  String get noImage => 'لا توجد صورة';
+
+  @override
+  String get imageLoadError => 'خطأ في التحميل';
+
+  @override
+  String get noImageWarning => 'هذا الطبق لا يحتوي على صورة. يوصى بطلب من المطعم إضافة واحدة.';
+
+  @override
+  String get confirmApproval => 'تأكيد الموافقة';
+
+  @override
+  String get confirmApproveDish => 'هل تريد الموافقة على هذا الطبق؟';
+
+  @override
+  String get approve => 'الموافقة';
+
+  @override
+  String get reject => 'رفض';
+
+  @override
+  String get dishApprovedSuccess => 'تمت الموافقة على الطبق بنجاح';
+
+  @override
+  String get dishRejected => 'تم رفض الطبق';
+
+  @override
+  String get rejectDish => 'رفض الطبق';
+
+  @override
+  String get rejectionReason => 'سبب الرفض *';
+
+  @override
+  String get rejectionReasonHint => 'مثال: صورة رديئة الجودة، عنوان غير مناسب...';
+
+  @override
+  String get enterReason => 'الرجاء إدخال سبب';
+
+  @override
+  String get dishName => 'اسم الطبق *';
+
+  @override
+  String get descriptionRequired => 'الوصف *';
+
+  @override
+  String get priceRequired => 'السعر (DHs) *';
+
+  @override
+  String get addPhoto => 'إضافة صورة';
+
+  @override
+  String get pendingApprovalNote => '(في انتظار الموافقة)';
+
+  @override
+  String get enterNameValidation => 'الرجاء إدخال اسم';
+
+  @override
+  String get nameTooShort => 'يجب أن يحتوي الاسم على 3 أحرف على الأقل';
+
+  @override
+  String get enterDescriptionValidation => 'الرجاء إدخال وصف';
+
+  @override
+  String get descriptionTooShort => 'يجب أن يحتوي الوصف على 10 أحرف على الأقل';
+
+  @override
+  String get enterPriceValidation => 'الرجاء إدخال سعر';
+
+  @override
+  String get invalidPrice => 'سعر غير صالح';
+
+  @override
+  String get pricePositive => 'يجب أن يكون السعر أكبر من 0';
+
+  @override
+  String get dishAddedPending => 'تمت إضافة الطبق! في انتظار موافقة المسؤول.';
+
+  @override
+  String get unknownError => 'خطأ غير معروف';
+
+  @override
+  String get addTheDish => 'إضافة الطبق';
+
+  @override
+  String get dishVerificationNote => 'سيتم التحقق من طبقك من قبل المسؤول قبل نشره.';
+
+  @override
+  String get chooseImage => 'اختر صورة';
+
+  @override
+  String get takePhoto => 'التقاط صورة';
+
+  @override
+  String get chooseFromGallery => 'اختر من المعرض';
+
+  @override
+  String get editDish => 'تعديل الطبق';
+
+  @override
+  String get changePhoto => 'تغيير الصورة';
+
+  @override
+  String get newPhoto => 'صورة جديدة';
+
+  @override
+  String get newPhotoPending => 'الصورة الجديدة ستكون في انتظار الموافقة';
+
+  @override
+  String get dishModifiedPending => 'تم تعديل الطبق! الصورة الجديدة في انتظار الموافقة.';
+
+  @override
+  String get dishModifiedSuccess => 'تم تعديل الطبق بنجاح!';
+
+  @override
+  String get modificationError => 'خطأ أثناء التعديل';
+
+  @override
+  String get saveChanges => 'حفظ التعديلات';
+
+  @override
+  String get userNotConnected => 'خطأ: المستخدم غير متصل';
+
+  @override
+  String get reason => 'السبب';
+
+  @override
+  String get manageMyMenu => 'إدارة قائمتي';
+
+  @override
+  String get deliveryService => 'خدمة التوصيل';
+
+  @override
+  String get invoiceTitle => 'فاتورة';
+
+  @override
+  String get clientInfo => 'معلومات العميل';
+
+  @override
+  String get name => 'الاسم';
+
+  @override
+  String get phone => 'الهاتف';
+
+  @override
+  String get address => 'العنوان';
+
+  @override
+  String get articleHeader => 'المنتج';
+
+  @override
+  String get qty => 'الكمية';
+
+  @override
+  String get unitPrice => 'سعر الوحدة';
+
+  @override
+  String get paymentMode => 'طريقة الدفع';
+
+  @override
+  String get cashOnDeliveryInvoice => 'نقدا عند التسليم';
+
+  @override
+  String get cardPaymentInvoice => 'بطاقة بنكية';
+
+  @override
+  String get thankYou => 'شكرا لاختياركم سندي!';
+
+  @override
+  String promoMinOrder(String amount) => 'الحد الأدنى للطلب: $amount DHs';
+
+  @override
+  String get promoExpired => 'الرمز الترويجي منتهي الصلاحية';
+
+  @override
+  String get promoInvalid => 'رمز ترويجي غير صالح';
+
+  @override
+  String get validationError => 'خطأ في التحقق';
 }

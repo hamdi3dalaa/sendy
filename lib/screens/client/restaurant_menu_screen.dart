@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:sendy/l10n/app_localizations.dart';
 import '../../providers/client_provider.dart';
 import '../../models/menu_item_model.dart';
 import 'cart_screen.dart';
@@ -89,6 +90,7 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
       ),
       body: Consumer<ClientProvider>(
         builder: (context, clientProvider, child) {
+          final l10n = AppLocalizations.of(context)!;
           if (clientProvider.isLoading) {
             return const Center(
               child: CircularProgressIndicator(
@@ -104,13 +106,13 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
                 children: [
                   const Icon(Icons.error_outline, size: 64, color: Colors.red),
                   const SizedBox(height: 16),
-                  Text('Erreur: ${clientProvider.error}'),
+                  Text('${l10n.error}: ${clientProvider.error}'),
                   const SizedBox(height: 16),
                   ElevatedButton.icon(
                     onPressed: () => clientProvider
                         .loadRestaurantMenu(widget.restaurant.uid),
                     icon: const Icon(Icons.refresh),
-                    label: const Text('Réessayer'),
+                    label: Text(l10n.retry),
                   ),
                 ],
               ),
@@ -128,7 +130,7 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
                       size: 80, color: Colors.grey[400]),
                   const SizedBox(height: 16),
                   Text(
-                    'Aucun plat disponible',
+                    l10n.noDishesAvailable,
                     style: TextStyle(fontSize: 18, color: Colors.grey[600]),
                   ),
                 ],
@@ -211,6 +213,7 @@ class _MenuItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Consumer<ClientProvider>(
       builder: (context, clientProvider, child) {
         final isInCart = clientProvider.isInCart(item.id);
@@ -306,7 +309,7 @@ class _MenuItemCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '${item.price.toStringAsFixed(2)} €',
+                          '${item.price.toStringAsFixed(2)} ${l10n.dhs}',
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -324,17 +327,17 @@ class _MenuItemCard extends StatelessWidget {
                             if (isInCart) {
                               clientProvider.removeFromCart(item.id);
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Retiré du panier'),
-                                  duration: Duration(seconds: 1),
+                                SnackBar(
+                                  content: Text(l10n.removedFromCart),
+                                  duration: const Duration(seconds: 1),
                                 ),
                               );
                             } else {
                               clientProvider.addToCart(item);
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Ajouté au panier'),
-                                  duration: Duration(seconds: 1),
+                                SnackBar(
+                                  content: Text(l10n.addedToCart),
+                                  duration: const Duration(seconds: 1),
                                   backgroundColor: Colors.green,
                                 ),
                               );

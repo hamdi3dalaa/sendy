@@ -22,7 +22,7 @@ class OrderDetailsScreen extends StatelessWidget {
           if (order.status == OrderStatus.delivered)
             IconButton(
               icon: const Icon(Icons.download),
-              onPressed: () => InvoiceService.generateAndDownloadInvoice(order),
+              onPressed: () => InvoiceService.generateAndDownloadInvoice(order, l10n),
               tooltip: l10n.downloadInvoice,
             ),
         ],
