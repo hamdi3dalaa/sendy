@@ -45,6 +45,24 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
         title: Text(l10n.deliveryPerson),
         backgroundColor: const Color(0xFFFF5722),
         actions: [
+          // Language toggle
+          TextButton(
+            onPressed: () {
+              final newLang = authProvider.locale.languageCode == 'fr' ? 'ar' : 'fr';
+              authProvider.changeLanguage(newLang);
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                authProvider.locale.languageCode == 'fr' ? 'AR' : 'FR',
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+              ),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () => authProvider.signOut(),
@@ -70,7 +88,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
             ),
             const SizedBox(height: 20),
             Text(
-              'Initialisation de la localisation...',
+              l10n.locationInitializing,
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ],
@@ -92,7 +110,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
               ),
               const SizedBox(height: 20),
               Text(
-                'Erreur de localisation',
+                l10n.locationError,
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 10),
@@ -105,7 +123,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
               ElevatedButton.icon(
                 onPressed: () => locationProvider.initializeLocation(),
                 icon: const Icon(Icons.refresh),
-                label: const Text('Réessayer'),
+                label: Text(l10n.retry),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFFF5722),
                   foregroundColor: Colors.white,
@@ -126,7 +144,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
                     }
                   },
                   icon: const Icon(Icons.settings),
-                  label: const Text('Ouvrir les paramètres'),
+                  label: Text(l10n.openSettings),
                 ),
             ],
           ),
@@ -147,7 +165,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
             ),
             const SizedBox(height: 20),
             Text(
-              'Espace Livreur',
+              l10n.deliverySpace,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             const SizedBox(height: 40),
@@ -155,7 +173,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
               elevation: 4,
               child: SwitchListTile(
                 title: Text(
-                  _isAvailable ? 'Disponible' : 'Indisponible',
+                  _isAvailable ? l10n.available : l10n.unavailable,
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -163,8 +181,8 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
                 ),
                 subtitle: Text(
                   _isAvailable
-                      ? 'Vous pouvez recevoir des commandes'
-                      : 'Activez pour recevoir des commandes',
+                      ? l10n.canReceiveOrders
+                      : l10n.activateToReceiveOrders,
                 ),
                 value: _isAvailable,
                 activeColor: const Color(0xFFFF5722),
@@ -191,7 +209,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
                     Icons.location_on,
                     color: Color(0xFFFF5722),
                   ),
-                  title: const Text('Position actuelle'),
+                  title: Text(l10n.currentPosition),
                   subtitle: Text(
                     'Lat: ${locationProvider.currentPosition!.latitude.toStringAsFixed(4)}\n'
                     'Lng: ${locationProvider.currentPosition!.longitude.toStringAsFixed(4)}',
@@ -199,7 +217,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
                   trailing: IconButton(
                     icon: const Icon(Icons.refresh),
                     onPressed: () => locationProvider.initializeLocation(),
-                    tooltip: 'Actualiser',
+                    tooltip: l10n.refresh,
                   ),
                 ),
               )
@@ -212,9 +230,9 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
                     Icons.location_searching,
                     color: Colors.orange,
                   ),
-                  title: const Text('Position requise'),
-                  subtitle: const Text(
-                    'La localisation est nécessaire pour recevoir des commandes',
+                  title: Text(l10n.positionRequired),
+                  subtitle: Text(
+                    l10n.positionRequiredDescription,
                   ),
                   trailing: IconButton(
                     icon: const Icon(Icons.refresh),
