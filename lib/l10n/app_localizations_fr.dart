@@ -880,4 +880,28 @@ class AppLocalizationsFr extends AppLocalizations {
   String get mySpace => 'Mon Espace';
   @override
   String get administration => 'Administration';
+
+  @override
+  String get restaurantAddressLabel => 'Adresse du restaurant';
+  @override
+  String get cityLabel => 'Ville';
+  @override
+  String get useGPS => 'Utiliser le GPS';
+  @override
+  String get gpsPositionCaptured => 'Position GPS capturee !';
+
+  @override
+  String get availableOrders => 'Livraisons';
+  @override
+  String get noAvailableOrders => 'Aucune livraison disponible';
+  @override
+  String get ordersWillAppearHere => 'Les commandes apparaitront ici';
+  @override
+  String get acceptDelivery => 'Accepter la livraison';
+  @override
+  String get confirmAcceptDelivery => 'Confirmer la livraison';
+  @override
+  String get confirmAcceptDeliveryMessage => 'Voulez-vous accepter cette livraison ?';
+  @override
+  String get orderAcceptedSuccess => 'Livraison acceptee !';
 }

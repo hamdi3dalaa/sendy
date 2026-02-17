@@ -879,4 +879,28 @@ class AppLocalizationsAr extends AppLocalizations {
   String get mySpace => 'مساحتي';
   @override
   String get administration => 'الإدارة';
+
+  @override
+  String get restaurantAddressLabel => 'عنوان المطعم';
+  @override
+  String get cityLabel => 'المدينة';
+  @override
+  String get useGPS => 'استخدام GPS';
+  @override
+  String get gpsPositionCaptured => 'تم التقاط موقع GPS!';
+
+  @override
+  String get availableOrders => 'التوصيلات';
+  @override
+  String get noAvailableOrders => 'لا توجد توصيلات متاحة';
+  @override
+  String get ordersWillAppearHere => 'ستظهر الطلبات هنا';
+  @override
+  String get acceptDelivery => 'قبول التوصيل';
+  @override
+  String get confirmAcceptDelivery => 'تأكيد التوصيل';
+  @override
+  String get confirmAcceptDeliveryMessage => 'هل تريد قبول هذا التوصيل؟';
+  @override
+  String get orderAcceptedSuccess => 'تم قبول التوصيل!';
 }

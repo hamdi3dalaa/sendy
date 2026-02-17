@@ -615,6 +615,21 @@ abstract class AppLocalizations {
   String get orderFood;
   String get mySpace;
   String get administration;
+
+  // Restaurant registration address
+  String get restaurantAddressLabel;
+  String get cityLabel;
+  String get useGPS;
+  String get gpsPositionCaptured;
+
+  // Delivery available orders
+  String get availableOrders;
+  String get noAvailableOrders;
+  String get ordersWillAppearHere;
+  String get acceptDelivery;
+  String get confirmAcceptDelivery;
+  String get confirmAcceptDeliveryMessage;
+  String get orderAcceptedSuccess;
 }
 
 class _AppLocalizationsDelegate

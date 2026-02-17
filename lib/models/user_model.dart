@@ -13,6 +13,8 @@ class UserModel {
   final ApprovalStatus? approvalStatus;
   final String? idCardUrl;
   final String? restaurantName;
+  final String? restaurantAddress;
+  final String? city;
   final Map<String, dynamic>? location;
   final String? fcmToken;
   final DateTime? createdAt;
@@ -28,6 +30,8 @@ class UserModel {
     this.approvalStatus,
     this.idCardUrl,
     this.restaurantName,
+    this.restaurantAddress,
+    this.city,
     this.location,
     this.fcmToken,
     this.createdAt,
@@ -47,6 +51,8 @@ class UserModel {
           : null,
       idCardUrl: map['idCardUrl'],
       restaurantName: map['restaurantName'],
+      restaurantAddress: map['restaurantAddress'],
+      city: map['city'],
       location: map['location'],
       fcmToken: map['fcmToken'],
       createdAt: map['createdAt'] != null
@@ -69,6 +75,8 @@ class UserModel {
       'approvalStatus': approvalStatus?.index,
       'idCardUrl': idCardUrl,
       'restaurantName': restaurantName,
+      'restaurantAddress': restaurantAddress,
+      'city': city,
       'location': location,
       'fcmToken': fcmToken,
       'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : null,
@@ -86,6 +94,8 @@ class UserModel {
     ApprovalStatus? approvalStatus,
     String? idCardUrl,
     String? restaurantName,
+    String? restaurantAddress,
+    String? city,
     Map<String, dynamic>? location,
     String? fcmToken,
     DateTime? createdAt,
@@ -101,6 +111,8 @@ class UserModel {
       approvalStatus: approvalStatus ?? this.approvalStatus,
       idCardUrl: idCardUrl ?? this.idCardUrl,
       restaurantName: restaurantName ?? this.restaurantName,
+      restaurantAddress: restaurantAddress ?? this.restaurantAddress,
+      city: city ?? this.city,
       location: location ?? this.location,
       fcmToken: fcmToken ?? this.fcmToken,
       createdAt: createdAt ?? this.createdAt,

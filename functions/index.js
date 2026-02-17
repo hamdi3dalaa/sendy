@@ -270,6 +270,161 @@ exports.resendWhatsAppOTP = functions.https.onCall(async (data, context) => {
 });
 
 // ============================================
+// FCM PUSH NOTIFICATION SYSTEM
+// ============================================
+
+// Send FCM push notification to a specific user by their FCM token
+async function sendFCMNotification(fcmToken, title, body, data = {}) {
+  if (!fcmToken) return;
+
+  try {
+    const message = {
+      token: fcmToken,
+      notification: {
+        title: title,
+        body: body,
+      },
+      data: data,
+      android: {
+        notification: {
+          channelId: 'sendy_channel',
+          priority: 'high',
+          sound: 'default',
+        },
+      },
+    };
+
+    await admin.messaging().send(message);
+    console.log('✅ FCM notification sent:', title);
+  } catch (error) {
+    console.error('❌ FCM send error:', error.message);
+  }
+}
+
+// ✅ TRIGGER: New order created → notify restaurant
+exports.onNewOrder = functions.firestore
+  .document('orders/{orderId}')
+  .onCreate(async (snap, context) => {
+    const orderData = snap.data();
+    const orderId = context.params.orderId;
+
+    // Notify the restaurant
+    try {
+      const restaurantDoc = await db.collection('users').doc(orderData.restaurantId).get();
+      if (restaurantDoc.exists) {
+        const restaurant = restaurantDoc.data();
+        if (restaurant.fcmToken) {
+          const itemCount = orderData.items ? orderData.items.length : 0;
+          const total = orderData.total || 0;
+          await sendFCMNotification(
+            restaurant.fcmToken,
+            'Nouvelle commande !',
+            `${itemCount} article(s) - ${total} DHs\n${orderData.clientComment || ''}`,
+            { orderId: orderId, type: 'new_order' }
+          );
+        }
+      }
+    } catch (e) {
+      console.error('Error notifying restaurant:', e);
+    }
+  });
+
+// ✅ TRIGGER: Order accepted by restaurant → notify all delivery in same city
+exports.onOrderAccepted = functions.firestore
+  .document('orders/{orderId}')
+  .onUpdate(async (change, context) => {
+    const before = change.before.data();
+    const after = change.after.data();
+    const orderId = context.params.orderId;
+
+    // Check if status changed to accepted (index 1)
+    if (before.status !== 1 && after.status === 1) {
+      try {
+        // Get restaurant city
+        const restaurantDoc = await db.collection('users').doc(after.restaurantId).get();
+        if (!restaurantDoc.exists) return;
+
+        const restaurantData = restaurantDoc.data();
+        const restaurantCity = restaurantData.city || '';
+        const restaurantName = restaurantData.restaurantName || restaurantData.name || 'Restaurant';
+
+        // Get all approved delivery persons in same city (or all if no city)
+        let deliveryQuery = db.collection('users')
+          .where('userType', '==', 1) // delivery
+          .where('approvalStatus', '==', 1); // approved
+
+        if (restaurantCity) {
+          deliveryQuery = deliveryQuery.where('city', '==', restaurantCity);
+        }
+
+        const deliverySnapshot = await deliveryQuery.get();
+
+        console.log(`📦 Order ${orderId} accepted - notifying ${deliverySnapshot.size} delivery persons in ${restaurantCity || 'all cities'}`);
+
+        const notificationPromises = [];
+        deliverySnapshot.forEach((doc) => {
+          const delivery = doc.data();
+          if (delivery.fcmToken) {
+            const itemCount = after.items ? after.items.length : 0;
+            notificationPromises.push(
+              sendFCMNotification(
+                delivery.fcmToken,
+                `Livraison disponible - ${restaurantName}`,
+                `${itemCount} article(s) - ${after.total || 0} DHs - ${after.deliveryAddress || ''}`,
+                { orderId: orderId, type: 'delivery_available' }
+              )
+            );
+          }
+        });
+
+        await Promise.all(notificationPromises);
+      } catch (e) {
+        console.error('Error notifying delivery persons:', e);
+      }
+    }
+
+    // Order picked up by delivery → notify client
+    if (before.status !== 2 && after.status === 2 && after.deliveryPersonId) {
+      try {
+        const clientDoc = await db.collection('users').doc(after.clientId).get();
+        if (clientDoc.exists) {
+          const client = clientDoc.data();
+          if (client.fcmToken) {
+            await sendFCMNotification(
+              client.fcmToken,
+              'Commande en cours de livraison',
+              'Votre commande est en route !',
+              { orderId: orderId, type: 'order_in_progress' }
+            );
+          }
+        }
+      } catch (e) {
+        console.error('Error notifying client:', e);
+      }
+    }
+
+    // Order delivered → notify client
+    if (before.status !== 3 && after.status === 3) {
+      try {
+        const clientDoc = await db.collection('users').doc(after.clientId).get();
+        if (clientDoc.exists) {
+          const client = clientDoc.data();
+          if (client.fcmToken) {
+            await sendFCMNotification(
+              client.fcmToken,
+              'Commande livrée !',
+              'Votre commande a été livrée. Bon appétit !',
+              { orderId: orderId, type: 'order_delivered' }
+            );
+          }
+        }
+      } catch (e) {
+        console.error('Error notifying client:', e);
+      }
+    }
+  });
+
+// ============================================
 // EMAIL NOTIFICATION SYSTEM
 // ============================================
 

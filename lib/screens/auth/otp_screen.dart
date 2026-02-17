@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sendy/l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import '../../providers/auth_provider.dart';
@@ -35,12 +37,16 @@ class _OTPScreenState extends State<OTPScreen> {
 
   final TextEditingController _restaurantNameController =
       TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _cityController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   File? _idCardImage;
   bool _isLoading = false;
   bool _isUploading = false;
   bool _showRegistrationFields = false;
   bool _otpVerified = false;
+  bool _isGettingLocation = false;
+  Map<String, dynamic>? _selectedLocation;
 
   @override
   Widget build(BuildContext context) {
@@ -146,6 +152,69 @@ class _OTPScreenState extends State<OTPScreen> {
                     prefixIcon: Icon(Icons.restaurant),
                   ),
                   textCapitalization: TextCapitalization.words,
+                ),
+                const SizedBox(height: 20),
+
+                // Restaurant Address
+                TextField(
+                  controller: _addressController,
+                  decoration: InputDecoration(
+                    labelText: 'Adresse du restaurant *',
+                    hintText: 'Rue Mohamed V, N°15',
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.location_on),
+                    suffixIcon: _isGettingLocation
+                        ? const Padding(
+                            padding: EdgeInsets.all(12),
+                            child: SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          )
+                        : IconButton(
+                            icon: const Icon(Icons.my_location, color: Color(0xFFFF5722)),
+                            onPressed: _getLocationByGPS,
+                            tooltip: 'Utiliser GPS',
+                          ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // City
+                TextField(
+                  controller: _cityController,
+                  decoration: const InputDecoration(
+                    labelText: 'Ville *',
+                    hintText: 'Casablanca',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.location_city),
+                  ),
+                  textCapitalization: TextCapitalization.words,
+                ),
+                const SizedBox(height: 8),
+
+                // GPS location button
+                OutlinedButton.icon(
+                  onPressed: _isGettingLocation ? null : _getLocationByGPS,
+                  icon: Icon(
+                    _selectedLocation != null ? Icons.check_circle : Icons.gps_fixed,
+                    color: _selectedLocation != null ? Colors.green : const Color(0xFFFF5722),
+                  ),
+                  label: Text(
+                    _selectedLocation != null
+                        ? 'Position GPS capturée ✓'
+                        : 'Capturer la position GPS',
+                    style: TextStyle(
+                      color: _selectedLocation != null ? Colors.green : const Color(0xFFFF5722),
+                    ),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    side: BorderSide(
+                      color: _selectedLocation != null ? Colors.green : const Color(0xFFFF5722),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 20),
               ],
@@ -424,6 +493,94 @@ class _OTPScreenState extends State<OTPScreen> {
     }
   }
 
+  Future<void> _getLocationByGPS() async {
+    setState(() => _isGettingLocation = true);
+
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Permission de localisation refusée')),
+            );
+          }
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Activez la localisation dans les paramètres')),
+          );
+        }
+        return;
+      }
+
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      _selectedLocation = {
+        'latitude': position.latitude,
+        'longitude': position.longitude,
+      };
+
+      // Reverse geocode to get address
+      try {
+        final placemarks = await placemarkFromCoordinates(
+          position.latitude,
+          position.longitude,
+        );
+
+        if (placemarks.isNotEmpty) {
+          final place = placemarks.first;
+          final address = [
+            place.street,
+            place.subLocality,
+            place.locality,
+          ].where((s) => s != null && s.isNotEmpty).join(', ');
+
+          if (mounted) {
+            setState(() {
+              if (address.isNotEmpty) {
+                _addressController.text = address;
+              }
+              if (place.locality != null && place.locality!.isNotEmpty) {
+                _cityController.text = place.locality!;
+              } else if (place.subAdministrativeArea != null) {
+                _cityController.text = place.subAdministrativeArea!;
+              }
+            });
+          }
+        }
+      } catch (e) {
+        print('Geocoding error: $e');
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Position GPS capturée !'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        setState(() {});
+      }
+    } catch (e) {
+      print('GPS error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur GPS: $e'), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isGettingLocation = false);
+    }
+  }
+
   // STEP 2: Complete registration for new users
   Future<void> _completeRegistration() async {
     print('🔵 [OTP_SCREEN] _completeRegistration called');
@@ -441,6 +598,24 @@ class _OTPScreenState extends State<OTPScreen> {
         _restaurantNameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Veuillez entrer le nom du restaurant')),
+      );
+      return;
+    }
+
+    // Validate restaurant address
+    if (widget.userType == UserType.restaurant &&
+        _addressController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Veuillez entrer l\'adresse du restaurant')),
+      );
+      return;
+    }
+
+    // Validate city
+    if (widget.userType == UserType.restaurant &&
+        _cityController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Veuillez entrer la ville')),
       );
       return;
     }
@@ -482,6 +657,13 @@ class _OTPScreenState extends State<OTPScreen> {
         restaurantName: widget.userType == UserType.restaurant
             ? _restaurantNameController.text.trim()
             : null,
+        restaurantAddress: widget.userType == UserType.restaurant
+            ? _addressController.text.trim()
+            : null,
+        city: widget.userType == UserType.restaurant
+            ? _cityController.text.trim()
+            : null,
+        location: _selectedLocation,
       );
 
       if (mounted) {
@@ -548,6 +730,8 @@ class _OTPScreenState extends State<OTPScreen> {
     }
     _nameController.dispose();
     _restaurantNameController.dispose();
+    _addressController.dispose();
+    _cityController.dispose();
     super.dispose();
   }
 }

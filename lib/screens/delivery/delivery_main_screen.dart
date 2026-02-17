@@ -9,6 +9,7 @@ import '../client/search_screen.dart';
 import '../client/my_orders_screen.dart';
 import '../client/cart_screen.dart';
 import 'delivery_home_screen.dart';
+import 'available_orders_screen.dart';
 
 class DeliveryMainScreen extends StatefulWidget {
   const DeliveryMainScreen({Key? key}) : super(key: key);
@@ -39,6 +40,7 @@ class _DeliveryMainScreenState extends State<DeliveryMainScreen> {
 
     final List<Widget> screens = [
       const DeliveryHomeScreen(),
+      const AvailableOrdersScreen(),
       const _ClientOrderingView(),
       const MyOrdersScreen(),
     ];
@@ -62,6 +64,10 @@ class _DeliveryMainScreenState extends State<DeliveryMainScreen> {
           BottomNavigationBarItem(
             icon: const Icon(Icons.delivery_dining),
             label: l10n.mySpace,
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.local_shipping),
+            label: l10n.availableOrders,
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.shopping_bag),

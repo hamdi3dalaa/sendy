@@ -317,6 +317,9 @@ class AuthProvider with ChangeNotifier {
     required UserType userType,
     String? idCardUrl,
     String? restaurantName,
+    String? restaurantAddress,
+    String? city,
+    Map<String, dynamic>? location,
   }) async {
     final user = _auth.currentUser;
     if (user == null) throw Exception('Non authentifié');
@@ -336,6 +339,9 @@ class AuthProvider with ChangeNotifier {
       approvalStatus: approvalStatus,
       idCardUrl: idCardUrl,
       restaurantName: restaurantName,
+      restaurantAddress: restaurantAddress,
+      city: city,
+      location: location,
       fcmToken: fcmToken,
     );
 

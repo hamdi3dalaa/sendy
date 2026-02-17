@@ -317,5 +317,18 @@
 
   "orderFood": "Commander",
   "mySpace": "Mon Espace",
-  "administration": "Administration"
+  "administration": "Administration",
+
+  "restaurantAddressLabel": "Adresse du restaurant",
+  "cityLabel": "Ville",
+  "useGPS": "Utiliser le GPS",
+  "gpsPositionCaptured": "Position GPS capturee !",
+
+  "availableOrders": "Livraisons",
+  "noAvailableOrders": "Aucune livraison disponible",
+  "ordersWillAppearHere": "Les commandes apparaitront ici",
+  "acceptDelivery": "Accepter la livraison",
+  "confirmAcceptDelivery": "Confirmer la livraison",
+  "confirmAcceptDeliveryMessage": "Voulez-vous accepter cette livraison ?",
+  "orderAcceptedSuccess": "Livraison acceptee !"
 }

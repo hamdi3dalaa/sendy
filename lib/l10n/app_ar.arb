@@ -317,5 +317,18 @@
 
   "orderFood": "طلب طعام",
   "mySpace": "مساحتي",
-  "administration": "الإدارة"
+  "administration": "الإدارة",
+
+  "restaurantAddressLabel": "عنوان المطعم",
+  "cityLabel": "المدينة",
+  "useGPS": "استخدام GPS",
+  "gpsPositionCaptured": "تم التقاط موقع GPS!",
+
+  "availableOrders": "التوصيلات",
+  "noAvailableOrders": "لا توجد توصيلات متاحة",
+  "ordersWillAppearHere": "ستظهر الطلبات هنا",
+  "acceptDelivery": "قبول التوصيل",
+  "confirmAcceptDelivery": "تأكيد التوصيل",
+  "confirmAcceptDeliveryMessage": "هل تريد قبول هذا التوصيل؟",
+  "orderAcceptedSuccess": "تم قبول التوصيل!"
 }
