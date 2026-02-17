@@ -313,5 +313,9 @@
   "emailNotifications": "Notifications par email",
   "newJoinRequest": "Nouvelle demande d'inscription",
   "menuItemUpdate": "Mise a jour du menu",
-  "imageChangeRequest": "Demande de changement d'image"
+  "imageChangeRequest": "Demande de changement d'image",
+
+  "orderFood": "Commander",
+  "mySpace": "Mon Espace",
+  "administration": "Administration"
 }

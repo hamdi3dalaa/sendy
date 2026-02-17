@@ -610,6 +610,11 @@ abstract class AppLocalizations {
   String get newJoinRequest;
   String get menuItemUpdate;
   String get imageChangeRequest;
+
+  // Navigation strings
+  String get orderFood;
+  String get mySpace;
+  String get administration;
 }
 
 class _AppLocalizationsDelegate

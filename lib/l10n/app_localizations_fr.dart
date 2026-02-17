@@ -873,4 +873,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get menuItemUpdate => 'Mise a jour du menu';
   @override
   String get imageChangeRequest => 'Demande de changement d\'image';
+
+  @override
+  String get orderFood => 'Commander';
+  @override
+  String get mySpace => 'Mon Espace';
+  @override
+  String get administration => 'Administration';
 }

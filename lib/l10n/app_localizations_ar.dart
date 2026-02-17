@@ -872,4 +872,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get menuItemUpdate => 'تحديث القائمة';
   @override
   String get imageChangeRequest => 'طلب تغيير الصورة';
+
+  @override
+  String get orderFood => 'طلب طعام';
+  @override
+  String get mySpace => 'مساحتي';
+  @override
+  String get administration => 'الإدارة';
 }

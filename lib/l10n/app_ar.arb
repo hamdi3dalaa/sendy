@@ -313,5 +313,9 @@
   "emailNotifications": "إشعارات البريد الإلكتروني",
   "newJoinRequest": "طلب انضمام جديد",
   "menuItemUpdate": "تحديث القائمة",
-  "imageChangeRequest": "طلب تغيير الصورة"
+  "imageChangeRequest": "طلب تغيير الصورة",
+
+  "orderFood": "طلب طعام",
+  "mySpace": "مساحتي",
+  "administration": "الإدارة"
 }

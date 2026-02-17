@@ -14,9 +14,9 @@ import 'models/user_model.dart';
 import 'screens/splash_screen.dart';
 import 'screens/auth/phone_auth_screen.dart';
 import 'screens/client/client_home_screen.dart';
-import 'screens/delivery/delivery_home_screen.dart';
-import 'screens/restaurant/restaurant_home_screen.dart';
-import 'screens/admin/admin_panel_screen.dart';
+import 'screens/delivery/delivery_main_screen.dart';
+import 'screens/restaurant/restaurant_main_screen.dart';
+import 'screens/admin/admin_main_screen.dart';
 import 'screens/waiting_approval_screen.dart';
 import 'services/notification_service.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
@@ -187,8 +187,8 @@ class _AuthWrapperState extends State<AuthWrapper> {
 
           print('🟢 [AUTH_WRAPPER] Checking admin...');
           if (user.userType == UserType.admin) {
-            print('✅ [AUTH_WRAPPER] IS ADMIN → AdminPanelScreen');
-            return const AdminPanelScreen();
+            print('✅ [AUTH_WRAPPER] IS ADMIN → AdminMainScreen');
+            return const AdminMainScreen();
           }
 
           if ((user.userType == UserType.delivery ||
@@ -207,14 +207,14 @@ class _AuthWrapperState extends State<AuthWrapper> {
               print('🟢 [AUTH_WRAPPER] → ClientHomeScreen');
               return const ClientHomeScreen();
             case UserType.delivery:
-              print('🟢 [AUTH_WRAPPER] → DeliveryHomeScreen');
-              return const DeliveryHomeScreen();
+              print('🟢 [AUTH_WRAPPER] → DeliveryMainScreen');
+              return const DeliveryMainScreen();
             case UserType.restaurant:
-              print('🟢 [AUTH_WRAPPER] → RestaurantHomeScreen');
-              return const RestaurantHomeScreen();
+              print('🟢 [AUTH_WRAPPER] → RestaurantMainScreen');
+              return const RestaurantMainScreen();
             case UserType.admin:
-              print('🟢 [AUTH_WRAPPER] → AdminPanelScreen (switch)');
-              return const AdminPanelScreen();
+              print('🟢 [AUTH_WRAPPER] → AdminMainScreen (switch)');
+              return const AdminMainScreen();
           }
         } catch (e, stackTrace) {
           print('❌ [AUTH_WRAPPER] Build error: $e');
