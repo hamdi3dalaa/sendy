@@ -2,14 +2,30 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<!-- Camera & Photo Library (image_picker) -->
 	<key>NSCameraUsageDescription</key>
-	<string>This app needs camera access to take photos of menu items</string>
+	<string>Sendy needs camera access to take photos for your profile picture, restaurant logo, or menu items.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This app needs photo library access to select menu item images</string>
+	<string>Sendy needs photo library access to select images for your profile picture, restaurant logo, or menu items.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Sendy needs permission to save invoice PDFs and images to your photo library.</string>
+	<!-- Location (geolocator / geocoding / google_maps_flutter) -->
 	<key>NSLocationWhenInUseUsageDescription</key>
-    <string>This app needs access to location when open.</string>
-    <key>NSLocationAlwaysUsageDescription</key>
-    <string>This app needs access to location when in the background.</string>
+	<string>Sendy needs your location to find nearby restaurants, set your restaurant address, and track deliveries.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Sendy needs your location in the background to track deliveries and provide real-time updates to customers.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Sendy needs your location in the background to track deliveries and provide real-time updates to customers.</string>
+	<!-- Firebase Cloud Messaging -->
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
+	<!-- Background Modes -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+		<string>location</string>
+	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
