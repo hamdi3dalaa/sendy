@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
 import 'dart:async';
+import 'dart:io';
 
 class AuthProvider with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -380,6 +382,51 @@ class AuthProvider with ChangeNotifier {
     } catch (e) {
       print('❌ [AUTH_PROVIDER] Error: $e');
       return null;
+    }
+  }
+
+  // Upload profile image (restaurant logo or delivery photo)
+  // Image goes to pending state for admin approval
+  Future<bool> uploadProfileImage(File imageFile) async {
+    final user = _auth.currentUser;
+    if (user == null || _currentUser == null) return false;
+
+    try {
+      final storage = FirebaseStorage.instance;
+      final fileName = '${DateTime.now().millisecondsSinceEpoch}_${user.uid}.jpg';
+      final ref = storage.ref().child('profile_images/${user.uid}/$fileName');
+      await ref.putFile(imageFile);
+      final imageUrl = await ref.getDownloadURL();
+
+      // If user already has a profile image, new one needs admin approval
+      if (_currentUser!.profileImageUrl != null) {
+        await _firestore.collection('users').doc(user.uid).update({
+          'pendingProfileImageUrl': imageUrl,
+          'hasPendingImageChange': true,
+        });
+
+        _currentUser = _currentUser!.copyWith(
+          pendingProfileImageUrl: imageUrl,
+          hasPendingImageChange: true,
+        );
+      } else {
+        // First time upload - set as pending for admin approval
+        await _firestore.collection('users').doc(user.uid).update({
+          'pendingProfileImageUrl': imageUrl,
+          'hasPendingImageChange': true,
+        });
+
+        _currentUser = _currentUser!.copyWith(
+          pendingProfileImageUrl: imageUrl,
+          hasPendingImageChange: true,
+        );
+      }
+
+      notifyListeners();
+      return true;
+    } catch (e) {
+      print('Error uploading profile image: $e');
+      return false;
     }
   }
 

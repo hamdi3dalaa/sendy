@@ -2,9 +2,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sendy/l10n/app_localizations.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import '../../providers/auth_provider.dart';
 import '../../providers/menu_provider.dart';
 import 'menu_management_screen.dart';
+import 'invoice_history_screen.dart';
 
 class RestaurantHomeScreen extends StatefulWidget {
   const RestaurantHomeScreen({Key? key}) : super(key: key);
@@ -204,15 +208,76 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Restaurant Header
+          // Restaurant Header with Logo
           Center(
             child: Column(
               children: [
-                const Icon(
-                  Icons.restaurant,
-                  size: 100,
-                  color: Color(0xFFFF5722),
+                GestureDetector(
+                  onTap: () => _uploadLogo(context, l10n),
+                  child: Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(50),
+                        child: authProvider.currentUser?.profileImageUrl != null
+                            ? CachedNetworkImage(
+                                imageUrl: authProvider.currentUser!.profileImageUrl!,
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                                placeholder: (_, __) => Container(
+                                  width: 100,
+                                  height: 100,
+                                  color: Colors.grey[200],
+                                  child: const CircularProgressIndicator(),
+                                ),
+                                errorWidget: (_, __, ___) => Container(
+                                  width: 100,
+                                  height: 100,
+                                  color: Colors.grey[200],
+                                  child: const Icon(Icons.restaurant, size: 50, color: Color(0xFFFF5722)),
+                                ),
+                              )
+                            : Container(
+                                width: 100,
+                                height: 100,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFF5722).withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                child: const Icon(Icons.restaurant, size: 50, color: Color(0xFFFF5722)),
+                              ),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFFF5722),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.camera_alt, size: 16, color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+                if (authProvider.currentUser?.hasPendingImageChange == true)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.orange[50],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.orange[200]!),
+                      ),
+                      child: Text(
+                        l10n.pendingImageApproval,
+                        style: TextStyle(fontSize: 12, color: Colors.orange[800]),
+                      ),
+                    ),
+                  ),
                 const SizedBox(height: 20),
                 Text(
                   restaurantName,
@@ -439,6 +504,39 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
           ),
           const SizedBox(height: 20),
 
+          // Invoice History Card
+          Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.receipt_long, color: Colors.green),
+              ),
+              title: Text(
+                l10n.invoiceHistory,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(l10n.ordersSummary),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const InvoiceHistoryScreen(),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 20),
+
           // Orders Section (placeholder)
           Card(
             elevation: 4,
@@ -507,6 +605,52 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _uploadLogo(BuildContext context, AppLocalizations l10n) async {
+    final picker = ImagePicker();
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: Text(l10n.takePhoto),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: Text(l10n.chooseFromGallery),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (source == null) return;
+
+    final pickedFile = await picker.pickImage(
+      source: source,
+      maxWidth: 1024,
+      maxHeight: 1024,
+      imageQuality: 85,
+    );
+
+    if (pickedFile == null || !mounted) return;
+
+    final authProvider = context.read<AuthProvider>();
+    final success = await authProvider.uploadProfileImage(File(pickedFile.path));
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(success ? l10n.imageUploadSuccess : l10n.imageUploadError),
+          backgroundColor: success ? Colors.green : Colors.red,
+        ),
+      );
+    }
   }
 
   Widget _buildStatColumn({

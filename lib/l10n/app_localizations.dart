@@ -563,6 +563,53 @@ abstract class AppLocalizations {
   String get promoExpired;
   String get promoInvalid;
   String get validationError;
+
+  // Profile image strings
+  String get profileImage;
+  String get restaurantLogo;
+  String get changeLogo;
+  String get changeProfilePhoto;
+  String get uploadLogo;
+  String get uploadPhoto;
+  String get imageUploadSuccess;
+  String get imageUploadError;
+  String get pendingImageApproval;
+  String get pendingImageChanges;
+  String get approveImage;
+  String get rejectImage;
+  String get imageApproved;
+  String get imageRejected;
+  String get currentImage;
+  String get newImage;
+  String get noProfileImage;
+
+  // Invoice history strings
+  String get invoiceHistory;
+  String get totalRevenue;
+  String get totalOrders;
+  String get totalDeliveries;
+  String get deliveryEarnings;
+  String get orderDate;
+  String get noInvoices;
+  String get invoicesWillAppear;
+  String get period;
+  String get allTime;
+  String get thisMonth;
+  String get thisWeek;
+  String get today;
+  String get from;
+  String get to;
+  String get generateReport;
+  String get ordersSummary;
+  String get deliverySummary;
+
+  // Admin email strings
+  String get adminEmailConfig;
+  String get adminEmail;
+  String get emailNotifications;
+  String get newJoinRequest;
+  String get menuItemUpdate;
+  String get imageChangeRequest;
 }
 
 class _AppLocalizationsDelegate

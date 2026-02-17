@@ -787,4 +787,89 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get validationError => 'خطأ في التحقق';
+
+  @override
+  String get profileImage => 'صورة الملف الشخصي';
+  @override
+  String get restaurantLogo => 'شعار المطعم';
+  @override
+  String get changeLogo => 'تغيير الشعار';
+  @override
+  String get changeProfilePhoto => 'تغيير صورة الملف الشخصي';
+  @override
+  String get uploadLogo => 'رفع الشعار';
+  @override
+  String get uploadPhoto => 'رفع الصورة';
+  @override
+  String get imageUploadSuccess => 'تم إرسال الصورة! في انتظار موافقة المسؤول.';
+  @override
+  String get imageUploadError => 'خطأ أثناء إرسال الصورة';
+  @override
+  String get pendingImageApproval => 'صورة جديدة في انتظار الموافقة';
+  @override
+  String get pendingImageChanges => 'تغييرات الصور في الانتظار';
+  @override
+  String get approveImage => 'الموافقة على الصورة';
+  @override
+  String get rejectImage => 'رفض الصورة';
+  @override
+  String get imageApproved => 'تمت الموافقة على الصورة بنجاح';
+  @override
+  String get imageRejected => 'تم رفض الصورة';
+  @override
+  String get currentImage => 'الصورة الحالية';
+  @override
+  String get newImage => 'صورة جديدة';
+  @override
+  String get noProfileImage => 'لا توجد صورة للملف الشخصي';
+
+  @override
+  String get invoiceHistory => 'سجل الفواتير';
+  @override
+  String get totalRevenue => 'إجمالي الإيرادات';
+  @override
+  String get totalOrders => 'إجمالي الطلبات';
+  @override
+  String get totalDeliveries => 'إجمالي التوصيلات';
+  @override
+  String get deliveryEarnings => 'أرباح التوصيل';
+  @override
+  String get orderDate => 'تاريخ الطلب';
+  @override
+  String get noInvoices => 'لا توجد فواتير';
+  @override
+  String get invoicesWillAppear => 'ستظهر الفواتير هنا';
+  @override
+  String get period => 'الفترة';
+  @override
+  String get allTime => 'كل الوقت';
+  @override
+  String get thisMonth => 'هذا الشهر';
+  @override
+  String get thisWeek => 'هذا الأسبوع';
+  @override
+  String get today => 'اليوم';
+  @override
+  String get from => 'من';
+  @override
+  String get to => 'إلى';
+  @override
+  String get generateReport => 'إنشاء التقرير';
+  @override
+  String get ordersSummary => 'ملخص الطلبات';
+  @override
+  String get deliverySummary => 'ملخص التوصيلات';
+
+  @override
+  String get adminEmailConfig => 'إعدادات البريد الإلكتروني للمسؤول';
+  @override
+  String get adminEmail => 'بريد المسؤول';
+  @override
+  String get emailNotifications => 'إشعارات البريد الإلكتروني';
+  @override
+  String get newJoinRequest => 'طلب انضمام جديد';
+  @override
+  String get menuItemUpdate => 'تحديث القائمة';
+  @override
+  String get imageChangeRequest => 'طلب تغيير الصورة';
 }

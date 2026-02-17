@@ -6,6 +6,7 @@ import '../../providers/admin_provider.dart';
 import '../../providers/auth_provider.dart';
 import 'pending_users_screen.dart';
 import 'pending_menu_items_screen.dart';
+import 'pending_image_changes_screen.dart';
 import '../../screens/admin/config_management_screen.dart';
 import '../../models/user_model.dart';
 
@@ -30,6 +31,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
     await Future.wait([
       adminProvider.loadPendingUsers(),
       adminProvider.loadPendingMenuItems(),
+      adminProvider.loadPendingImageChanges(),
     ]);
   }
 
@@ -156,6 +158,26 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                       ],
                     ),
                     const SizedBox(height: 16),
+
+                    // Pending Image Changes
+                    if (adminProvider.pendingImageUsers.isNotEmpty)
+                      _buildActionCard(
+                        title: l10n.pendingImageChanges,
+                        subtitle: '${adminProvider.pendingImageUsers.length} ${l10n.pendingImageChanges.toLowerCase()}',
+                        icon: Icons.image,
+                        iconColor: Colors.teal,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const PendingImageChangesScreen(),
+                            ),
+                          ).then((_) => _loadData());
+                        },
+                      ),
+                    if (adminProvider.pendingImageUsers.isNotEmpty)
+                      const SizedBox(height: 16),
 
                     // Configuration
                     _buildActionCard(

@@ -241,6 +241,88 @@ class AdminProvider with ChangeNotifier {
     }
   }
 
+  // Load users with pending image changes
+  List<UserModel> get pendingImageChanges => _pendingUsers
+      .where((u) => u.hasPendingImageChange)
+      .toList();
+
+  // Load all users with pending image changes (separate from pending users)
+  List<UserModel> _pendingImageUsers = [];
+  List<UserModel> get pendingImageUsers => _pendingImageUsers;
+
+  Future<void> loadPendingImageChanges() async {
+    try {
+      final snapshot = await _firestore
+          .collection('users')
+          .where('hasPendingImageChange', isEqualTo: true)
+          .get();
+
+      _pendingImageUsers =
+          snapshot.docs.map((doc) => UserModel.fromMap(doc.data())).toList();
+      notifyListeners();
+    } catch (e) {
+      print('Error loading pending image changes: $e');
+    }
+  }
+
+  // Approve image change
+  Future<bool> approveImageChange(String uid, String adminUid) async {
+    try {
+      final doc = await _firestore.collection('users').doc(uid).get();
+      if (!doc.exists) return false;
+
+      final data = doc.data()!;
+      final pendingUrl = data['pendingProfileImageUrl'];
+
+      if (pendingUrl == null) return false;
+
+      await _firestore.collection('users').doc(uid).update({
+        'profileImageUrl': pendingUrl,
+        'pendingProfileImageUrl': null,
+        'hasPendingImageChange': false,
+      });
+
+      await _firestore.collection('approval_logs').add({
+        'type': 'image_change',
+        'targetId': uid,
+        'action': 'approved',
+        'adminUid': adminUid,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      await loadPendingImageChanges();
+      return true;
+    } catch (e) {
+      print('Error approving image change: $e');
+      return false;
+    }
+  }
+
+  // Reject image change
+  Future<bool> rejectImageChange(String uid, String reason, String adminUid) async {
+    try {
+      await _firestore.collection('users').doc(uid).update({
+        'pendingProfileImageUrl': null,
+        'hasPendingImageChange': false,
+      });
+
+      await _firestore.collection('approval_logs').add({
+        'type': 'image_change',
+        'targetId': uid,
+        'action': 'rejected',
+        'reason': reason,
+        'adminUid': adminUid,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      await loadPendingImageChanges();
+      return true;
+    } catch (e) {
+      print('Error rejecting image change: $e');
+      return false;
+    }
+  }
+
   // Get restaurant name by ID
   Future<String> getRestaurantName(String restaurantId) async {
     try {

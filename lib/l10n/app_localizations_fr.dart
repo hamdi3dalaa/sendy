@@ -788,4 +788,89 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get validationError => 'Erreur de validation';
+
+  @override
+  String get profileImage => 'Photo de profil';
+  @override
+  String get restaurantLogo => 'Logo du restaurant';
+  @override
+  String get changeLogo => 'Changer le logo';
+  @override
+  String get changeProfilePhoto => 'Changer la photo de profil';
+  @override
+  String get uploadLogo => 'Telecharger le logo';
+  @override
+  String get uploadPhoto => 'Telecharger la photo';
+  @override
+  String get imageUploadSuccess => 'Image envoyee ! En attente d\'approbation par l\'admin.';
+  @override
+  String get imageUploadError => 'Erreur lors de l\'envoi de l\'image';
+  @override
+  String get pendingImageApproval => 'Nouvelle image en attente d\'approbation';
+  @override
+  String get pendingImageChanges => 'Changements d\'images en attente';
+  @override
+  String get approveImage => 'Approuver l\'image';
+  @override
+  String get rejectImage => 'Rejeter l\'image';
+  @override
+  String get imageApproved => 'Image approuvee avec succes';
+  @override
+  String get imageRejected => 'Image rejetee';
+  @override
+  String get currentImage => 'Image actuelle';
+  @override
+  String get newImage => 'Nouvelle image';
+  @override
+  String get noProfileImage => 'Aucune photo de profil';
+
+  @override
+  String get invoiceHistory => 'Historique des factures';
+  @override
+  String get totalRevenue => 'Revenu total';
+  @override
+  String get totalOrders => 'Total commandes';
+  @override
+  String get totalDeliveries => 'Total livraisons';
+  @override
+  String get deliveryEarnings => 'Gains de livraison';
+  @override
+  String get orderDate => 'Date de commande';
+  @override
+  String get noInvoices => 'Aucune facture';
+  @override
+  String get invoicesWillAppear => 'Les factures apparaitront ici';
+  @override
+  String get period => 'Periode';
+  @override
+  String get allTime => 'Tout le temps';
+  @override
+  String get thisMonth => 'Ce mois';
+  @override
+  String get thisWeek => 'Cette semaine';
+  @override
+  String get today => 'Aujourd\'hui';
+  @override
+  String get from => 'De';
+  @override
+  String get to => 'A';
+  @override
+  String get generateReport => 'Generer le rapport';
+  @override
+  String get ordersSummary => 'Resume des commandes';
+  @override
+  String get deliverySummary => 'Resume des livraisons';
+
+  @override
+  String get adminEmailConfig => 'Configuration Email Admin';
+  @override
+  String get adminEmail => 'Email admin';
+  @override
+  String get emailNotifications => 'Notifications par email';
+  @override
+  String get newJoinRequest => 'Nouvelle demande d\'inscription';
+  @override
+  String get menuItemUpdate => 'Mise a jour du menu';
+  @override
+  String get imageChangeRequest => 'Demande de changement d\'image';
 }

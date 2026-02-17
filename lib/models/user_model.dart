@@ -16,6 +16,9 @@ class UserModel {
   final Map<String, dynamic>? location;
   final String? fcmToken;
   final DateTime? createdAt;
+  final String? profileImageUrl;
+  final String? pendingProfileImageUrl;
+  final bool hasPendingImageChange;
 
   UserModel({
     required this.uid,
@@ -28,6 +31,9 @@ class UserModel {
     this.location,
     this.fcmToken,
     this.createdAt,
+    this.profileImageUrl,
+    this.pendingProfileImageUrl,
+    this.hasPendingImageChange = false,
   });
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
@@ -48,6 +54,9 @@ class UserModel {
               ? (map['createdAt'] as Timestamp).toDate()
               : DateTime.parse(map['createdAt'].toString()))
           : null,
+      profileImageUrl: map['profileImageUrl'],
+      pendingProfileImageUrl: map['pendingProfileImageUrl'],
+      hasPendingImageChange: map['hasPendingImageChange'] ?? false,
     );
   }
 
@@ -63,6 +72,9 @@ class UserModel {
       'location': location,
       'fcmToken': fcmToken,
       'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : null,
+      'profileImageUrl': profileImageUrl,
+      'pendingProfileImageUrl': pendingProfileImageUrl,
+      'hasPendingImageChange': hasPendingImageChange,
     };
   }
 
@@ -77,6 +89,9 @@ class UserModel {
     Map<String, dynamic>? location,
     String? fcmToken,
     DateTime? createdAt,
+    String? profileImageUrl,
+    String? pendingProfileImageUrl,
+    bool? hasPendingImageChange,
   }) {
     return UserModel(
       uid: uid ?? this.uid,
@@ -89,6 +104,9 @@ class UserModel {
       location: location ?? this.location,
       fcmToken: fcmToken ?? this.fcmToken,
       createdAt: createdAt ?? this.createdAt,
+      profileImageUrl: profileImageUrl ?? this.profileImageUrl,
+      pendingProfileImageUrl: pendingProfileImageUrl ?? this.pendingProfileImageUrl,
+      hasPendingImageChange: hasPendingImageChange ?? this.hasPendingImageChange,
     );
   }
 
