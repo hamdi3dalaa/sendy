@@ -18,9 +18,11 @@ class AuthProvider with ChangeNotifier {
   String? _currentPhoneNumber;
   UserModel? _currentUser;
   Locale _locale = const Locale('fr');
+  bool _isAuthReady = false;
 
   UserModel? get currentUser => _currentUser;
   Locale get locale => _locale;
+  bool get isAuthReady => _isAuthReady;
 
   /// Get current user as RestaurantUser (null if not a restaurant)
   RestaurantUser? get currentRestaurantUser =>
@@ -58,7 +60,6 @@ class AuthProvider with ChangeNotifier {
       print('🟦 [AUTH_PROVIDER] Auth state changed: ${user.uid}');
 
       try {
-        // ✅ ADD TIMEOUT to prevent hanging
         final doc =
             await _firestore.collection('users').doc(user.uid).get().timeout(
           const Duration(seconds: 10),
@@ -72,44 +73,37 @@ class AuthProvider with ChangeNotifier {
           print('🟢 [AUTH_PROVIDER] User document found');
           final data = doc.data()!;
 
-          print('═══════════════════════════════════════');
           print('📊 [AUTH_PROVIDER] USER DATA:');
           print('   - phoneNumber: ${data['phoneNumber']}');
-          print('   - name: ${data['name']}');
-          print(
-              '   - userType: ${data['userType']} (${data['userType'].runtimeType})');
+          print('   - userType: ${data['userType']}');
           print('   - approvalStatus: ${data['approvalStatus']}');
-          print('═══════════════════════════════════════');
 
           _currentUser = UserModel.fromMap(data);
 
-          print('👤 [AUTH_PROVIDER] UserModel created:');
-          print('   - userType: ${_currentUser!.userType}');
-          print('   - isAdmin: ${_currentUser!.isAdmin}');
-          print('   - userTypeString: ${_currentUser!.userTypeString}');
-
-          notifyListeners();
-          print('✅ [AUTH_PROVIDER] notifyListeners called');
+          print('👤 [AUTH_PROVIDER] UserModel created: ${_currentUser!.userType}');
         } else {
           print('🟡 [AUTH_PROVIDER] User document not found');
           _currentUser = null;
-          notifyListeners();
         }
       } on TimeoutException catch (e) {
         print('❌ [AUTH_PROVIDER] Timeout: $e');
         _currentUser = null;
-        notifyListeners();
       } catch (e, stackTrace) {
         print('🔴 [AUTH_PROVIDER] Error loading user: $e');
         print('🔴 [AUTH_PROVIDER] Stack trace: $stackTrace');
         _currentUser = null;
-        notifyListeners();
       }
     } else {
       print('🟡 [AUTH_PROVIDER] User signed out');
       _currentUser = null;
-      notifyListeners();
     }
+
+    // Mark auth as ready after the first auth state check
+    if (!_isAuthReady) {
+      _isAuthReady = true;
+      print('✅ [AUTH_PROVIDER] Auth ready');
+    }
+    notifyListeners();
   }
 
   // ✅ FIREBASE PHONE AUTH - GRATUIT
