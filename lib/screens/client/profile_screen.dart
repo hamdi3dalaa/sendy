@@ -24,7 +24,8 @@ class ProfileScreen extends StatelessWidget {
           // User Info Card
           Card(
             elevation: 3,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             child: Padding(
               padding: const EdgeInsets.all(24),
               child: Column(
@@ -32,12 +33,14 @@ class ProfileScreen extends StatelessWidget {
                   CircleAvatar(
                     radius: 45,
                     backgroundColor: const Color(0xFFFF5722).withOpacity(0.1),
-                    child: const Icon(Icons.person, size: 50, color: Color(0xFFFF5722)),
+                    child: const Icon(Icons.person,
+                        size: 50, color: Color(0xFFFF5722)),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     user?.displayName ?? l10n.client,
-                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -52,11 +55,14 @@ class ProfileScreen extends StatelessWidget {
 
           // Language Switcher
           Card(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             child: ListTile(
               leading: const Icon(Icons.language, color: Color(0xFFFF5722)),
               title: Text(l10n.language),
-              subtitle: Text(authProvider.locale.languageCode == 'fr' ? l10n.french : l10n.arabic),
+              subtitle: Text(authProvider.locale.languageCode == 'fr'
+                  ? l10n.french
+                  : l10n.arabic),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () => _showLanguageDialog(context, l10n, authProvider),
             ),
@@ -65,7 +71,8 @@ class ProfileScreen extends StatelessWidget {
 
           // Saved Addresses
           Card(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             child: ListTile(
               leading: const Icon(Icons.location_on, color: Color(0xFFFF5722)),
               title: Text(l10n.savedAddresses),
@@ -74,7 +81,8 @@ class ProfileScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SavedAddressesScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const SavedAddressesScreen()),
                 );
               },
             ),
@@ -83,7 +91,8 @@ class ProfileScreen extends StatelessWidget {
 
           // Favorites
           Card(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             child: ListTile(
               leading: const Icon(Icons.favorite, color: Color(0xFFFF5722)),
               title: Text(l10n.favorites),
@@ -96,7 +105,8 @@ class ProfileScreen extends StatelessWidget {
 
           // Settings
           Card(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             child: ListTile(
               leading: const Icon(Icons.settings, color: Color(0xFFFF5722)),
               title: Text(l10n.settings),
@@ -117,7 +127,8 @@ class ProfileScreen extends StatelessWidget {
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
               ),
             ),
           ),
@@ -127,7 +138,8 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  void _showLanguageDialog(BuildContext context, AppLocalizations l10n, AuthProvider authProvider) {
+  void _showLanguageDialog(
+      BuildContext context, AppLocalizations l10n, AuthProvider authProvider) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -142,7 +154,7 @@ class ProfileScreen extends StatelessWidget {
                   ? const Icon(Icons.check, color: Color(0xFFFF5722))
                   : null,
               onTap: () {
-                authProvider.setLocale(const Locale('fr'));
+                authProvider.changeLanguage('fr');
                 Navigator.pop(context);
               },
             ),
@@ -153,7 +165,7 @@ class ProfileScreen extends StatelessWidget {
                   ? const Icon(Icons.check, color: Color(0xFFFF5722))
                   : null,
               onTap: () {
-                authProvider.setLocale(const Locale('ar'));
+                authProvider.changeLanguage('fr');
                 Navigator.pop(context);
               },
             ),
@@ -163,7 +175,8 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  void _showFavorites(BuildContext context, AppLocalizations l10n, ClientProvider clientProvider) {
+  void _showFavorites(BuildContext context, AppLocalizations l10n,
+      ClientProvider clientProvider) {
     final favoriteIds = clientProvider.favoriteRestaurantIds;
     final favoriteRestaurants = clientProvider.restaurants
         .where((r) => favoriteIds.contains(r.uid))
@@ -181,7 +194,8 @@ class ProfileScreen extends StatelessWidget {
               const SizedBox(height: 16),
               Text(l10n.noFavorites, style: TextStyle(color: Colors.grey[600])),
               const SizedBox(height: 8),
-              Text(l10n.favoritesWillAppear, style: TextStyle(fontSize: 13, color: Colors.grey[500])),
+              Text(l10n.favoritesWillAppear,
+                  style: TextStyle(fontSize: 13, color: Colors.grey[500])),
             ],
           ),
           actions: [
@@ -210,7 +224,8 @@ class ProfileScreen extends StatelessWidget {
               final restaurant = favoriteRestaurants[index];
               return Card(
                 margin: const EdgeInsets.only(bottom: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
                 child: ListTile(
                   contentPadding: const EdgeInsets.all(12),
                   leading: Container(
@@ -220,15 +235,19 @@ class ProfileScreen extends StatelessWidget {
                       color: const Color(0xFFFF5722).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.restaurant, color: Color(0xFFFF5722)),
+                    child:
+                        const Icon(Icons.restaurant, color: Color(0xFFFF5722)),
                   ),
-                  title: Text(restaurant.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  title: Text(restaurant.name,
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
                   subtitle: restaurant.averageRating > 0
                       ? Row(
                           children: [
-                            const Icon(Icons.star, size: 14, color: Colors.amber),
+                            const Icon(Icons.star,
+                                size: 14, color: Colors.amber),
                             const SizedBox(width: 4),
-                            Text('${restaurant.averageRating.toStringAsFixed(1)}'),
+                            Text(
+                                '${restaurant.averageRating.toStringAsFixed(1)}'),
                           ],
                         )
                       : null,
@@ -237,7 +256,8 @@ class ProfileScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => RestaurantMenuScreen(restaurant: restaurant),
+                        builder: (context) =>
+                            RestaurantMenuScreen(restaurant: restaurant),
                       ),
                     );
                   },
@@ -250,7 +270,8 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  void _confirmLogout(BuildContext context, AppLocalizations l10n, AuthProvider authProvider) {
+  void _confirmLogout(
+      BuildContext context, AppLocalizations l10n, AuthProvider authProvider) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

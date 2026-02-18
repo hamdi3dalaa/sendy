@@ -63,6 +63,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get restaurant => 'مطعم';
 
   @override
+  String get admin => 'المسؤول';
+
+  @override
   String get selectUserType => 'اختر نوع المستخدم';
 
   @override
@@ -399,7 +402,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get estimatedDelivery => 'التوصيل المتوقع';
 
   @override
-  String arrivingIn(String minutes) => 'يصل في ~$minutes دقيقة';
+  String arrivingIn(Object minutes) {
+    return 'يصل في ~$minutes دقيقة';
+  }
 
   @override
   String get orderPlaced => 'تم تقديم الطلب';
@@ -558,9 +563,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get recentSearches => 'عمليات البحث الأخيرة';
 
   @override
-  String get admin => 'المسؤول';
-
-  @override
   String get menuManagement => 'إدارة القائمة';
 
   @override
@@ -579,7 +581,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get confirmDeletion => 'تأكيد الحذف';
 
   @override
-  String confirmDeleteDishMessage(String name) => 'هل تريد حقا حذف "$name" ؟';
+  String confirmDeleteDishMessage(String name) {
+    return 'هل تريد حقا حذف \"$name\" ؟';
+  }
 
   @override
   String get delete => 'حذف';
@@ -615,7 +619,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get imageLoadError => 'خطأ في التحميل';
 
   @override
-  String get noImageWarning => 'هذا الطبق لا يحتوي على صورة. يوصى بطلب من المطعم إضافة واحدة.';
+  String get noImageWarning =>
+      'هذا الطبق لا يحتوي على صورة. يوصى بطلب من المطعم إضافة واحدة.';
 
   @override
   String get confirmApproval => 'تأكيد الموافقة';
@@ -642,7 +647,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get rejectionReason => 'سبب الرفض *';
 
   @override
-  String get rejectionReasonHint => 'مثال: صورة رديئة الجودة، عنوان غير مناسب...';
+  String get rejectionReasonHint =>
+      'مثال: صورة رديئة الجودة، عنوان غير مناسب...';
 
   @override
   String get enterReason => 'الرجاء إدخال سبب';
@@ -693,7 +699,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get addTheDish => 'إضافة الطبق';
 
   @override
-  String get dishVerificationNote => 'سيتم التحقق من طبقك من قبل المسؤول قبل نشره.';
+  String get dishVerificationNote =>
+      'سيتم التحقق من طبقك من قبل المسؤول قبل نشره.';
 
   @override
   String get chooseImage => 'اختر صورة';
@@ -717,7 +724,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get newPhotoPending => 'الصورة الجديدة ستكون في انتظار الموافقة';
 
   @override
-  String get dishModifiedPending => 'تم تعديل الطبق! الصورة الجديدة في انتظار الموافقة.';
+  String get dishModifiedPending =>
+      'تم تعديل الطبق! الصورة الجديدة في انتظار الموافقة.';
 
   @override
   String get dishModifiedSuccess => 'تم تعديل الطبق بنجاح!';
@@ -777,7 +785,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get thankYou => 'شكرا لاختياركم سندي!';
 
   @override
-  String promoMinOrder(String amount) => 'الحد الأدنى للطلب: $amount DHs';
+  String promoMinOrder(String amount) {
+    return 'الحد الأدنى للطلب: $amount DHs';
+  }
 
   @override
   String get promoExpired => 'الرمز الترويجي منتهي الصلاحية';
@@ -790,117 +800,166 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get profileImage => 'صورة الملف الشخصي';
+
   @override
   String get restaurantLogo => 'شعار المطعم';
+
   @override
   String get changeLogo => 'تغيير الشعار';
+
   @override
   String get changeProfilePhoto => 'تغيير صورة الملف الشخصي';
+
   @override
   String get uploadLogo => 'رفع الشعار';
+
   @override
   String get uploadPhoto => 'رفع الصورة';
+
   @override
   String get imageUploadSuccess => 'تم إرسال الصورة! في انتظار موافقة المسؤول.';
+
   @override
   String get imageUploadError => 'خطأ أثناء إرسال الصورة';
+
   @override
   String get pendingImageApproval => 'صورة جديدة في انتظار الموافقة';
+
   @override
   String get pendingImageChanges => 'تغييرات الصور في الانتظار';
+
   @override
   String get approveImage => 'الموافقة على الصورة';
+
   @override
   String get rejectImage => 'رفض الصورة';
+
   @override
   String get imageApproved => 'تمت الموافقة على الصورة بنجاح';
+
   @override
   String get imageRejected => 'تم رفض الصورة';
+
   @override
   String get currentImage => 'الصورة الحالية';
+
   @override
   String get newImage => 'صورة جديدة';
+
   @override
   String get noProfileImage => 'لا توجد صورة للملف الشخصي';
 
   @override
   String get invoiceHistory => 'سجل الفواتير';
+
   @override
   String get totalRevenue => 'إجمالي الإيرادات';
+
   @override
   String get totalOrders => 'إجمالي الطلبات';
+
   @override
   String get totalDeliveries => 'إجمالي التوصيلات';
+
   @override
   String get deliveryEarnings => 'أرباح التوصيل';
+
   @override
   String get orderDate => 'تاريخ الطلب';
+
   @override
   String get noInvoices => 'لا توجد فواتير';
+
   @override
   String get invoicesWillAppear => 'ستظهر الفواتير هنا';
+
   @override
   String get period => 'الفترة';
+
   @override
   String get allTime => 'كل الوقت';
+
   @override
   String get thisMonth => 'هذا الشهر';
+
   @override
   String get thisWeek => 'هذا الأسبوع';
+
   @override
   String get today => 'اليوم';
+
   @override
   String get from => 'من';
+
   @override
   String get to => 'إلى';
+
   @override
   String get generateReport => 'إنشاء التقرير';
+
   @override
   String get ordersSummary => 'ملخص الطلبات';
+
   @override
   String get deliverySummary => 'ملخص التوصيلات';
 
   @override
   String get adminEmailConfig => 'إعدادات البريد الإلكتروني للمسؤول';
+
   @override
   String get adminEmail => 'بريد المسؤول';
+
   @override
   String get emailNotifications => 'إشعارات البريد الإلكتروني';
+
   @override
   String get newJoinRequest => 'طلب انضمام جديد';
+
   @override
   String get menuItemUpdate => 'تحديث القائمة';
+
   @override
   String get imageChangeRequest => 'طلب تغيير الصورة';
 
   @override
   String get orderFood => 'طلب طعام';
+
   @override
   String get mySpace => 'مساحتي';
+
   @override
   String get administration => 'الإدارة';
 
   @override
   String get restaurantAddressLabel => 'عنوان المطعم';
+
   @override
   String get cityLabel => 'المدينة';
+
   @override
   String get useGPS => 'استخدام GPS';
+
   @override
   String get gpsPositionCaptured => 'تم التقاط موقع GPS!';
 
   @override
   String get availableOrders => 'التوصيلات';
+
   @override
   String get noAvailableOrders => 'لا توجد توصيلات متاحة';
+
   @override
   String get ordersWillAppearHere => 'ستظهر الطلبات هنا';
+
   @override
   String get acceptDelivery => 'قبول التوصيل';
+
   @override
   String get confirmAcceptDelivery => 'تأكيد التوصيل';
+
   @override
   String get confirmAcceptDeliveryMessage => 'هل تريد قبول هذا التوصيل؟';
+
   @override
   String get orderAcceptedSuccess => 'تم قبول التوصيل!';
 }

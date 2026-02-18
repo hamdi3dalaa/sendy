@@ -178,7 +178,8 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                   valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF5722)),
                 ),
               )
-            : _buildContent(context, l10n, restaurantName, menuProvider),
+            : _buildContent(
+                context, l10n, restaurantName, menuProvider, authProvider),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _navigateToMenuManagement,
@@ -190,11 +191,11 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
   }
 
   Widget _buildContent(
-    BuildContext context,
-    AppLocalizations l10n,
-    String restaurantName,
-    MenuProvider menuProvider,
-  ) {
+      BuildContext context,
+      AppLocalizations l10n,
+      String restaurantName,
+      MenuProvider menuProvider,
+      AuthProvider authProvider) {
     final totalItems = menuProvider.menuItems.length;
     final approvedCount = menuProvider.approvedItems.length;
     final pendingCount = menuProvider.pendingItems.length;
@@ -220,7 +221,8 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                         borderRadius: BorderRadius.circular(50),
                         child: authProvider.currentUser?.profileImageUrl != null
                             ? CachedNetworkImage(
-                                imageUrl: authProvider.currentUser!.profileImageUrl!,
+                                imageUrl:
+                                    authProvider.currentUser!.profileImageUrl!,
                                 width: 100,
                                 height: 100,
                                 fit: BoxFit.cover,
@@ -234,17 +236,20 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                                   width: 100,
                                   height: 100,
                                   color: Colors.grey[200],
-                                  child: const Icon(Icons.restaurant, size: 50, color: Color(0xFFFF5722)),
+                                  child: const Icon(Icons.restaurant,
+                                      size: 50, color: Color(0xFFFF5722)),
                                 ),
                               )
                             : Container(
                                 width: 100,
                                 height: 100,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFFF5722).withOpacity(0.1),
+                                  color:
+                                      const Color(0xFFFF5722).withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(50),
                                 ),
-                                child: const Icon(Icons.restaurant, size: 50, color: Color(0xFFFF5722)),
+                                child: const Icon(Icons.restaurant,
+                                    size: 50, color: Color(0xFFFF5722)),
                               ),
                       ),
                       Positioned(
@@ -256,7 +261,8 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                             color: Color(0xFFFF5722),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.camera_alt, size: 16, color: Colors.white),
+                          child: const Icon(Icons.camera_alt,
+                              size: 16, color: Colors.white),
                         ),
                       ),
                     ],
@@ -266,7 +272,8 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
                         color: Colors.orange[50],
                         borderRadius: BorderRadius.circular(12),
@@ -274,7 +281,8 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                       ),
                       child: Text(
                         l10n.pendingImageApproval,
-                        style: TextStyle(fontSize: 12, color: Colors.orange[800]),
+                        style:
+                            TextStyle(fontSize: 12, color: Colors.orange[800]),
                       ),
                     ),
                   ),
@@ -641,12 +649,14 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
     if (pickedFile == null || !mounted) return;
 
     final authProvider = context.read<AuthProvider>();
-    final success = await authProvider.uploadProfileImage(File(pickedFile.path));
+    final success =
+        await authProvider.uploadProfileImage(File(pickedFile.path));
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(success ? l10n.imageUploadSuccess : l10n.imageUploadError),
+          content:
+              Text(success ? l10n.imageUploadSuccess : l10n.imageUploadError),
           backgroundColor: success ? Colors.green : Colors.red,
         ),
       );

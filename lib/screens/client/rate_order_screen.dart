@@ -20,6 +20,27 @@ class _RateOrderScreenState extends State<RateOrderScreen> {
   final _commentController = TextEditingController();
   bool _isSubmitting = false;
 
+  String? _restaurantName;
+  bool _isLoadingRestaurant = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRestaurantName();
+  }
+
+  Future<void> _loadRestaurantName() async {
+    final clientProvider = context.read<ClientProvider>();
+    final restaurant =
+        await clientProvider.getRestaurantById(widget.order.restaurantId!);
+    if (mounted) {
+      setState(() {
+        _restaurantName = restaurant?.name ?? 'Restaurant';
+        _isLoadingRestaurant = false;
+      });
+    }
+  }
+
   @override
   void dispose() {
     _commentController.dispose();
@@ -90,10 +111,16 @@ class _RateOrderScreenState extends State<RateOrderScreen> {
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            Text(
-              widget.order.restaurantName ?? l10n.restaurant,
-              style: TextStyle(fontSize: 18, color: Colors.grey[700]),
-            ),
+            _isLoadingRestaurant
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Text(
+                    _restaurantName ?? l10n.restaurant,
+                    style: TextStyle(fontSize: 18, color: Colors.grey[700]),
+                  ),
             const SizedBox(height: 40),
 
             // Rate your experience
@@ -115,7 +142,9 @@ class _RateOrderScreenState extends State<RateOrderScreen> {
                     child: Icon(
                       _rating >= starValue ? Icons.star : Icons.star_border,
                       size: 48,
-                      color: _rating >= starValue ? Colors.amber : Colors.grey[400],
+                      color: _rating >= starValue
+                          ? Colors.amber
+                          : Colors.grey[400],
                     ),
                   ),
                 );
@@ -135,10 +164,12 @@ class _RateOrderScreenState extends State<RateOrderScreen> {
               maxLines: 4,
               decoration: InputDecoration(
                 hintText: l10n.writeReview,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Color(0xFFFF5722), width: 2),
+                  borderSide:
+                      const BorderSide(color: Color(0xFFFF5722), width: 2),
                 ),
               ),
             ),
@@ -153,7 +184,8 @@ class _RateOrderScreenState extends State<RateOrderScreen> {
                   backgroundColor: const Color(0xFFFF5722),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
                   disabledBackgroundColor: Colors.grey[300],
                 ),
                 child: _isSubmitting
@@ -162,12 +194,14 @@ class _RateOrderScreenState extends State<RateOrderScreen> {
                         width: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
                       )
                     : Text(
                         l10n.submitReview,
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
                       ),
               ),
             ),

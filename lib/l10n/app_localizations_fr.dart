@@ -21,16 +21,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get register => 'S\'inscrire';
 
   @override
-  String get phoneNumber => 'Numéro de téléphone';
+  String get phoneNumber => 'Numero de telephone';
 
   @override
-  String get verifyPhone => 'Vérifier le téléphone';
+  String get verifyPhone => 'Verifier le telephone';
 
   @override
   String get enterOTP => 'Entrez le code OTP';
 
   @override
-  String get verify => 'Vérifier';
+  String get verify => 'Verifier';
 
   @override
   String get orders => 'Commandes';
@@ -45,13 +45,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get trackDelivery => 'Suivre la livraison';
 
   @override
-  String get orderAccepted => 'Commande acceptée';
+  String get orderAccepted => 'Commande acceptee';
 
   @override
   String get orderInProgress => 'En cours de livraison';
 
   @override
-  String get orderDelivered => 'Livré';
+  String get orderDelivered => 'Livre';
 
   @override
   String get client => 'Client';
@@ -63,19 +63,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String get restaurant => 'Restaurant';
 
   @override
-  String get selectUserType => 'Sélectionnez le type d\'utilisateur';
+  String get admin => 'Administrateur';
 
   @override
-  String get uploadID => 'Télécharger la carte d\'identité';
+  String get selectUserType => 'Selectionnez le type d\'utilisateur';
+
+  @override
+  String get uploadID => 'Telecharger la carte d\'identite';
 
   @override
   String get waitingApproval => 'En attente d\'approbation';
 
   @override
-  String get approved => 'Approuvé';
+  String get approved => 'Approuve';
 
   @override
-  String get rejected => 'Rejeté';
+  String get rejected => 'Rejete';
 
   @override
   String get myLocation => 'Ma position';
@@ -84,16 +87,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get deliveryLocation => 'Position du livreur';
 
   @override
-  String get paymentMethod => 'Méthode de paiement';
+  String get paymentMethod => 'Methode de paiement';
 
   @override
-  String get cashOnDelivery => 'Paiement à la livraison';
+  String get cashOnDelivery => 'Paiement a la livraison';
 
   @override
   String get cardPayment => 'Paiement par carte';
 
   @override
-  String get comingSoon => 'Bientôt disponible';
+  String get comingSoon => 'Bientot disponible';
 
   @override
   String get subtotal => 'Sous-total';
@@ -112,7 +115,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get commentPlaceholder =>
-      'Instructions spéciales pour votre commande...';
+      'Instructions speciales pour votre commande...';
 
   @override
   String get placeOrder => 'Passer la commande';
@@ -121,10 +124,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get invoice => 'Facture';
 
   @override
-  String get downloadInvoice => 'Télécharger la facture';
+  String get downloadInvoice => 'Telecharger la facture';
 
   @override
-  String get orderDetails => 'Détails de la commande';
+  String get orderDetails => 'Details de la commande';
 
   @override
   String get clientComment => 'Commentaire du client';
@@ -166,7 +169,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get noRestaurantsAvailable => 'Aucun restaurant disponible';
 
   @override
-  String get restaurantsWillAppear => 'Les restaurants apparaitront ici une fois approuves';
+  String get restaurantsWillAppear =>
+      'Les restaurants apparaitront ici une fois approuves';
 
   @override
   String get noResultsFound => 'Aucun resultat trouve';
@@ -178,7 +182,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get discoverRestaurants => 'Decouvrez nos restaurants';
 
   @override
-  String get tapToLoadRestaurants => 'Appuyez sur le bouton pour charger les restaurants disponibles';
+  String get tapToLoadRestaurants =>
+      'Appuyez sur le bouton pour charger les restaurants disponibles';
 
   @override
   String get loadRestaurants => 'Charger les restaurants';
@@ -226,7 +231,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get pay => 'Payer';
 
   @override
-  String get enterDeliveryAddress => 'Veuillez entrer votre adresse de livraison';
+  String get enterDeliveryAddress =>
+      'Veuillez entrer votre adresse de livraison';
 
   @override
   String get orderPlacedSuccess => 'Commande passee avec succes!';
@@ -400,7 +406,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get estimatedDelivery => 'Livraison estimee';
 
   @override
-  String arrivingIn(String minutes) => 'Arrive dans ~$minutes min';
+  String arrivingIn(Object minutes) {
+    return 'Arrive dans ~$minutes min';
+  }
 
   @override
   String get orderPlaced => 'Commande passee';
@@ -448,7 +456,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get positionRequired => 'Position requise';
 
   @override
-  String get positionRequiredDescription => 'La localisation est necessaire pour recevoir des commandes';
+  String get positionRequiredDescription =>
+      'La localisation est necessaire pour recevoir des commandes';
 
   @override
   String get refresh => 'Actualiser';
@@ -496,7 +505,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get adminPanel => 'Tableau de Bord Admin';
 
   @override
-  String get manageApprovalsAndConfig => 'Gerer les approbations et configurations';
+  String get manageApprovalsAndConfig =>
+      'Gerer les approbations et configurations';
 
   @override
   String get pendingUsers => 'Utilisateurs en attente';
@@ -559,9 +569,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get recentSearches => 'Recherches recentes';
 
   @override
-  String get admin => 'Administrateur';
-
-  @override
   String get menuManagement => 'Gestion du Menu';
 
   @override
@@ -580,7 +587,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get confirmDeletion => 'Confirmer la suppression';
 
   @override
-  String confirmDeleteDishMessage(String name) => 'Voulez-vous vraiment supprimer "$name" ?';
+  String confirmDeleteDishMessage(String name) {
+    return 'Voulez-vous vraiment supprimer \"$name\" ?';
+  }
 
   @override
   String get delete => 'Supprimer';
@@ -616,7 +625,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get imageLoadError => 'Erreur de chargement';
 
   @override
-  String get noImageWarning => 'Ce plat n\'a pas d\'image. Recommande de demander au restaurant d\'en ajouter une.';
+  String get noImageWarning =>
+      'Ce plat n\'a pas d\'image. Recommande de demander au restaurant d\'en ajouter une.';
 
   @override
   String get confirmApproval => 'Confirmer l\'approbation';
@@ -643,7 +653,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get rejectionReason => 'Raison du rejet *';
 
   @override
-  String get rejectionReasonHint => 'Ex: Image de mauvaise qualite, titre inapproprie...';
+  String get rejectionReasonHint =>
+      'Ex: Image de mauvaise qualite, titre inapproprie...';
 
   @override
   String get enterReason => 'Veuillez entrer une raison';
@@ -673,7 +684,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get enterDescriptionValidation => 'Veuillez entrer une description';
 
   @override
-  String get descriptionTooShort => 'La description doit contenir au moins 10 caracteres';
+  String get descriptionTooShort =>
+      'La description doit contenir au moins 10 caracteres';
 
   @override
   String get enterPriceValidation => 'Veuillez entrer un prix';
@@ -685,7 +697,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get pricePositive => 'Le prix doit etre superieur a 0';
 
   @override
-  String get dishAddedPending => 'Plat ajoute ! En attente d\'approbation par l\'admin.';
+  String get dishAddedPending =>
+      'Plat ajoute ! En attente d\'approbation par l\'admin.';
 
   @override
   String get unknownError => 'Erreur inconnue';
@@ -694,7 +707,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get addTheDish => 'Ajouter le plat';
 
   @override
-  String get dishVerificationNote => 'Votre plat sera verifie par un administrateur avant d\'etre publie.';
+  String get dishVerificationNote =>
+      'Votre plat sera verifie par un administrateur avant d\'etre publie.';
 
   @override
   String get chooseImage => 'Choisir une image';
@@ -715,10 +729,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get newPhoto => 'Nouvelle photo';
 
   @override
-  String get newPhotoPending => 'La nouvelle photo sera en attente d\'approbation';
+  String get newPhotoPending =>
+      'La nouvelle photo sera en attente d\'approbation';
 
   @override
-  String get dishModifiedPending => 'Plat modifie ! Nouvelle photo en attente d\'approbation.';
+  String get dishModifiedPending =>
+      'Plat modifie ! Nouvelle photo en attente d\'approbation.';
 
   @override
   String get dishModifiedSuccess => 'Plat modifie avec succes !';
@@ -778,7 +794,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get thankYou => 'Merci d\'avoir choisi Sendy!';
 
   @override
-  String promoMinOrder(String amount) => 'Commande minimum: $amount DHs';
+  String promoMinOrder(String amount) {
+    return 'Commande minimum: $amount DHs';
+  }
 
   @override
   String get promoExpired => 'Code promo expire';
@@ -791,117 +809,168 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get profileImage => 'Photo de profil';
+
   @override
   String get restaurantLogo => 'Logo du restaurant';
+
   @override
   String get changeLogo => 'Changer le logo';
+
   @override
   String get changeProfilePhoto => 'Changer la photo de profil';
+
   @override
   String get uploadLogo => 'Telecharger le logo';
+
   @override
   String get uploadPhoto => 'Telecharger la photo';
+
   @override
-  String get imageUploadSuccess => 'Image envoyee ! En attente d\'approbation par l\'admin.';
+  String get imageUploadSuccess =>
+      'Image envoyee ! En attente d\'approbation par l\'admin.';
+
   @override
   String get imageUploadError => 'Erreur lors de l\'envoi de l\'image';
+
   @override
   String get pendingImageApproval => 'Nouvelle image en attente d\'approbation';
+
   @override
   String get pendingImageChanges => 'Changements d\'images en attente';
+
   @override
   String get approveImage => 'Approuver l\'image';
+
   @override
   String get rejectImage => 'Rejeter l\'image';
+
   @override
   String get imageApproved => 'Image approuvee avec succes';
+
   @override
   String get imageRejected => 'Image rejetee';
+
   @override
   String get currentImage => 'Image actuelle';
+
   @override
   String get newImage => 'Nouvelle image';
+
   @override
   String get noProfileImage => 'Aucune photo de profil';
 
   @override
   String get invoiceHistory => 'Historique des factures';
+
   @override
   String get totalRevenue => 'Revenu total';
+
   @override
   String get totalOrders => 'Total commandes';
+
   @override
   String get totalDeliveries => 'Total livraisons';
+
   @override
   String get deliveryEarnings => 'Gains de livraison';
+
   @override
   String get orderDate => 'Date de commande';
+
   @override
   String get noInvoices => 'Aucune facture';
+
   @override
   String get invoicesWillAppear => 'Les factures apparaitront ici';
+
   @override
   String get period => 'Periode';
+
   @override
   String get allTime => 'Tout le temps';
+
   @override
   String get thisMonth => 'Ce mois';
+
   @override
   String get thisWeek => 'Cette semaine';
+
   @override
   String get today => 'Aujourd\'hui';
+
   @override
   String get from => 'De';
+
   @override
   String get to => 'A';
+
   @override
   String get generateReport => 'Generer le rapport';
+
   @override
   String get ordersSummary => 'Resume des commandes';
+
   @override
   String get deliverySummary => 'Resume des livraisons';
 
   @override
   String get adminEmailConfig => 'Configuration Email Admin';
+
   @override
   String get adminEmail => 'Email admin';
+
   @override
   String get emailNotifications => 'Notifications par email';
+
   @override
   String get newJoinRequest => 'Nouvelle demande d\'inscription';
+
   @override
   String get menuItemUpdate => 'Mise a jour du menu';
+
   @override
   String get imageChangeRequest => 'Demande de changement d\'image';
 
   @override
   String get orderFood => 'Commander';
+
   @override
   String get mySpace => 'Mon Espace';
+
   @override
   String get administration => 'Administration';
 
   @override
   String get restaurantAddressLabel => 'Adresse du restaurant';
+
   @override
   String get cityLabel => 'Ville';
+
   @override
   String get useGPS => 'Utiliser le GPS';
+
   @override
   String get gpsPositionCaptured => 'Position GPS capturee !';
 
   @override
   String get availableOrders => 'Livraisons';
+
   @override
   String get noAvailableOrders => 'Aucune livraison disponible';
+
   @override
   String get ordersWillAppearHere => 'Les commandes apparaitront ici';
+
   @override
   String get acceptDelivery => 'Accepter la livraison';
+
   @override
   String get confirmAcceptDelivery => 'Confirmer la livraison';
+
   @override
-  String get confirmAcceptDeliveryMessage => 'Voulez-vous accepter cette livraison ?';
+  String get confirmAcceptDeliveryMessage =>
+      'Voulez-vous accepter cette livraison ?';
+
   @override
   String get orderAcceptedSuccess => 'Livraison acceptee !';
 }
