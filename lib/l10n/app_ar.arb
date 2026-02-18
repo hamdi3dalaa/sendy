@@ -330,5 +330,15 @@
   "acceptDelivery": "قبول التوصيل",
   "confirmAcceptDelivery": "تأكيد التوصيل",
   "confirmAcceptDeliveryMessage": "هل تريد قبول هذا التوصيل؟",
-  "orderAcceptedSuccess": "تم قبول التوصيل!"
+  "orderAcceptedSuccess": "تم قبول التوصيل!",
+
+  "incomingOrders": "الطلبات الواردة",
+  "noIncomingOrders": "لا توجد طلبات واردة",
+  "confirmAcceptOrderMessage": "هل تريد قبول هذا الطلب؟",
+  "orderAcceptedByRestaurant": "تم قبول الطلب! تم إخطار السائقين.",
+  "rejectOrder": "رفض الطلب",
+  "rejectOrderMessage": "هل تريد رفض هذا الطلب؟",
+  "orderRejectedSuccess": "تم رفض الطلب",
+  "noOrdersInYourCity": "لا توجد طلبات في مدينتك",
+  "chooseLanguage": "اختر اللغة"
 }

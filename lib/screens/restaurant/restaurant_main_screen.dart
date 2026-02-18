@@ -9,6 +9,7 @@ import '../client/search_screen.dart';
 import '../client/my_orders_screen.dart';
 import '../client/cart_screen.dart';
 import 'restaurant_home_screen.dart';
+import 'incoming_orders_screen.dart';
 
 class RestaurantMainScreen extends StatefulWidget {
   const RestaurantMainScreen({Key? key}) : super(key: key);
@@ -39,6 +40,7 @@ class _RestaurantMainScreenState extends State<RestaurantMainScreen> {
 
     final List<Widget> screens = [
       const RestaurantHomeScreen(),
+      const IncomingOrdersScreen(),
       const _ClientOrderingView(),
       const MyOrdersScreen(),
     ];
@@ -62,6 +64,10 @@ class _RestaurantMainScreenState extends State<RestaurantMainScreen> {
           BottomNavigationBarItem(
             icon: const Icon(Icons.restaurant),
             label: l10n.mySpace,
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.notifications_active),
+            label: l10n.incomingOrders,
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.shopping_bag),

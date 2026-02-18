@@ -973,4 +973,23 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get orderAcceptedSuccess => 'Livraison acceptee !';
+
+  @override
+  String get incomingOrders => 'Commandes';
+  @override
+  String get noIncomingOrders => 'Aucune commande entrante';
+  @override
+  String get confirmAcceptOrderMessage => 'Voulez-vous accepter cette commande ?';
+  @override
+  String get orderAcceptedByRestaurant => 'Commande acceptee ! Les livreurs sont notifies.';
+  @override
+  String get rejectOrder => 'Rejeter la commande';
+  @override
+  String get rejectOrderMessage => 'Voulez-vous rejeter cette commande ?';
+  @override
+  String get orderRejectedSuccess => 'Commande rejetee';
+  @override
+  String get noOrdersInYourCity => 'Aucune commande dans votre ville';
+  @override
+  String get chooseLanguage => 'Choisir la langue';
 }

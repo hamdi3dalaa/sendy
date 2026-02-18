@@ -44,6 +44,26 @@ class _AvailableOrdersScreenState extends State<AvailableOrdersScreen> {
     return 'Restaurant';
   }
 
+  Future<List<OrderModel>> _filterOrdersByCity(
+      List<OrderModel> orders, String deliveryCity) async {
+    if (deliveryCity.isEmpty) return orders; // No city set, show all
+
+    final filtered = <OrderModel>[];
+    for (final order in orders) {
+      // Get restaurant city for this order
+      final restaurantId = order.restaurantId;
+      if (!_restaurantCities.containsKey(restaurantId)) {
+        await _getRestaurantName(restaurantId);
+      }
+      final restaurantCity =
+          _restaurantCities[restaurantId]?.toLowerCase().trim() ?? '';
+      if (restaurantCity.isEmpty || restaurantCity == deliveryCity) {
+        filtered.add(order);
+      }
+    }
+    return filtered;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -73,39 +93,73 @@ class _AvailableOrdersScreenState extends State<AvailableOrdersScreen> {
             );
           }
 
-          final orders = snapshot.data?.docs
+          final allOrders = snapshot.data?.docs
                   .map((doc) =>
                       OrderModel.fromMap(doc.data() as Map<String, dynamic>))
                   .toList() ??
               [];
 
-          if (orders.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.delivery_dining,
-                      size: 80, color: Colors.grey[400]),
-                  const SizedBox(height: 16),
-                  Text(
-                    l10n.noAvailableOrders,
-                    style: TextStyle(fontSize: 18, color: Colors.grey[600]),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    l10n.ordersWillAppearHere,
-                    style: TextStyle(color: Colors.grey[500]),
-                  ),
-                ],
-              ),
-            );
-          }
+          // Filter by delivery person's city using restaurant city
+          final deliveryCity = currentUser?.city?.toLowerCase().trim() ?? '';
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: orders.length,
-            itemBuilder: (context, index) {
-              return _buildOrderCard(orders[index], currentUser, l10n);
+          return FutureBuilder<List<OrderModel>>(
+            future: _filterOrdersByCity(allOrders, deliveryCity),
+            builder: (context, filteredSnapshot) {
+              final orders = filteredSnapshot.data ?? [];
+
+              if (orders.isEmpty && allOrders.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.delivery_dining,
+                          size: 80, color: Colors.grey[400]),
+                      const SizedBox(height: 16),
+                      Text(
+                        l10n.noAvailableOrders,
+                        style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        l10n.ordersWillAppearHere,
+                        style: TextStyle(color: Colors.grey[500]),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              if (orders.isEmpty && allOrders.isNotEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.location_off,
+                          size: 80, color: Colors.grey[400]),
+                      const SizedBox(height: 16),
+                      Text(
+                        l10n.noOrdersInYourCity,
+                        style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                      ),
+                      if (deliveryCity.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          '${l10n.cityLabel}: ${currentUser?.city}',
+                          style: TextStyle(color: Colors.grey[500]),
+                        ),
+                      ],
+                    ],
+                  ),
+                );
+              }
+
+              return ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: orders.length,
+                itemBuilder: (context, index) {
+                  return _buildOrderCard(orders[index], currentUser, l10n);
+                },
+              );
             },
           );
         },

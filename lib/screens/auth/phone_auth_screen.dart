@@ -254,7 +254,55 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                     style: TextStyle(fontSize: 16, color: Colors.white70),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 50),
+                  const SizedBox(height: 20),
+                  // Language Toggle
+                  Consumer<AuthProvider>(
+                    builder: (context, authProvider, _) {
+                      final isArabic = authProvider.locale.languageCode == 'ar';
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          GestureDetector(
+                            onTap: () => authProvider.changeLanguage('fr'),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: !isArabic ? Colors.white : Colors.white.withOpacity(0.3),
+                                borderRadius: const BorderRadius.horizontal(left: Radius.circular(20)),
+                                border: Border.all(color: Colors.white.withOpacity(0.5)),
+                              ),
+                              child: Text(
+                                '🇫🇷 Français',
+                                style: TextStyle(
+                                  fontWeight: !isArabic ? FontWeight.bold : FontWeight.normal,
+                                  color: !isArabic ? const Color(0xFFFF5722) : Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => authProvider.changeLanguage('ar'),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: isArabic ? Colors.white : Colors.white.withOpacity(0.3),
+                                borderRadius: const BorderRadius.horizontal(right: Radius.circular(20)),
+                                border: Border.all(color: Colors.white.withOpacity(0.5)),
+                              ),
+                              child: Text(
+                                '🇲🇦 العربية',
+                                style: TextStyle(
+                                  fontWeight: isArabic ? FontWeight.bold : FontWeight.normal,
+                                  color: isArabic ? const Color(0xFFFF5722) : Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 30),
                   Card(
                     elevation: 8,
                     shape: RoundedRectangleBorder(

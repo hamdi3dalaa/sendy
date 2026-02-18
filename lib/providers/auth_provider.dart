@@ -22,6 +22,18 @@ class AuthProvider with ChangeNotifier {
   UserModel? get currentUser => _currentUser;
   Locale get locale => _locale;
 
+  /// Get current user as RestaurantUser (null if not a restaurant)
+  RestaurantUser? get currentRestaurantUser =>
+      _currentUser?.userType == UserType.restaurant
+          ? RestaurantUser.fromUserModel(_currentUser!)
+          : null;
+
+  /// Get current user as DeliveryUser (null if not a delivery person)
+  DeliveryUser? get currentDeliveryUser =>
+      _currentUser?.userType == UserType.delivery
+          ? DeliveryUser.fromUserModel(_currentUser!)
+          : null;
+
   AuthProvider() {
     _loadLanguage();
     _auth.authStateChanges().listen(_onAuthStateChanged);

@@ -10,6 +10,8 @@ import '../../providers/auth_provider.dart';
 import '../../models/order_model.dart';
 import 'package:uuid/uuid.dart';
 import 'package:sendy/l10n/app_localizations.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 
 class CartScreen extends StatefulWidget {
   final RestaurantModel restaurant;
@@ -28,10 +30,109 @@ class _CartScreenState extends State<CartScreen> {
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _promoController = TextEditingController();
   bool _isLoading = false;
+  bool _isGettingLocation = false;
   String? _promoError;
+  List<String> _savedAddresses = [];
+  String? _lastUsedAddress;
 
   double get _deliveryFee => 14.0;
   double get _serviceFee => 2.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedAddresses();
+  }
+
+  Future<void> _loadSavedAddresses() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final clientProvider = Provider.of<ClientProvider>(context, listen: false);
+    final userId = authProvider.currentUser?.uid;
+    if (userId == null) return;
+
+    // Load saved addresses from ClientProvider
+    final addresses = clientProvider.addresses;
+    final addressStrings = <String>[];
+    for (final addr in addresses) {
+      if (addr.address.isNotEmpty) {
+        addressStrings.add(addr.address);
+      }
+    }
+
+    // Get last used address from most recent order
+    try {
+      final snapshot = await Provider.of<OrderProvider>(context, listen: false)
+          .getLastOrderAddress(userId);
+      if (snapshot != null && snapshot.isNotEmpty) {
+        setState(() {
+          _lastUsedAddress = snapshot;
+          _addressController.text = snapshot;
+        });
+      }
+    } catch (_) {}
+
+    if (mounted) {
+      setState(() {
+        _savedAddresses = addressStrings;
+      });
+    }
+  }
+
+  Future<void> _getLocationByGPS() async {
+    setState(() => _isGettingLocation = true);
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Permission de localisation refusée'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      final placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      if (placemarks.isNotEmpty && mounted) {
+        final place = placemarks.first;
+        final address = [
+          place.street,
+          place.subLocality,
+          place.locality,
+          place.postalCode,
+        ].where((s) => s != null && s.isNotEmpty).join(', ');
+
+        setState(() {
+          _addressController.text = address;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erreur GPS: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isGettingLocation = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,21 +175,94 @@ class _CartScreenState extends State<CartScreen> {
                         },
                       ),
 
-                      // Delivery Address
+                      // Delivery Address Section
                       Padding(
                         padding: const EdgeInsets.all(16),
-                        child: TextField(
-                          controller: _addressController,
-                          maxLines: 2,
-                          decoration: InputDecoration(
-                            labelText: '${l10n.deliveryAddress} *',
-                            hintText: l10n.enterFullAddress,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TextField(
+                              controller: _addressController,
+                              maxLines: 2,
+                              decoration: InputDecoration(
+                                labelText: '${l10n.deliveryAddress} *',
+                                hintText: l10n.enterFullAddress,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                prefixIcon: const Icon(Icons.location_on,
+                                    color: Color(0xFFFF5722)),
+                                suffixIcon: _isGettingLocation
+                                    ? const Padding(
+                                        padding: EdgeInsets.all(12),
+                                        child: SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(strokeWidth: 2),
+                                        ),
+                                      )
+                                    : IconButton(
+                                        icon: const Icon(Icons.my_location,
+                                            color: Color(0xFFFF5722)),
+                                        onPressed: _getLocationByGPS,
+                                        tooltip: l10n.useGPS,
+                                      ),
+                              ),
                             ),
-                            prefixIcon: const Icon(Icons.location_on,
-                                color: Color(0xFFFF5722)),
-                          ),
+                            const SizedBox(height: 8),
+                            // GPS and saved address quick actions
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: [
+                                  ActionChip(
+                                    avatar: const Icon(Icons.gps_fixed, size: 16),
+                                    label: Text(l10n.useGPS),
+                                    onPressed: _isGettingLocation ? null : _getLocationByGPS,
+                                    backgroundColor: const Color(0xFFFF5722).withOpacity(0.1),
+                                  ),
+                                  if (_lastUsedAddress != null &&
+                                      _lastUsedAddress!.isNotEmpty &&
+                                      _addressController.text != _lastUsedAddress) ...[
+                                    const SizedBox(width: 8),
+                                    ActionChip(
+                                      avatar: const Icon(Icons.history, size: 16),
+                                      label: Text(
+                                        _lastUsedAddress!.length > 25
+                                            ? '${_lastUsedAddress!.substring(0, 25)}...'
+                                            : _lastUsedAddress!,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _addressController.text = _lastUsedAddress!;
+                                        });
+                                      },
+                                      backgroundColor: Colors.blue.withOpacity(0.1),
+                                    ),
+                                  ],
+                                  ..._savedAddresses
+                                      .where((a) => a != _lastUsedAddress && a != _addressController.text)
+                                      .take(3)
+                                      .map((addr) => Padding(
+                                            padding: const EdgeInsets.only(left: 8),
+                                            child: ActionChip(
+                                              avatar: const Icon(Icons.bookmark, size: 16),
+                                              label: Text(
+                                                addr.length > 20
+                                                    ? '${addr.substring(0, 20)}...'
+                                                    : addr,
+                                              ),
+                                              onPressed: () {
+                                                setState(() {
+                                                  _addressController.text = addr;
+                                                });
+                                              },
+                                            ),
+                                          )),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
 
