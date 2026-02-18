@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:provider/provider.dart';
 import 'package:sendy/l10n/app_localizations.dart';
@@ -11,7 +10,6 @@ import 'providers/location_provider.dart';
 import 'providers/menu_provider.dart';
 import 'providers/admin_provider.dart';
 import 'models/user_model.dart';
-import 'screens/splash_screen.dart';
 import 'screens/auth/phone_auth_screen.dart';
 import 'screens/client/client_home_screen.dart';
 import 'screens/delivery/delivery_main_screen.dart';
@@ -32,26 +30,34 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Add error handling for initialization
   try {
     await Firebase.initializeApp();
     print('✅ Firebase initialized');
 
-    // COMMENT OUT APP CHECK FOR NOW - IT'S CAUSING ISSUES
-    await FirebaseAppCheck.instance.activate(
-      androidProvider: AndroidProvider.debug,
-    );
-
-    // Initialize notifications
+    // Register background handler (must be before runApp)
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-    await NotificationService().initialize();
-    print('✅ Notifications initialized');
   } catch (e, stackTrace) {
-    print('❌ Error initializing app: $e');
+    print('❌ Error initializing Firebase: $e');
     print('Stack trace: $stackTrace');
   }
 
+  // Run app immediately - defer heavy init to after first frame
   runApp(const MyApp());
+
+  // Defer non-critical initialization to after the first frame renders
+  // This prevents the freeze/black screen on startup
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    try {
+      await FirebaseAppCheck.instance.activate(
+        androidProvider: AndroidProvider.debug,
+      );
+
+      await NotificationService().initialize();
+      print('✅ Notifications initialized');
+    } catch (e) {
+      print('❌ Error initializing services: $e');
+    }
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -104,142 +110,86 @@ class AuthWrapper extends StatefulWidget {
 }
 
 class _AuthWrapperState extends State<AuthWrapper> {
-  bool _isInitialized = false;
   String? _error;
 
   @override
   void initState() {
     super.initState();
     print('🟢 [AUTH_WRAPPER] initState');
-    _initializeApp();
-  }
-
-  Future<void> _initializeApp() async {
-    if (_isInitialized) return;
-
-    try {
-      print('🟢 [AUTH_WRAPPER] Initializing...');
-
-      final authProvider = context.read<AuthProvider>();
-
-      // Wait for AuthProvider to settle (auth state listener fires)
-      // This prevents the black screen by giving Firebase time to restore the session
-      await Future.delayed(const Duration(milliseconds: 300));
-
-      if (!mounted) return;
-
-      print(
-          '🟢 [AUTH_WRAPPER] Current user: ${authProvider.currentUser?.phoneNumber}');
-      print(
-          '🟢 [AUTH_WRAPPER] User type: ${authProvider.currentUser?.userType}');
-
-      setState(() {
-        _isInitialized = true;
-      });
-
-      // Initialize location AFTER UI renders (in background)
-      if (authProvider.currentUser?.userType == UserType.delivery) {
-        print(
-            '🟢 [AUTH_WRAPPER] Scheduling location initialization for delivery user');
-        Future.delayed(const Duration(milliseconds: 500), () {
-          if (mounted) {
-            context
-                .read<LocationProvider>()
-                .initializeLocation()
-                .catchError((error) {
-              print('❌ Location error: $error');
-            });
-          }
-        });
-      }
-    } catch (e, stackTrace) {
-      print('❌ [AUTH_WRAPPER] Init error: $e');
-      print('Stack: $stackTrace');
-      if (mounted) {
-        setState(() {
-          _error = e.toString();
-          _isInitialized = true;
-        });
-      }
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    print('🟢 [AUTH_WRAPPER] Building...');
-
-    if (_error != null) {
-      return _buildErrorScreen(_error!);
-    }
-
-    // Show a branded loading screen while initializing
-    // This prevents the black screen flash on startup
-    if (!_isInitialized) {
-      return Scaffold(
-        body: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Color(0xFFFF5722), Color(0xFFFF7043)],
-            ),
-          ),
-          child: const Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.delivery_dining, size: 60, color: Colors.white),
-                SizedBox(height: 16),
-                Text(
-                  'SENDY',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    letterSpacing: 4,
-                  ),
-                ),
-                SizedBox(height: 24),
-                CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-
     return Consumer<AuthProvider>(
       builder: (context, authProvider, _) {
+        print('🟢 [AUTH_WRAPPER] Building... authReady=${authProvider.isAuthReady}');
+
+        if (_error != null) {
+          return _buildErrorScreen(_error!);
+        }
+
+        // Show branded loading screen until AuthProvider has completed
+        // its first auth state check (prevents black screen / freeze)
+        if (!authProvider.isAuthReady) {
+          return Scaffold(
+            body: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFFFF5722), Color(0xFFFF7043)],
+                ),
+              ),
+              child: const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.delivery_dining, size: 60, color: Colors.white),
+                    SizedBox(height: 16),
+                    Text(
+                      'SENDY',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: 4,
+                      ),
+                    ),
+                    SizedBox(height: 24),
+                    CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+
         try {
           final user = authProvider.currentUser;
 
-          print('🟢 [AUTH_WRAPPER] Build - User: ${user?.phoneNumber}');
-          print('🟢 [AUTH_WRAPPER] Build - UserType: ${user?.userType}');
-          print('🟢 [AUTH_WRAPPER] Build - IsAdmin: ${user?.isAdmin}');
+          print('🟢 [AUTH_WRAPPER] User: ${user?.phoneNumber}, Type: ${user?.userType}');
 
           if (user == null) {
-            print('🟢 [AUTH_WRAPPER] No user');
-            final firebaseUser = FirebaseAuth.instance.currentUser;
-            if (firebaseUser != null) {
-              print('🟢 [AUTH_WRAPPER] Firebase user exists → SplashScreen');
-              return const SplashScreen();
-            }
-            print('🟢 [AUTH_WRAPPER] No Firebase user → PhoneAuthScreen');
+            print('🟢 [AUTH_WRAPPER] No user → PhoneAuthScreen');
             return const PhoneAuthScreen();
           }
 
-          print('🟢 [AUTH_WRAPPER] Checking admin...');
+          // Initialize location for delivery users (deferred)
+          if (user.userType == UserType.delivery) {
+            _initLocationIfNeeded();
+          }
+
           if (user.userType == UserType.admin) {
-            print('✅ [AUTH_WRAPPER] IS ADMIN → AdminMainScreen');
+            print('✅ [AUTH_WRAPPER] → AdminMainScreen');
             return const AdminMainScreen();
           }
 
           if ((user.userType == UserType.delivery ||
                   user.userType == UserType.restaurant) &&
               user.approvalStatus != ApprovalStatus.approved) {
-            print('🟢 [AUTH_WRAPPER] Needs approval → WaitingApprovalScreen');
+            print('🟢 [AUTH_WRAPPER] → WaitingApprovalScreen');
             return WaitingApprovalScreen(
               userType: user.userType,
               isRejected: user.isRejected,
@@ -249,16 +199,12 @@ class _AuthWrapperState extends State<AuthWrapper> {
           print('🟢 [AUTH_WRAPPER] Routing by type: ${user.userType}');
           switch (user.userType) {
             case UserType.client:
-              print('🟢 [AUTH_WRAPPER] → ClientHomeScreen');
               return const ClientHomeScreen();
             case UserType.delivery:
-              print('🟢 [AUTH_WRAPPER] → DeliveryMainScreen');
               return const DeliveryMainScreen();
             case UserType.restaurant:
-              print('🟢 [AUTH_WRAPPER] → RestaurantMainScreen');
               return const RestaurantMainScreen();
             case UserType.admin:
-              print('🟢 [AUTH_WRAPPER] → AdminMainScreen (switch)');
               return const AdminMainScreen();
           }
         } catch (e, stackTrace) {
@@ -268,6 +214,23 @@ class _AuthWrapperState extends State<AuthWrapper> {
         }
       },
     );
+  }
+
+  bool _locationInitStarted = false;
+  void _initLocationIfNeeded() {
+    if (_locationInitStarted) return;
+    _locationInitStarted = true;
+    // Defer location init to avoid blocking the UI
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (mounted) {
+        context
+            .read<LocationProvider>()
+            .initializeLocation()
+            .catchError((error) {
+          print('❌ Location error: $error');
+        });
+      }
+    });
   }
 
   Widget _buildErrorScreen(String error) {
@@ -315,9 +278,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
                   onPressed: () {
                     setState(() {
                       _error = null;
-                      _isInitialized = false;
                     });
-                    _initializeApp();
                   },
                   child: const Text('Réessayer'),
                 ),
