@@ -148,6 +148,41 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  // Sign in with OTP only (no Firestore doc creation) - for new user registration flow
+  Future<bool> signInWithOTP(String code) async {
+    print('🔵 [AUTH_PROVIDER] Signing in with OTP only');
+
+    if (_verificationId == null) {
+      throw Exception('Aucun code de vérification en cours');
+    }
+
+    try {
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: _verificationId!,
+        smsCode: code,
+      );
+
+      User? user;
+      try {
+        final userCredential = await _auth.signInWithCredential(credential);
+        user = userCredential.user;
+      } catch (typeError) {
+        user = _auth.currentUser;
+      }
+
+      if (user != null) {
+        print('🟢 [AUTH_PROVIDER] OTP sign-in successful: ${user.uid}');
+        return true;
+      }
+
+      return false;
+    } on FirebaseAuthException catch (e) {
+      // Even on error, check if user is signed in
+      if (_auth.currentUser != null) return true;
+      throw Exception(e.message ?? 'Erreur de vérification');
+    }
+  }
+
   // Vérifier OTP et créer utilisateur
   Future<bool> verifyPhoneOTP(
     String code,
