@@ -330,5 +330,15 @@
   "acceptDelivery": "Accepter la livraison",
   "confirmAcceptDelivery": "Confirmer la livraison",
   "confirmAcceptDeliveryMessage": "Voulez-vous accepter cette livraison ?",
-  "orderAcceptedSuccess": "Livraison acceptee !"
+  "orderAcceptedSuccess": "Livraison acceptee !",
+
+  "incomingOrders": "Commandes",
+  "noIncomingOrders": "Aucune commande entrante",
+  "confirmAcceptOrderMessage": "Voulez-vous accepter cette commande ?",
+  "orderAcceptedByRestaurant": "Commande acceptee ! Les livreurs sont notifies.",
+  "rejectOrder": "Rejeter la commande",
+  "rejectOrderMessage": "Voulez-vous rejeter cette commande ?",
+  "orderRejectedSuccess": "Commande rejetee",
+  "noOrdersInYourCity": "Aucune commande dans votre ville",
+  "chooseLanguage": "Choisir la langue"
 }

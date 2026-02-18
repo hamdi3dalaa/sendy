@@ -903,4 +903,23 @@ class AppLocalizationsAr extends AppLocalizations {
   String get confirmAcceptDeliveryMessage => 'هل تريد قبول هذا التوصيل؟';
   @override
   String get orderAcceptedSuccess => 'تم قبول التوصيل!';
+
+  @override
+  String get incomingOrders => 'الطلبات الواردة';
+  @override
+  String get noIncomingOrders => 'لا توجد طلبات واردة';
+  @override
+  String get confirmAcceptOrderMessage => 'هل تريد قبول هذا الطلب؟';
+  @override
+  String get orderAcceptedByRestaurant => 'تم قبول الطلب! تم إخطار السائقين.';
+  @override
+  String get rejectOrder => 'رفض الطلب';
+  @override
+  String get rejectOrderMessage => 'هل تريد رفض هذا الطلب؟';
+  @override
+  String get orderRejectedSuccess => 'تم رفض الطلب';
+  @override
+  String get noOrdersInYourCity => 'لا توجد طلبات في مدينتك';
+  @override
+  String get chooseLanguage => 'اختر اللغة';
 }

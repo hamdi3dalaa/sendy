@@ -630,6 +630,17 @@ abstract class AppLocalizations {
   String get confirmAcceptDelivery;
   String get confirmAcceptDeliveryMessage;
   String get orderAcceptedSuccess;
+
+  // Restaurant incoming orders
+  String get incomingOrders;
+  String get noIncomingOrders;
+  String get confirmAcceptOrderMessage;
+  String get orderAcceptedByRestaurant;
+  String get rejectOrder;
+  String get rejectOrderMessage;
+  String get orderRejectedSuccess;
+  String get noOrdersInYourCity;
+  String get chooseLanguage;
 }
 
 class _AppLocalizationsDelegate

@@ -195,6 +195,7 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
     String restaurantName,
     MenuProvider menuProvider,
   ) {
+    final authProvider = Provider.of<AuthProvider>(context);
     final totalItems = menuProvider.menuItems.length;
     final approvedCount = menuProvider.approvedItems.length;
     final pendingCount = menuProvider.pendingItems.length;

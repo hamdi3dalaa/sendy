@@ -173,6 +173,27 @@ class OrderProvider with ChangeNotifier {
     });
   }
 
+  Future<String?> getLastOrderAddress(String userId) async {
+    try {
+      final snapshot = await _firestore
+          .collection('orders')
+          .where('clientId', isEqualTo: userId)
+          .orderBy('createdAt', descending: true)
+          .limit(1)
+          .get()
+          .timeout(const Duration(seconds: 10));
+
+      if (snapshot.docs.isNotEmpty) {
+        final data = snapshot.docs.first.data();
+        return data['deliveryAddress'] as String?;
+      }
+      return null;
+    } catch (e) {
+      print('Error getting last order address: $e');
+      return null;
+    }
+  }
+
   Future<OrderModel?> getOrderById(String orderId) async {
     try {
       final doc = await _firestore.collection('orders').doc(orderId).get();
