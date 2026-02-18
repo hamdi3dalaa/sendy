@@ -387,24 +387,71 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                           ],
                           if (_existingUser != null && _codeSent) ...[
                             Container(
-                              padding: const EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: Colors.blue.shade50,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Colors.blue.shade200),
+                                color: Colors.green.shade50,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.green.shade300, width: 1.5),
                               ),
-                              child: Row(
+                              child: Column(
                                 children: [
                                   Icon(
-                                      _getUserTypeIcon(_existingUser!.userType),
-                                      color: Colors.blue.shade700),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Text(
-                                      'Connexion en tant que: ${_getUserTypeText(_existingUser!.userType)}',
+                                    Icons.check_circle,
+                                    color: Colors.green.shade700,
+                                    size: 36,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Compte detecte !',
+                                    style: TextStyle(
+                                      color: Colors.green.shade900,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          _getUserTypeIcon(_existingUser!.userType),
+                                          color: _getUserTypeColor(_existingUser!.userType),
+                                          size: 22,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          _getUserTypeText(_existingUser!.userType),
+                                          style: TextStyle(
+                                            color: _getUserTypeColor(_existingUser!.userType),
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  if (_existingUser!.name != null && _existingUser!.name!.isNotEmpty) ...[
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      _existingUser!.name!,
                                       style: TextStyle(
-                                          color: Colors.blue.shade900,
-                                          fontWeight: FontWeight.w500),
+                                        color: Colors.green.shade800,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Entrez le code pour vous connecter',
+                                    style: TextStyle(
+                                      color: Colors.green.shade700,
+                                      fontSize: 12,
                                     ),
                                   ),
                                 ],
@@ -477,6 +524,19 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
         ),
       ),
     );
+  }
+
+  Color _getUserTypeColor(UserType type) {
+    switch (type) {
+      case UserType.client:
+        return Colors.blue;
+      case UserType.delivery:
+        return Colors.orange;
+      case UserType.restaurant:
+        return Colors.green;
+      case UserType.admin:
+        return Colors.purple;
+    }
   }
 
   IconData _getUserTypeIcon(UserType type) {
@@ -558,7 +618,32 @@ class _UserTypeSelectionSheetState extends State<_UserTypeSelectionSheet> {
             'Choisissez votre type de compte',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 8),
+          // Approval warning for restaurant and delivery
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.amber.shade50,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.amber.shade300),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.info_outline, color: Colors.amber.shade800, size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Les comptes Restaurant et Livreur necessitent une approbation par l\'administration avant activation.',
+                    style: TextStyle(
+                      color: Colors.amber.shade900,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
           _buildUserTypeCard(
             icon: Icons.person,
             title: 'Client',
@@ -572,14 +657,16 @@ class _UserTypeSelectionSheetState extends State<_UserTypeSelectionSheet> {
             title: 'Livreur',
             subtitle: 'Livrer des commandes',
             color: Colors.orange,
+            needsApproval: true,
             onTap: () => _selectUserType(UserType.delivery),
           ),
           const SizedBox(height: 12),
           _buildUserTypeCard(
             icon: Icons.restaurant,
             title: 'Restaurant',
-            subtitle: 'Gérer votre restaurant',
+            subtitle: 'Gerer votre restaurant',
             color: Colors.green,
+            needsApproval: true,
             onTap: () => _selectUserType(UserType.restaurant),
           ),
           const SizedBox(height: 24),
@@ -595,6 +682,7 @@ class _UserTypeSelectionSheetState extends State<_UserTypeSelectionSheet> {
     required String subtitle,
     required Color color,
     required VoidCallback onTap,
+    bool needsApproval = false,
   }) {
     return Card(
       elevation: 2,
@@ -624,6 +712,24 @@ class _UserTypeSelectionSheetState extends State<_UserTypeSelectionSheet> {
                     Text(subtitle,
                         style:
                             TextStyle(color: Colors.grey[600], fontSize: 14)),
+                    if (needsApproval) ...[
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(Icons.admin_panel_settings,
+                              size: 14, color: Colors.orange.shade700),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Approbation requise',
+                            style: TextStyle(
+                              color: Colors.orange.shade700,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),
