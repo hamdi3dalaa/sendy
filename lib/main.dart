@@ -111,9 +111,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
   void initState() {
     super.initState();
     print('🟢 [AUTH_WRAPPER] initState');
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _initializeApp();
-    });
+    _initializeApp();
   }
 
   Future<void> _initializeApp() async {
@@ -124,6 +122,12 @@ class _AuthWrapperState extends State<AuthWrapper> {
 
       final authProvider = context.read<AuthProvider>();
 
+      // Wait for AuthProvider to settle (auth state listener fires)
+      // This prevents the black screen by giving Firebase time to restore the session
+      await Future.delayed(const Duration(milliseconds: 300));
+
+      if (!mounted) return;
+
       print(
           '🟢 [AUTH_WRAPPER] Current user: ${authProvider.currentUser?.phoneNumber}');
       print(
@@ -133,7 +137,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
         _isInitialized = true;
       });
 
-      // ✅ FIX: Initialize location AFTER UI renders (in background)
+      // Initialize location AFTER UI renders (in background)
       if (authProvider.currentUser?.userType == UserType.delivery) {
         print(
             '🟢 [AUTH_WRAPPER] Scheduling location initialization for delivery user');
@@ -151,9 +155,12 @@ class _AuthWrapperState extends State<AuthWrapper> {
     } catch (e, stackTrace) {
       print('❌ [AUTH_WRAPPER] Init error: $e');
       print('Stack: $stackTrace');
-      setState(() {
-        _error = e.toString();
-      });
+      if (mounted) {
+        setState(() {
+          _error = e.toString();
+          _isInitialized = true;
+        });
+      }
     }
   }
 
@@ -163,6 +170,44 @@ class _AuthWrapperState extends State<AuthWrapper> {
 
     if (_error != null) {
       return _buildErrorScreen(_error!);
+    }
+
+    // Show a branded loading screen while initializing
+    // This prevents the black screen flash on startup
+    if (!_isInitialized) {
+      return Scaffold(
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFFFF5722), Color(0xFFFF7043)],
+            ),
+          ),
+          child: const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.delivery_dining, size: 60, color: Colors.white),
+                SizedBox(height: 16),
+                Text(
+                  'SENDY',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: 4,
+                  ),
+                ),
+                SizedBox(height: 24),
+                CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
     }
 
     return Consumer<AuthProvider>(
