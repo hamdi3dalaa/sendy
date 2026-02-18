@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/user_model.dart';
+import 'registration_screen.dart';
 
 class PhoneAuthScreen extends StatefulWidget {
   const PhoneAuthScreen({Key? key}) : super(key: key);
@@ -162,6 +163,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
 
     try {
       if (_existingUser != null) {
+        // Existing user: verify OTP and login with detected type
         print('✅ Logging in existing user');
         final success = await authProvider.verifyPhoneOTP(
           code,
@@ -172,9 +174,17 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
           print('✅ Login successful');
         }
       } else {
-        print('🆕 New user - showing type selection');
-        if (mounted) {
-          _showUserTypeSelection(code);
+        // New user: sign in with OTP, then navigate to registration
+        print('🆕 New user - signing in and going to registration');
+        final success = await authProvider.signInWithOTP(code);
+        if (success && mounted) {
+          setState(() => _isLoading = false);
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => const RegistrationScreen(),
+            ),
+          );
+          return;
         }
       }
     } catch (e) {
@@ -185,21 +195,6 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
         });
       }
     }
-  }
-
-  void _showUserTypeSelection(String verificationCode) {
-    showModalBottomSheet(
-      context: context,
-      isDismissible: false,
-      enableDrag: false,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => _UserTypeSelectionSheet(
-        phoneNumber: fullPhoneNumber,
-        verificationCode: verificationCode,
-      ),
-    );
   }
 
   @override
@@ -563,181 +558,5 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
       case UserType.admin:
         return 'Administrateur';
     }
-  }
-}
-
-class _UserTypeSelectionSheet extends StatefulWidget {
-  final String phoneNumber;
-  final String verificationCode;
-
-  const _UserTypeSelectionSheet({
-    required this.phoneNumber,
-    required this.verificationCode,
-  });
-
-  @override
-  State<_UserTypeSelectionSheet> createState() =>
-      _UserTypeSelectionSheetState();
-}
-
-class _UserTypeSelectionSheetState extends State<_UserTypeSelectionSheet> {
-  bool _isLoading = false;
-
-  Future<void> _selectUserType(UserType userType) async {
-    setState(() => _isLoading = true);
-
-    final authProvider = context.read<AuthProvider>();
-
-    try {
-      final success = await authProvider.verifyPhoneOTP(
-        widget.verificationCode,
-        userType,
-      );
-
-      if (success && mounted) {
-        Navigator.of(context).pop();
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur: $e'), backgroundColor: Colors.red),
-        );
-        setState(() => _isLoading = false);
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            'Choisissez votre type de compte',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          // Approval warning for restaurant and delivery
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.amber.shade50,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.amber.shade300),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.info_outline, color: Colors.amber.shade800, size: 20),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Les comptes Restaurant et Livreur necessitent une approbation par l\'administration avant activation.',
-                    style: TextStyle(
-                      color: Colors.amber.shade900,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          _buildUserTypeCard(
-            icon: Icons.person,
-            title: 'Client',
-            subtitle: 'Commander de la nourriture',
-            color: Colors.blue,
-            onTap: () => _selectUserType(UserType.client),
-          ),
-          const SizedBox(height: 12),
-          _buildUserTypeCard(
-            icon: Icons.delivery_dining,
-            title: 'Livreur',
-            subtitle: 'Livrer des commandes',
-            color: Colors.orange,
-            needsApproval: true,
-            onTap: () => _selectUserType(UserType.delivery),
-          ),
-          const SizedBox(height: 12),
-          _buildUserTypeCard(
-            icon: Icons.restaurant,
-            title: 'Restaurant',
-            subtitle: 'Gerer votre restaurant',
-            color: Colors.green,
-            needsApproval: true,
-            onTap: () => _selectUserType(UserType.restaurant),
-          ),
-          const SizedBox(height: 24),
-          if (_isLoading) const CircularProgressIndicator(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildUserTypeCard({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required Color color,
-    required VoidCallback onTap,
-    bool needsApproval = false,
-  }) {
-    return Card(
-      elevation: 2,
-      child: InkWell(
-        onTap: _isLoading ? null : onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, color: color, size: 32),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title,
-                        style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                    Text(subtitle,
-                        style:
-                            TextStyle(color: Colors.grey[600], fontSize: 14)),
-                    if (needsApproval) ...[
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Icon(Icons.admin_panel_settings,
-                              size: 14, color: Colors.orange.shade700),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Approbation requise',
-                            style: TextStyle(
-                              color: Colors.orange.shade700,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              Icon(Icons.arrow_forward_ios, color: color),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }
