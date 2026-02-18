@@ -154,3 +154,140 @@ class UserModel {
     }
   }
 }
+
+/// Restaurant-specific user model with restaurant fields
+class RestaurantUser extends UserModel {
+  RestaurantUser._({
+    required super.uid,
+    required super.phoneNumber,
+    super.name,
+    super.approvalStatus,
+    super.idCardUrl,
+    super.restaurantName,
+    super.restaurantAddress,
+    super.city,
+    super.location,
+    super.fcmToken,
+    super.createdAt,
+    super.profileImageUrl,
+    super.pendingProfileImageUrl,
+    super.hasPendingImageChange,
+  }) : super(userType: UserType.restaurant);
+
+  factory RestaurantUser.fromUserModel(UserModel user) {
+    return RestaurantUser._(
+      uid: user.uid,
+      phoneNumber: user.phoneNumber,
+      name: user.name,
+      approvalStatus: user.approvalStatus,
+      idCardUrl: user.idCardUrl,
+      restaurantName: user.restaurantName,
+      restaurantAddress: user.restaurantAddress,
+      city: user.city,
+      location: user.location,
+      fcmToken: user.fcmToken,
+      createdAt: user.createdAt,
+      profileImageUrl: user.profileImageUrl,
+      pendingProfileImageUrl: user.pendingProfileImageUrl,
+      hasPendingImageChange: user.hasPendingImageChange,
+    );
+  }
+
+  factory RestaurantUser.fromMap(Map<String, dynamic> map) {
+    return RestaurantUser.fromUserModel(UserModel.fromMap(map));
+  }
+
+  /// Restaurant display name (restaurantName or name)
+  String get displayRestaurantName =>
+      restaurantName ?? name ?? phoneNumber;
+
+  /// Full address string
+  String get fullAddress {
+    final parts = <String>[];
+    if (restaurantAddress != null && restaurantAddress!.isNotEmpty) {
+      parts.add(restaurantAddress!);
+    }
+    if (city != null && city!.isNotEmpty) {
+      parts.add(city!);
+    }
+    return parts.join(', ');
+  }
+
+  /// Whether the restaurant has a logo
+  bool get hasLogo =>
+      profileImageUrl != null && profileImageUrl!.isNotEmpty;
+
+  /// Whether the restaurant has a complete profile
+  bool get hasCompleteProfile =>
+      restaurantName != null &&
+      restaurantName!.isNotEmpty &&
+      restaurantAddress != null &&
+      restaurantAddress!.isNotEmpty;
+}
+
+/// Delivery-specific user model with delivery fields
+class DeliveryUser extends UserModel {
+  DeliveryUser._({
+    required super.uid,
+    required super.phoneNumber,
+    super.name,
+    super.approvalStatus,
+    super.idCardUrl,
+    super.city,
+    super.location,
+    super.fcmToken,
+    super.createdAt,
+    super.profileImageUrl,
+    super.pendingProfileImageUrl,
+    super.hasPendingImageChange,
+  }) : super(userType: UserType.delivery);
+
+  factory DeliveryUser.fromUserModel(UserModel user) {
+    return DeliveryUser._(
+      uid: user.uid,
+      phoneNumber: user.phoneNumber,
+      name: user.name,
+      approvalStatus: user.approvalStatus,
+      idCardUrl: user.idCardUrl,
+      city: user.city,
+      location: user.location,
+      fcmToken: user.fcmToken,
+      createdAt: user.createdAt,
+      profileImageUrl: user.profileImageUrl,
+      pendingProfileImageUrl: user.pendingProfileImageUrl,
+      hasPendingImageChange: user.hasPendingImageChange,
+    );
+  }
+
+  factory DeliveryUser.fromMap(Map<String, dynamic> map) {
+    return DeliveryUser.fromUserModel(UserModel.fromMap(map));
+  }
+
+  /// Delivery person's operating city
+  String get operatingCity => city ?? '';
+
+  /// Whether the delivery person has set their city
+  bool get hasCitySet => city != null && city!.isNotEmpty;
+
+  /// Whether the delivery person has a profile photo
+  bool get hasProfilePhoto =>
+      profileImageUrl != null && profileImageUrl!.isNotEmpty;
+
+  /// Whether the delivery person has a complete profile
+  bool get hasCompleteProfile =>
+      name != null &&
+      name!.isNotEmpty &&
+      idCardUrl != null &&
+      idCardUrl!.isNotEmpty &&
+      hasCitySet;
+
+  /// Current GPS location (lat/lng)
+  double? get latitude =>
+      location != null ? (location!['latitude'] as num?)?.toDouble() : null;
+
+  double? get longitude =>
+      location != null ? (location!['longitude'] as num?)?.toDouble() : null;
+
+  /// Whether the delivery person has a valid GPS location
+  bool get hasLocation => latitude != null && longitude != null;
+}

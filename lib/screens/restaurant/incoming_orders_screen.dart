@@ -7,6 +7,7 @@ import 'package:sendy/l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/order_provider.dart';
 import '../../models/order_model.dart';
+import '../../models/user_model.dart';
 
 class IncomingOrdersScreen extends StatelessWidget {
   const IncomingOrdersScreen({Key? key}) : super(key: key);

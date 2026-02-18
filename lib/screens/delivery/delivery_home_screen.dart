@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../providers/auth_provider.dart';
 import '../../providers/location_provider.dart';
+import '../../models/user_model.dart';
 import 'delivery_invoice_history_screen.dart';
 
 class DeliveryHomeScreen extends StatefulWidget {

@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../providers/auth_provider.dart';
 import '../../providers/menu_provider.dart';
+import '../../models/user_model.dart';
 import 'menu_management_screen.dart';
 import 'invoice_history_screen.dart';
 
@@ -196,6 +197,9 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
     MenuProvider menuProvider,
   ) {
     final authProvider = Provider.of<AuthProvider>(context);
+    final restaurantUser = authProvider.currentUser != null
+        ? RestaurantUser.fromUserModel(authProvider.currentUser!)
+        : null;
     final totalItems = menuProvider.menuItems.length;
     final approvedCount = menuProvider.approvedItems.length;
     final pendingCount = menuProvider.pendingItems.length;
