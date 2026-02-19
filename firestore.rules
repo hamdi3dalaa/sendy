@@ -2,14 +2,29 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // App config - read for all, write for admin only
-    match /app_config/{configId} {
-      allow read: if true;
-      allow write: if request.auth != null &&
-                     get(/databases/$(database)/documents/users/$(request.auth.uid)).data.userType == 'admin';
+    // Helper: check if the current user is an admin (userType 3 = admin)
+    function isAdmin() {
+      return request.auth != null &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.userType == 3;
     }
 
-    // OTP codes - no direct access
+    // Helper: check if the user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper: check if the user is the document owner
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // App config - read for all authenticated, write for admin only
+    match /app_config/{configId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // OTP codes - no direct client access
     match /otp_codes/{phoneNumber} {
       allow read: if false;
       allow write: if false;
@@ -17,41 +32,69 @@ service cloud.firestore {
 
     // OTP logs - admin only
     match /otp_logs/{logId} {
-      allow read: if request.auth != null &&
-                    get(/databases/$(database)/documents/users/$(request.auth.uid)).data.userType == 'admin';
+      allow read: if isAdmin();
       allow write: if false;
     }
 
-    // Users
+    // Users collection
     match /users/{userId} {
-      allow read: if request.auth != null && request.auth.uid == userId;
-      allow write: if request.auth != null && request.auth.uid == userId;
+      // Any authenticated user can read any user doc
+      // (needed for: phone lookup, admin loading pending users,
+      //  client viewing restaurant info, delivery viewing orders)
+      allow read: if isAuthenticated();
+
+      // Users can create/update their own document
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) || isAdmin();
+
+      // Only admin can delete users
+      allow delete: if isAdmin();
+
+      // User sub-collections (addresses, etc.)
+      match /{subcollection=**} {
+        allow read, write: if isOwner(userId) || isAdmin();
+      }
     }
 
-    // Admin mail config - admin only read/write, Cloud Functions bypass rules
-    match /admin_mail/{document=**} {
-      allow read: if request.auth != null &&
-                    get(/databases/$(database)/documents/users/$(request.auth.uid)).data.userType == 'admin';
-      allow write: if request.auth != null &&
-                     get(/databases/$(database)/documents/users/$(request.auth.uid)).data.userType == 'admin';
+    // Favorites
+    match /favorites/{favId} {
+      allow read: if isAuthenticated() &&
+                    resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() &&
+                      request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAuthenticated() &&
+                              resource.data.userId == request.auth.uid;
     }
 
-    // Menu items - read for authenticated, write for owner restaurant
+    // Menu items - read for all authenticated, write for owner restaurant or admin
     match /menuItems/{itemId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null;
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (
+        resource.data.restaurantId == request.auth.uid || isAdmin()
+      );
+      allow delete: if isAuthenticated() && (
+        resource.data.restaurantId == request.auth.uid || isAdmin()
+      );
     }
 
-    // Orders - read/write for involved parties
+    // Orders - read/write for involved parties (client, restaurant, delivery, admin)
     match /orders/{orderId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null;
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
     }
 
-    // Approval logs - admin read, Cloud Functions write
+    // Approval logs - read/write for authenticated (admin primarily uses this)
     match /approval_logs/{logId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null;
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAdmin();
+    }
+
+    // Admin mail config
+    match /admin_mail/{document=**} {
+      allow read, write: if isAdmin();
     }
   }
 }
