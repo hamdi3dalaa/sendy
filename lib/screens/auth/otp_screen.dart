@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/user_model.dart';
@@ -392,7 +393,8 @@ class _OTPScreenState extends State<OTPScreen> {
     setState(() => _isUploading = true);
 
     try {
-      final fileName = 'id_cards/${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final userId = FirebaseAuth.instance.currentUser?.uid ?? 'unknown';
+      final fileName = 'id_cards/$userId/${DateTime.now().millisecondsSinceEpoch}.jpg';
       final ref = FirebaseStorage.instance.ref().child(fileName);
 
       // Add timeout to prevent hanging
