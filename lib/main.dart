@@ -11,6 +11,7 @@ import 'providers/menu_provider.dart';
 import 'providers/admin_provider.dart';
 import 'models/user_model.dart';
 import 'screens/auth/phone_auth_screen.dart';
+import 'screens/auth/registration_screen.dart';
 import 'screens/client/client_home_screen.dart';
 import 'screens/delivery/delivery_main_screen.dart';
 import 'screens/restaurant/restaurant_main_screen.dart';
@@ -172,6 +173,11 @@ class _AuthWrapperState extends State<AuthWrapper> {
           print('🟢 [AUTH_WRAPPER] User: ${user?.phoneNumber}, Type: ${user?.userType}');
 
           if (user == null) {
+            // New user signed in via OTP but no Firestore doc yet → show registration
+            if (authProvider.isNewUserRegistering) {
+              print('🟢 [AUTH_WRAPPER] New user registering → RegistrationScreen');
+              return const RegistrationScreen();
+            }
             print('🟢 [AUTH_WRAPPER] No user → PhoneAuthScreen');
             return const PhoneAuthScreen();
           }

@@ -8,7 +8,6 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/user_model.dart';
-import '../../main.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({Key? key}) : super(key: key);
@@ -192,23 +191,21 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         return;
       }
     }
-    if ((_selectedType == UserType.delivery || _selectedType == UserType.restaurant) &&
-        _idCardImage == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez telecharger votre carte d\'identite')),
-      );
-      return;
-    }
-
     setState(() => _isLoading = true);
 
     try {
+      // Try to upload ID card, but don't block registration if it fails
       String? idCardUrl;
       if (_idCardImage != null) {
         idCardUrl = await _uploadIdCard();
-        if (idCardUrl == null) {
-          setState(() => _isLoading = false);
-          return;
+        // If upload fails, continue with registration (ID can be uploaded later)
+        if (idCardUrl == null && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('La carte d\'identite sera demandee plus tard'),
+              backgroundColor: Colors.orange,
+            ),
+          );
         }
       }
 
@@ -236,10 +233,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             backgroundColor: Colors.green,
           ),
         );
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const AuthWrapper()),
-          (route) => false,
-        );
+        // AuthWrapper will automatically route to the correct screen
+        // after completeProfile sets _currentUser and notifies listeners
       }
     } catch (e) {
       if (mounted) {
