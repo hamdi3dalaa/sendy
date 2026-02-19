@@ -2,29 +2,29 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper: check if the current user is an admin (userType 3 = admin)
-    function isAdmin() {
-      return request.auth != null &&
-             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.userType == 3;
-    }
-
-    // Helper: check if the user is authenticated
+    // Helper function to check if user is authenticated
     function isAuthenticated() {
       return request.auth != null;
     }
 
-    // Helper: check if the user is the document owner
+    // Helper function to check if user is admin (userType 3 = admin)
+    function isAdmin() {
+      return isAuthenticated() &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.userType == 3;
+    }
+
+    // Helper function to check if user owns the document
     function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
-    // App config - read for all authenticated, write for admin only
+    // App config - read for all, write for admin only
     match /app_config/{configId} {
-      allow read: if isAuthenticated();
+      allow read: if true;
       allow write: if isAdmin();
     }
 
-    // OTP codes - no direct client access
+    // OTP codes - no direct access
     match /otp_codes/{phoneNumber} {
       allow read: if false;
       allow write: if false;
@@ -36,65 +36,75 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    // Users collection
+    // Users
     match /users/{userId} {
-      // Any authenticated user can read any user doc
-      // (needed for: phone lookup, admin loading pending users,
-      //  client viewing restaurant info, delivery viewing orders)
-      allow read: if isAuthenticated();
-
-      // Users can create/update their own document
-      allow create: if isOwner(userId);
+      allow create: if isAuthenticated();
+      // CRITICAL: Admin must be able to update users (for approve/reject)
       allow update: if isOwner(userId) || isAdmin();
-
-      // Only admin can delete users
-      allow delete: if isAdmin();
-
-      // User sub-collections (addresses, etc.)
-      match /{subcollection=**} {
-        allow read, write: if isOwner(userId) || isAdmin();
-      }
+      allow delete: if false;
+      // Admin must be able to get individual user docs (for viewing before approval)
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAuthenticated();
+      // Public read for approved restaurants (visible to clients)
+      allow read: if isOwner(userId) ||
+                   isAdmin() ||
+                   (resource.data.userType == 2 &&
+                    resource.data.approvalStatus == 1);
     }
 
-    // Favorites
-    match /favorites/{favId} {
-      allow read: if isAuthenticated() &&
-                    resource.data.userId == request.auth.uid;
-      allow create: if isAuthenticated() &&
-                      request.resource.data.userId == request.auth.uid;
-      allow update, delete: if isAuthenticated() &&
-                              resource.data.userId == request.auth.uid;
-    }
-
-    // Menu items - read for all authenticated, write for owner restaurant or admin
-    match /menuItems/{itemId} {
+    // Reviews
+    match /reviews/{reviewId} {
       allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow delete: if isAdmin();
+      allow update: if false;
+    }
+
+    // Admin mail config - admin only
+    match /admin_mail/{document=**} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Menu items - read for approved or owner/admin, write for owner/admin
+    match /menuItems/{itemId} {
+      allow read: if resource.data.status == 'approved' ||
+                     isOwner(resource.data.restaurantId) ||
+                     isAdmin();
+      allow create: if isAuthenticated() &&
+                      request.resource.data.restaurantId == request.auth.uid;
+      allow update: if isOwner(resource.data.restaurantId) || isAdmin();
+      allow delete: if isOwner(resource.data.restaurantId) || isAdmin();
+    }
+
+    // Orders - read/write for involved parties or admin
+    match /orders/{orderId} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid == resource.data.clientId ||
+        request.auth.uid == resource.data.restaurantId ||
+        request.auth.uid == resource.data.deliveryPersonId ||
+        isAdmin()
+      );
       allow create: if isAuthenticated();
       allow update: if isAuthenticated() && (
-        resource.data.restaurantId == request.auth.uid || isAdmin()
+        request.auth.uid == resource.data.clientId ||
+        request.auth.uid == resource.data.restaurantId ||
+        request.auth.uid == resource.data.deliveryPersonId ||
+        isAdmin()
       );
-      allow delete: if isAuthenticated() && (
-        resource.data.restaurantId == request.auth.uid || isAdmin()
-      );
+      allow delete: if isAdmin();
     }
 
-    // Orders - read/write for involved parties (client, restaurant, delivery, admin)
-    match /orders/{orderId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow update: if isAuthenticated();
-    }
-
-    // Approval logs - read/write for authenticated (admin primarily uses this)
+    // Approval logs - admin only
     match /approval_logs/{logId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow update, delete: if isAdmin();
+      allow read: if isAdmin();
+      allow write: if isAdmin();
     }
 
-    // Admin mail config
-    match /admin_mail/{document=**} {
-      allow read, write: if isAdmin();
+    // Admin collection
+    match /admins/{adminId} {
+      allow read: if isOwner(adminId) || isAdmin();
+      allow write: if false;
     }
   }
 }

@@ -2,32 +2,35 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
 
-    // ID card uploads - authenticated users can upload their own,
-    // admin and the owner can read
-    match /id_cards/{fileName} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null;
-      allow update, delete: if request.auth != null;
+    // Menu item images
+    match /menu_items/{restaurantId}/{fileName} {
+      allow read: if true;
+      allow write: if request.auth != null &&
+                      request.auth.uid == restaurantId;
     }
 
-    // Profile images - authenticated users can upload to their own folder
+    // User ID card images (for delivery/restaurant approval)
+    match /id_cards/{userId}/{fileName} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null &&
+                      request.auth.uid == userId;
+    }
+
+    // User profile images
     match /profile_images/{userId}/{fileName} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null && request.auth.uid == userId;
-      allow update, delete: if request.auth != null && request.auth.uid == userId;
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == userId;
     }
 
-    // Menu item images - authenticated users (restaurants) can upload
-    match /menu_images/{fileName} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null;
-      allow update, delete: if request.auth != null;
+    // Restaurant images
+    match /restaurant_images/{restaurantId}/{fileName} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == restaurantId;
     }
 
-    // General uploads fallback
+    // Default: deny everything else
     match /{allPaths=**} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null;
+      allow read, write: if false;
     }
   }
 }
