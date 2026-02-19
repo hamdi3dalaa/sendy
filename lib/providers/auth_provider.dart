@@ -19,10 +19,12 @@ class AuthProvider with ChangeNotifier {
   UserModel? _currentUser;
   Locale _locale = const Locale('fr');
   bool _isAuthReady = false;
+  bool _isNewUserRegistering = false;
 
   UserModel? get currentUser => _currentUser;
   Locale get locale => _locale;
   bool get isAuthReady => _isAuthReady;
+  bool get isNewUserRegistering => _isNewUserRegistering;
 
   /// Get current user as RestaurantUser (null if not a restaurant)
   RestaurantUser? get currentRestaurantUser =>
@@ -79,11 +81,13 @@ class AuthProvider with ChangeNotifier {
           print('   - approvalStatus: ${data['approvalStatus']}');
 
           _currentUser = UserModel.fromMap(data);
+          _isNewUserRegistering = false;
 
           print('👤 [AUTH_PROVIDER] UserModel created: ${_currentUser!.userType}');
         } else {
-          print('🟡 [AUTH_PROVIDER] User document not found');
+          print('🟡 [AUTH_PROVIDER] User document not found - new user registering');
           _currentUser = null;
+          _isNewUserRegistering = true;
         }
       } on TimeoutException catch (e) {
         print('❌ [AUTH_PROVIDER] Timeout: $e');
@@ -96,6 +100,7 @@ class AuthProvider with ChangeNotifier {
     } else {
       print('🟡 [AUTH_PROVIDER] User signed out');
       _currentUser = null;
+      _isNewUserRegistering = false;
     }
 
     // Mark auth as ready after the first auth state check
@@ -390,6 +395,7 @@ class AuthProvider with ChangeNotifier {
         .collection('users')
         .doc(user.uid)
         .set(_currentUser!.toMap());
+    _isNewUserRegistering = false;
     notifyListeners();
   }
 

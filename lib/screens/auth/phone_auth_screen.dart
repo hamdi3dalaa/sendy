@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/user_model.dart';
-import 'registration_screen.dart';
 
 class PhoneAuthScreen extends StatefulWidget {
   const PhoneAuthScreen({Key? key}) : super(key: key);
@@ -174,18 +173,12 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
           print('✅ Login successful');
         }
       } else {
-        // New user: sign in with OTP, then navigate to registration
-        print('🆕 New user - signing in and going to registration');
-        final success = await authProvider.signInWithOTP(code);
-        if (success && mounted) {
-          setState(() => _isLoading = false);
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => const RegistrationScreen(),
-            ),
-          );
-          return;
-        }
+        // New user: sign in with OTP only
+        // AuthWrapper will detect isNewUserRegistering and show RegistrationScreen
+        print('🆕 New user - signing in with OTP');
+        await authProvider.signInWithOTP(code);
+        if (mounted) setState(() => _isLoading = false);
+        return;
       }
     } catch (e) {
       if (mounted) {
