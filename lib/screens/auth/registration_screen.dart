@@ -5,7 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'dart:io';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:firebase_storage/firebase_storage.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/user_model.dart';
@@ -65,7 +65,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
     setState(() => _isUploading = true);
     try {
-      final userId = FirebaseAuth.instance.currentUser?.uid ?? 'unknown';
+      final userId = fb_auth.FirebaseAuth.instance.currentUser?.uid ?? 'unknown';
       final fileName = 'id_cards/$userId/${DateTime.now().millisecondsSinceEpoch}.jpg';
       final ref = FirebaseStorage.instance.ref().child(fileName);
       final uploadTask = ref.putFile(_idCardImage!);
