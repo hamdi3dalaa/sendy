@@ -992,4 +992,17 @@ class AppLocalizationsFr extends AppLocalizations {
   String get noOrdersInYourCity => 'Aucune commande dans votre ville';
   @override
   String get chooseLanguage => 'Choisir la langue';
+
+  @override
+  String get activeDelivery => 'Livraison en cours';
+  @override
+  String get confirmDelivery => 'Confirmer la livraison';
+  @override
+  String get confirmDeliveryMessage => 'Confirmez-vous que la commande a ete livree au client ?';
+  @override
+  String get markAsDelivered => 'Livree';
+  @override
+  String get deliveryCompleted => 'Livraison terminee avec succes !';
+  @override
+  String get callClient => 'Appeler';
 }

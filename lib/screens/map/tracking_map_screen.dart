@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:sendy/l10n/app_localizations.dart';
 import '../../models/order_model.dart';
 
@@ -28,6 +29,8 @@ class _TrackingMapScreenState extends State<TrackingMapScreen> {
 
   LatLng? _deliveryPersonLatLng;
   OrderStatus _currentStatus = OrderStatus.pending;
+  String? _deliveryPersonName;
+  String? _deliveryPersonPhone;
 
   @override
   void initState() {
@@ -35,6 +38,37 @@ class _TrackingMapScreenState extends State<TrackingMapScreen> {
     _currentStatus = widget.order.status;
     _setupMarkers();
     _listenToOrderUpdates();
+    _loadDeliveryPersonInfo();
+  }
+
+  Future<void> _loadDeliveryPersonInfo() async {
+    final deliveryId = widget.order.deliveryPersonId;
+    if (deliveryId == null) return;
+
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(deliveryId)
+          .get();
+      if (doc.exists && mounted) {
+        final data = doc.data()!;
+        setState(() {
+          _deliveryPersonName = data['name'] as String?;
+          _deliveryPersonPhone = data['phone'] as String?;
+        });
+      }
+    } catch (e) {
+      print('Error loading delivery person info: $e');
+    }
+  }
+
+  Future<void> _callDeliveryPerson() async {
+    if (_deliveryPersonPhone != null && _deliveryPersonPhone!.isNotEmpty) {
+      final uri = Uri.parse('tel:$_deliveryPersonPhone');
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+      }
+    }
   }
 
   void _setupMarkers() {
@@ -92,6 +126,18 @@ class _TrackingMapScreenState extends State<TrackingMapScreen> {
             _currentStatus = OrderStatus.values[statusIndex];
           }
         });
+
+        // Auto-close when delivered
+        if (_currentStatus == OrderStatus.delivered && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(AppLocalizations.of(context).orderDelivered),
+              backgroundColor: Colors.green,
+            ),
+          );
+          Navigator.pop(context);
+          return;
+        }
 
         if (currentLoc != null) {
           final newLatLng = LatLng(
@@ -290,7 +336,7 @@ class _TrackingMapScreenState extends State<TrackingMapScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        l10n.deliveryPerson,
+                        _deliveryPersonName ?? l10n.deliveryPerson,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -316,9 +362,9 @@ class _TrackingMapScreenState extends State<TrackingMapScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: () {
-                  // Call delivery person action
-                },
+                onPressed: _deliveryPersonPhone != null
+                    ? _callDeliveryPerson
+                    : null,
                 icon: const Icon(Icons.phone),
                 label: Text(l10n.callDelivery),
                 style: ElevatedButton.styleFrom(

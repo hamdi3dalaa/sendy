@@ -8,6 +8,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/order_provider.dart';
 import '../../models/order_model.dart';
 import '../../models/user_model.dart';
+import 'delivery_active_order_screen.dart';
 
 class AvailableOrdersScreen extends StatefulWidget {
   const AvailableOrdersScreen({Key? key}) : super(key: key);
@@ -431,6 +432,19 @@ class _AvailableOrdersScreenState extends State<AvailableOrdersScreen> {
           SnackBar(
             content: Text(l10n.orderAcceptedSuccess),
             backgroundColor: Colors.green,
+          ),
+        );
+
+        // Navigate to active delivery screen with map
+        final updatedOrder = order.copyWith(
+          deliveryPersonId: currentUser.uid,
+          status: OrderStatus.inProgress,
+        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                DeliveryActiveOrderScreen(order: updatedOrder),
           ),
         );
       }

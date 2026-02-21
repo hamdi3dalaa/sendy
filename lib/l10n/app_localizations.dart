@@ -1998,6 +1998,14 @@ abstract class AppLocalizations {
   String get orderRejectedSuccess;
   String get noOrdersInYourCity;
   String get chooseLanguage;
+
+  // Delivery active order
+  String get activeDelivery;
+  String get confirmDelivery;
+  String get confirmDeliveryMessage;
+  String get markAsDelivered;
+  String get deliveryCompleted;
+  String get callClient;
 }
 
 class _AppLocalizationsDelegate

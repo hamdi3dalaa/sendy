@@ -19,6 +19,14 @@ class _RestaurantsListScreenState extends State<RestaurantsListScreen> {
   String _selectedCategory = '';
   bool _hasLoaded = false;
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadRestaurants();
+    });
+  }
+
   static const List<String> _categoryKeys = [
     '',
     'fastFood',

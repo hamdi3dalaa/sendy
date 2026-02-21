@@ -7,6 +7,7 @@ import '../../providers/order_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/order_model.dart';
 import '../orders/order_details_screen.dart';
+import '../map/tracking_map_screen.dart';
 import 'rate_order_screen.dart';
 
 class MyOrdersScreen extends StatefulWidget {
@@ -165,7 +166,7 @@ class _OrderCard extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => OrderDetailsScreen(order: order)));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => TrackingMapScreen(order: order)));
                       },
                       icon: const Icon(Icons.location_on),
                       label: Text(l10n.trackOrder),

@@ -981,4 +981,17 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noOrdersInYourCity => 'لا توجد طلبات في مدينتك';
   @override
   String get chooseLanguage => 'اختر اللغة';
+
+  @override
+  String get activeDelivery => 'التوصيل الجاري';
+  @override
+  String get confirmDelivery => 'تأكيد التوصيل';
+  @override
+  String get confirmDeliveryMessage => 'هل تؤكد أن الطلب تم توصيله للعميل؟';
+  @override
+  String get markAsDelivered => 'تم التوصيل';
+  @override
+  String get deliveryCompleted => 'تم التوصيل بنجاح!';
+  @override
+  String get callClient => 'اتصال';
 }

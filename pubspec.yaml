@@ -48,6 +48,9 @@ dependencies:
   # Image Picker
   image_picker: ^1.0.7
   
+  # URL Launcher
+  url_launcher: ^6.2.4
+
   # Utilities
   shared_preferences: ^2.2.2
   uuid: ^4.3.3
