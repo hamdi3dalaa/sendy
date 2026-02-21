@@ -13,6 +13,14 @@ service cloud.firestore {
              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.userType == 3;
     }
 
+    // Helper function to check if user is an approved delivery person (userType 1 = delivery, approvalStatus 1 = approved)
+    function isApprovedDelivery() {
+      let userData = get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+      return isAuthenticated() &&
+             userData.userType == 1 &&
+             userData.approvalStatus == 1;
+    }
+
     // Helper function to check if user owns the document
     function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
@@ -83,14 +91,18 @@ service cloud.firestore {
         request.auth.uid == resource.data.clientId ||
         request.auth.uid == resource.data.restaurantId ||
         request.auth.uid == resource.data.deliveryPersonId ||
-        isAdmin()
+        isAdmin() ||
+        // Allow approved delivery persons to see available orders (no delivery person assigned yet)
+        (isApprovedDelivery() && resource.data.deliveryPersonId == null)
       );
       allow create: if isAuthenticated();
       allow update: if isAuthenticated() && (
         request.auth.uid == resource.data.clientId ||
         request.auth.uid == resource.data.restaurantId ||
         request.auth.uid == resource.data.deliveryPersonId ||
-        isAdmin()
+        isAdmin() ||
+        // Allow approved delivery persons to accept available orders
+        (isApprovedDelivery() && resource.data.deliveryPersonId == null)
       );
       allow delete: if isAdmin();
     }
