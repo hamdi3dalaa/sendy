@@ -20,7 +20,15 @@ class _RestaurantsListScreenState extends State<RestaurantsListScreen> {
   bool _hasLoaded = false;
 
   static const List<String> _categoryKeys = [
-    '', 'fastFood', 'moroccan', 'pizza', 'sushi', 'burger', 'chicken', 'tacos', 'desserts',
+    '',
+    'fastFood',
+    'moroccan',
+    'pizza',
+    'sushi',
+    'burger',
+    'chicken',
+    'tacos',
+    'desserts',
   ];
 
   @override
@@ -69,7 +77,8 @@ class _RestaurantsListScreenState extends State<RestaurantsListScreen> {
               ),
               filled: true,
               fillColor: Colors.grey[100],
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
             ),
           ),
         ),
@@ -130,14 +139,16 @@ class _RestaurantsListScreenState extends State<RestaurantsListScreen> {
                 return _buildInitialState(l10n);
               }
 
-              var restaurants = clientProvider.restaurants.where((r) =>
-                r.name.toLowerCase().contains(_searchQuery)
-              ).toList();
+              var restaurants = clientProvider.restaurants
+                  .where((r) => r.name.toLowerCase().contains(_searchQuery))
+                  .toList();
 
               if (_selectedCategory.isNotEmpty) {
-                restaurants = restaurants.where((r) =>
-                  r.category.toLowerCase() == _selectedCategory.toLowerCase()
-                ).toList();
+                restaurants = restaurants
+                    .where((r) =>
+                        r.category.toLowerCase() ==
+                        _selectedCategory.toLowerCase())
+                    .toList();
               }
 
               if (restaurants.isEmpty) {
@@ -183,12 +194,17 @@ class _RestaurantsListScreenState extends State<RestaurantsListScreen> {
                 color: const Color(0xFFFF5722).withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.restaurant, size: 80, color: Color(0xFFFF5722)),
+              child: const Icon(Icons.restaurant,
+                  size: 80, color: Color(0xFFFF5722)),
             ),
             const SizedBox(height: 24),
-            Text(l10n.discoverRestaurants, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            Text(l10n.discoverRestaurants,
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Text(l10n.tapToLoadRestaurants, textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+            Text(l10n.tapToLoadRestaurants,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 14, color: Colors.grey[600])),
             const SizedBox(height: 32),
             ElevatedButton.icon(
               onPressed: _loadRestaurants,
@@ -197,8 +213,10 @@ class _RestaurantsListScreenState extends State<RestaurantsListScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFF5722),
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30)),
               ),
             ),
           ],
@@ -207,7 +225,8 @@ class _RestaurantsListScreenState extends State<RestaurantsListScreen> {
     );
   }
 
-  Widget _buildErrorState(ClientProvider clientProvider, AppLocalizations l10n) {
+  Widget _buildErrorState(
+      ClientProvider clientProvider, AppLocalizations l10n) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -216,15 +235,21 @@ class _RestaurantsListScreenState extends State<RestaurantsListScreen> {
           children: [
             Icon(Icons.error_outline, size: 64, color: Colors.red.shade300),
             const SizedBox(height: 24),
-            Text(l10n.error, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            Text(l10n.error,
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Text(clientProvider.error ?? '', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+            Text(clientProvider.error ?? '',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12, color: Colors.grey[500])),
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: _loadRestaurants,
               icon: const Icon(Icons.refresh),
               label: Text(l10n.retry),
-              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF5722), foregroundColor: Colors.white),
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFF5722),
+                  foregroundColor: Colors.white),
             ),
           ],
         ),
@@ -239,15 +264,20 @@ class _RestaurantsListScreenState extends State<RestaurantsListScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(_searchQuery.isEmpty ? Icons.restaurant : Icons.search_off, size: 64, color: Colors.grey.shade400),
+            Icon(_searchQuery.isEmpty ? Icons.restaurant : Icons.search_off,
+                size: 64, color: Colors.grey.shade400),
             const SizedBox(height: 24),
             Text(
-              _searchQuery.isEmpty ? l10n.noRestaurantsAvailable : l10n.noResultsFound,
+              _searchQuery.isEmpty
+                  ? l10n.noRestaurantsAvailable
+                  : l10n.noResultsFound,
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
-              _searchQuery.isEmpty ? l10n.restaurantsWillAppear : l10n.tryAnotherSearch,
+              _searchQuery.isEmpty
+                  ? l10n.restaurantsWillAppear
+                  : l10n.tryAnotherSearch,
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 14, color: Colors.grey[600]),
             ),
@@ -278,7 +308,8 @@ class _RestaurantCard extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => RestaurantMenuScreen(restaurant: restaurant),
+              builder: (context) =>
+                  RestaurantMenuScreen(restaurant: restaurant),
             ),
           );
         },
@@ -288,16 +319,7 @@ class _RestaurantCard extends StatelessWidget {
             // Cover image or gradient header
             Stack(
               children: [
-                restaurant.coverImageUrl != null
-                    ? CachedNetworkImage(
-                        imageUrl: restaurant.coverImageUrl!,
-                        height: 150,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                        placeholder: (_, __) => Container(height: 150, color: Colors.grey[200]),
-                        errorWidget: (_, __, ___) => _buildGradientHeader(),
-                      )
-                    : _buildGradientHeader(),
+                _buildHeader(),
                 // Favorite button
                 Positioned(
                   top: 8,
@@ -308,7 +330,8 @@ class _RestaurantCard extends StatelessWidget {
                       return GestureDetector(
                         onTap: () {
                           if (authProvider.currentUser != null) {
-                            clientProvider.toggleFavorite(authProvider.currentUser!.uid, restaurant.uid);
+                            clientProvider.toggleFavorite(
+                                authProvider.currentUser!.uid, restaurant.uid);
                           }
                         },
                         child: Container(
@@ -332,14 +355,18 @@ class _RestaurantCard extends StatelessWidget {
                     top: 8,
                     left: 8,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
                         color: const Color(0xFFFF5722),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
                         restaurant.category,
-                        style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -356,7 +383,8 @@ class _RestaurantCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           restaurant.name,
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -364,24 +392,32 @@ class _RestaurantCard extends StatelessWidget {
                       if (restaurant.averageRating > 0) ...[
                         const Icon(Icons.star, color: Colors.amber, size: 18),
                         const SizedBox(width: 2),
-                        Text(restaurant.averageRating.toStringAsFixed(1), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                        Text(' (${restaurant.totalReviews})', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                        Text(restaurant.averageRating.toStringAsFixed(1),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 14)),
+                        Text(' (${restaurant.totalReviews})',
+                            style: TextStyle(
+                                color: Colors.grey[600], fontSize: 12)),
                       ],
                     ],
                   ),
                   const SizedBox(height: 6),
                   Row(
                     children: [
-                      Icon(Icons.restaurant_menu, size: 14, color: Colors.grey[600]),
+                      Icon(Icons.restaurant_menu,
+                          size: 14, color: Colors.grey[600]),
                       const SizedBox(width: 4),
                       Text(
                         '${restaurant.approvedItemsCount} ${restaurant.approvedItemsCount > 1 ? l10n.dishes : l10n.dish}',
                         style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                       ),
                       const SizedBox(width: 16),
-                      Icon(Icons.delivery_dining, size: 14, color: Colors.grey[600]),
+                      Icon(Icons.delivery_dining,
+                          size: 14, color: Colors.grey[600]),
                       const SizedBox(width: 4),
-                      Text('14.00 ${l10n.dhs}', style: TextStyle(fontSize: 13, color: Colors.grey[600])),
+                      Text('14.00 ${l10n.dhs}',
+                          style:
+                              TextStyle(fontSize: 13, color: Colors.grey[600])),
                     ],
                   ),
                 ],
@@ -391,6 +427,34 @@ class _RestaurantCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildHeader() {
+    final bool hasImage = restaurant.coverImageUrl != null &&
+        restaurant.coverImageUrl!.isNotEmpty;
+
+    if (hasImage) {
+      // Has image - use CachedNetworkImage
+      return CachedNetworkImage(
+        imageUrl: restaurant.coverImageUrl!,
+        height: 150,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        placeholder: (context, url) => Container(
+          height: 150,
+          color: Colors.grey[200],
+          child: const Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF5722)),
+            ),
+          ),
+        ),
+        errorWidget: (context, url, error) => _buildGradientHeader(),
+      );
+    } else {
+      // No image - show gradient with letter
+      return _buildGradientHeader();
+    }
   }
 
   Widget _buildGradientHeader() {
@@ -405,8 +469,11 @@ class _RestaurantCard extends StatelessWidget {
       ),
       child: Center(
         child: Text(
-          restaurant.name.isNotEmpty ? restaurant.name.substring(0, 1).toUpperCase() : 'R',
-          style: const TextStyle(fontSize: 60, fontWeight: FontWeight.bold, color: Colors.white),
+          restaurant.name.isNotEmpty
+              ? restaurant.name.substring(0, 1).toUpperCase()
+              : 'R',
+          style: const TextStyle(
+              fontSize: 60, fontWeight: FontWeight.bold, color: Colors.white),
         ),
       ),
     );

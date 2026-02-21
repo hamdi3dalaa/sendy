@@ -149,8 +149,7 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content:
-                Text(l10n.dishAddedPending),
+            content: Text(l10n.dishAddedPending),
             backgroundColor: Colors.orange,
             duration: const Duration(seconds: 3),
           ),
@@ -313,7 +312,7 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
                   decoration: InputDecoration(
                     labelText: l10n.priceRequired,
                     border: const OutlineInputBorder(),
-                    prefixIcon: const Icon(Icons.euro),
+                    prefixText: l10n.dhs,
                   ),
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),

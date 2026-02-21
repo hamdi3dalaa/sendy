@@ -51,7 +51,7 @@ class _CartScreenState extends State<CartScreen> {
     if (userId == null) return;
 
     // Load saved addresses from ClientProvider
-    final addresses = clientProvider.addresses;
+    final addresses = clientProvider.savedAddresses;
     final addressStrings = <String>[];
     for (final addr in addresses) {
       if (addr.address.isNotEmpty) {
@@ -198,7 +198,8 @@ class _CartScreenState extends State<CartScreen> {
                                         child: SizedBox(
                                           width: 20,
                                           height: 20,
-                                          child: CircularProgressIndicator(strokeWidth: 2),
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2),
                                         ),
                                       )
                                     : IconButton(
@@ -216,17 +217,23 @@ class _CartScreenState extends State<CartScreen> {
                               child: Row(
                                 children: [
                                   ActionChip(
-                                    avatar: const Icon(Icons.gps_fixed, size: 16),
+                                    avatar:
+                                        const Icon(Icons.gps_fixed, size: 16),
                                     label: Text(l10n.useGPS),
-                                    onPressed: _isGettingLocation ? null : _getLocationByGPS,
-                                    backgroundColor: const Color(0xFFFF5722).withOpacity(0.1),
+                                    onPressed: _isGettingLocation
+                                        ? null
+                                        : _getLocationByGPS,
+                                    backgroundColor: const Color(0xFFFF5722)
+                                        .withOpacity(0.1),
                                   ),
                                   if (_lastUsedAddress != null &&
                                       _lastUsedAddress!.isNotEmpty &&
-                                      _addressController.text != _lastUsedAddress) ...[
+                                      _addressController.text !=
+                                          _lastUsedAddress) ...[
                                     const SizedBox(width: 8),
                                     ActionChip(
-                                      avatar: const Icon(Icons.history, size: 16),
+                                      avatar:
+                                          const Icon(Icons.history, size: 16),
                                       label: Text(
                                         _lastUsedAddress!.length > 25
                                             ? '${_lastUsedAddress!.substring(0, 25)}...'
@@ -234,19 +241,25 @@ class _CartScreenState extends State<CartScreen> {
                                       ),
                                       onPressed: () {
                                         setState(() {
-                                          _addressController.text = _lastUsedAddress!;
+                                          _addressController.text =
+                                              _lastUsedAddress!;
                                         });
                                       },
-                                      backgroundColor: Colors.blue.withOpacity(0.1),
+                                      backgroundColor:
+                                          Colors.blue.withOpacity(0.1),
                                     ),
                                   ],
                                   ..._savedAddresses
-                                      .where((a) => a != _lastUsedAddress && a != _addressController.text)
+                                      .where((a) =>
+                                          a != _lastUsedAddress &&
+                                          a != _addressController.text)
                                       .take(3)
                                       .map((addr) => Padding(
-                                            padding: const EdgeInsets.only(left: 8),
+                                            padding:
+                                                const EdgeInsets.only(left: 8),
                                             child: ActionChip(
-                                              avatar: const Icon(Icons.bookmark, size: 16),
+                                              avatar: const Icon(Icons.bookmark,
+                                                  size: 16),
                                               label: Text(
                                                 addr.length > 20
                                                     ? '${addr.substring(0, 20)}...'
@@ -254,7 +267,8 @@ class _CartScreenState extends State<CartScreen> {
                                               ),
                                               onPressed: () {
                                                 setState(() {
-                                                  _addressController.text = addr;
+                                                  _addressController.text =
+                                                      addr;
                                                 });
                                               },
                                             ),
@@ -405,7 +419,8 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  Widget _buildPromoCodeSection(double subtotal, ClientProvider clientProvider) {
+  Widget _buildPromoCodeSection(
+      double subtotal, ClientProvider clientProvider) {
     final l10n = AppLocalizations.of(context)!;
     final appliedPromo = clientProvider.appliedPromo;
 
@@ -429,7 +444,9 @@ class _CartScreenState extends State<CartScreen> {
                   Expanded(
                     child: Text(
                       '${l10n.promoApplied} -${clientProvider.promoDiscount.toStringAsFixed(2)} ${l10n.dhs}',
-                      style: TextStyle(color: Colors.green[700], fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          color: Colors.green[700],
+                          fontWeight: FontWeight.bold),
                     ),
                   ),
                   GestureDetector(
@@ -438,7 +455,8 @@ class _CartScreenState extends State<CartScreen> {
                       _promoController.clear();
                       setState(() => _promoError = null);
                     },
-                    child: Icon(Icons.close, color: Colors.green[700], size: 20),
+                    child:
+                        Icon(Icons.close, color: Colors.green[700], size: 20),
                   ),
                 ],
               ),
@@ -451,9 +469,12 @@ class _CartScreenState extends State<CartScreen> {
                     controller: _promoController,
                     decoration: InputDecoration(
                       hintText: l10n.enterPromoCode,
-                      prefixIcon: const Icon(Icons.local_offer, color: Color(0xFFFF5722)),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      prefixIcon: const Icon(Icons.local_offer,
+                          color: Color(0xFFFF5722)),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                       errorText: _promoError,
                     ),
                   ),
@@ -471,8 +492,10 @@ class _CartScreenState extends State<CartScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFF5722),
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
                   child: Text(l10n.apply),
                 ),
@@ -483,7 +506,8 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  Widget _buildPriceSummary(double subtotal, double total, double promoDiscount) {
+  Widget _buildPriceSummary(
+      double subtotal, double total, double promoDiscount) {
     final l10n = AppLocalizations.of(context)!;
     return Card(
       margin: const EdgeInsets.all(16),
@@ -514,9 +538,13 @@ class _CartScreenState extends State<CartScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(l10n.discount, style: TextStyle(fontSize: 16, color: Colors.green[700])),
+                  Text(l10n.discount,
+                      style: TextStyle(fontSize: 16, color: Colors.green[700])),
                   Text('-${promoDiscount.toStringAsFixed(2)} ${l10n.dhs}',
-                      style: TextStyle(fontSize: 16, color: Colors.green[700], fontWeight: FontWeight.bold)),
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.green[700],
+                          fontWeight: FontWeight.bold)),
                 ],
               ),
             ],

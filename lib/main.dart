@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:provider/provider.dart';
+import 'package:lottie/lottie.dart'; // 👈 ADD THIS
 import 'package:sendy/l10n/app_localizations.dart';
 import 'providers/auth_provider.dart';
 import 'providers/order_provider.dart';
@@ -110,26 +111,38 @@ class AuthWrapper extends StatefulWidget {
   State<AuthWrapper> createState() => _AuthWrapperState();
 }
 
-class _AuthWrapperState extends State<AuthWrapper> {
+class _AuthWrapperState extends State<AuthWrapper>
+    with TickerProviderStateMixin {
   String? _error;
+  late AnimationController _lottieController;
 
   @override
   void initState() {
     super.initState();
     print('🟢 [AUTH_WRAPPER] initState');
+
+    // Initialize Lottie animation controller
+    _lottieController = AnimationController(vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _lottieController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<AuthProvider>(
       builder: (context, authProvider, _) {
-        print('🟢 [AUTH_WRAPPER] Building... authReady=${authProvider.isAuthReady}');
+        print(
+            '🟢 [AUTH_WRAPPER] Building... authReady=${authProvider.isAuthReady}');
 
         if (_error != null) {
           return _buildErrorScreen(_error!);
         }
 
-        // Show branded loading screen until AuthProvider has completed
+        // Show branded loading screen with Lottie animation until AuthProvider has completed
         // its first auth state check (prevents black screen / freeze)
         if (!authProvider.isAuthReady) {
           return Scaffold(
@@ -141,23 +154,36 @@ class _AuthWrapperState extends State<AuthWrapper> {
                   colors: [Color(0xFFFF5722), Color(0xFFFF7043)],
                 ),
               ),
-              child: const Center(
+              child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.delivery_dining, size: 60, color: Colors.white),
-                    SizedBox(height: 16),
-                    Text(
-                      'SENDY',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        letterSpacing: 4,
-                      ),
+                    // Delivery icon above animation
+                    const Icon(
+                      Icons.delivery_dining,
+                      size: 60,
+                      color: Colors.white,
                     ),
-                    SizedBox(height: 24),
-                    CircularProgressIndicator(
+                    const SizedBox(height: 24),
+
+                    // 🎬 Lottie SENDY Animation
+                    Lottie.asset(
+                      'assets/lottie/animation.json',
+                      controller: _lottieController,
+                      width: 300,
+                      height: 120,
+                      fit: BoxFit.contain,
+                      onLoaded: (composition) {
+                        _lottieController
+                          ..duration = composition.duration
+                          ..repeat(); // Loop the animation
+                      },
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // Loading indicator
+                    const CircularProgressIndicator(
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
                   ],
@@ -170,12 +196,14 @@ class _AuthWrapperState extends State<AuthWrapper> {
         try {
           final user = authProvider.currentUser;
 
-          print('🟢 [AUTH_WRAPPER] User: ${user?.phoneNumber}, Type: ${user?.userType}');
+          print(
+              '🟢 [AUTH_WRAPPER] User: ${user?.phoneNumber}, Type: ${user?.userType}');
 
           if (user == null) {
             // New user signed in via OTP but no Firestore doc yet → show registration
             if (authProvider.isNewUserRegistering) {
-              print('🟢 [AUTH_WRAPPER] New user registering → RegistrationScreen');
+              print(
+                  '🟢 [AUTH_WRAPPER] New user registering → RegistrationScreen');
               return const RegistrationScreen();
             }
             print('🟢 [AUTH_WRAPPER] No user → PhoneAuthScreen');

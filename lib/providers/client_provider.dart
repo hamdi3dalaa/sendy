@@ -213,7 +213,7 @@ class ClientProvider with ChangeNotifier {
           location: userData['location'],
           approvedItemsCount: menuCounts[doc.id] ?? 0,
           category: userData['restaurantCategory'] ?? '',
-          coverImageUrl: userData['coverImageUrl'],
+          coverImageUrl: userData['profileImageUrl'],
           averageRating: avgRating,
           totalReviews: ratings.length,
         ));
@@ -422,7 +422,8 @@ class ClientProvider with ChangeNotifier {
     }
   }
 
-  Future<List<Map<String, dynamic>>> loadRestaurantReviews(String restaurantId) async {
+  Future<List<Map<String, dynamic>>> loadRestaurantReviews(
+      String restaurantId) async {
     try {
       final snapshot = await _firestore
           .collection('reviews')
@@ -505,7 +506,8 @@ class ClientProvider with ChangeNotifier {
         return 'Code promo invalide';
       }
 
-      final promo = PromoCode.fromMap(snapshot.docs.first.id, snapshot.docs.first.data());
+      final promo =
+          PromoCode.fromMap(snapshot.docs.first.id, snapshot.docs.first.data());
 
       if (promo.expiresAt.isBefore(DateTime.now())) {
         return 'Code promo expiré';

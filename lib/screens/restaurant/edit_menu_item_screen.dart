@@ -357,7 +357,7 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
                 decoration: InputDecoration(
                   labelText: l10n.priceRequired,
                   border: const OutlineInputBorder(),
-                  prefixIcon: const Icon(Icons.euro),
+                  prefixText: l10n.dhs,
                 ),
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),

@@ -174,7 +174,8 @@ class _OTPScreenState extends State<OTPScreen> {
                             ),
                           )
                         : IconButton(
-                            icon: const Icon(Icons.my_location, color: Color(0xFFFF5722)),
+                            icon: const Icon(Icons.my_location,
+                                color: Color(0xFFFF5722)),
                             onPressed: _getLocationByGPS,
                             tooltip: 'Utiliser GPS',
                           ),
@@ -199,21 +200,29 @@ class _OTPScreenState extends State<OTPScreen> {
                 OutlinedButton.icon(
                   onPressed: _isGettingLocation ? null : _getLocationByGPS,
                   icon: Icon(
-                    _selectedLocation != null ? Icons.check_circle : Icons.gps_fixed,
-                    color: _selectedLocation != null ? Colors.green : const Color(0xFFFF5722),
+                    _selectedLocation != null
+                        ? Icons.check_circle
+                        : Icons.gps_fixed,
+                    color: _selectedLocation != null
+                        ? Colors.green
+                        : const Color(0xFFFF5722),
                   ),
                   label: Text(
                     _selectedLocation != null
                         ? 'Position GPS capturée ✓'
                         : 'Capturer la position GPS',
                     style: TextStyle(
-                      color: _selectedLocation != null ? Colors.green : const Color(0xFFFF5722),
+                      color: _selectedLocation != null
+                          ? Colors.green
+                          : const Color(0xFFFF5722),
                     ),
                   ),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     side: BorderSide(
-                      color: _selectedLocation != null ? Colors.green : const Color(0xFFFF5722),
+                      color: _selectedLocation != null
+                          ? Colors.green
+                          : const Color(0xFFFF5722),
                     ),
                   ),
                 ),
@@ -393,8 +402,10 @@ class _OTPScreenState extends State<OTPScreen> {
     setState(() => _isUploading = true);
 
     try {
-      final userId = fb_auth.FirebaseAuth.instance.currentUser?.uid ?? 'unknown';
-      final fileName = 'id_cards/$userId/${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final userId =
+          fb_auth.FirebaseAuth.instance.currentUser?.uid ?? 'unknown';
+      final fileName =
+          'id_cards/$userId/${DateTime.now().millisecondsSinceEpoch}.jpg';
       final ref = FirebaseStorage.instance.ref().child(fileName);
 
       // Add timeout to prevent hanging
@@ -505,7 +516,8 @@ class _OTPScreenState extends State<OTPScreen> {
         if (permission == LocationPermission.denied) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Permission de localisation refusée')),
+              const SnackBar(
+                  content: Text('Permission de localisation refusée')),
             );
           }
           return;
@@ -515,7 +527,8 @@ class _OTPScreenState extends State<OTPScreen> {
       if (permission == LocationPermission.deniedForever) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Activez la localisation dans les paramètres')),
+            const SnackBar(
+                content: Text('Activez la localisation dans les paramètres')),
           );
         }
         return;
@@ -575,7 +588,8 @@ class _OTPScreenState extends State<OTPScreen> {
       print('GPS error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur GPS: $e'), backgroundColor: Colors.red),
+          SnackBar(
+              content: Text('Erreur GPS: $e'), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -608,7 +622,8 @@ class _OTPScreenState extends State<OTPScreen> {
     if (widget.userType == UserType.restaurant &&
         _addressController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez entrer l\'adresse du restaurant')),
+        const SnackBar(
+            content: Text('Veuillez entrer l\'adresse du restaurant')),
       );
       return;
     }
