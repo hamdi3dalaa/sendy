@@ -82,7 +82,6 @@ class InvoiceService {
                     ),
                     pw.SizedBox(height: 5),
                     pw.Text('${l10n.name}: ${order.clientName ?? l10n.client}'),
-                    pw.Text('${l10n.phone}: ${order.clientPhone ?? "N/A"}'),
                     pw.Text('${l10n.address}: ${order.deliveryAddress ?? "N/A"}'),
                   ],
                 ),
