@@ -178,6 +178,16 @@ class _RestaurantsListScreenState extends State<RestaurantsListScreen> {
               // Get active promotions (already filtered by city from provider)
               final promotions = clientProvider.dishPromotions;
 
+              // Sort: restaurants with active promotions appear first
+              final promoRestaurantIds = promotions.map((p) => p.restaurantId).toSet();
+              restaurants.sort((a, b) {
+                final aHasPromo = promoRestaurantIds.contains(a.uid);
+                final bHasPromo = promoRestaurantIds.contains(b.uid);
+                if (aHasPromo && !bHasPromo) return -1;
+                if (!aHasPromo && bHasPromo) return 1;
+                return 0;
+              });
+
               if (restaurants.isEmpty && promotions.isEmpty) {
                 return _buildEmptyState(l10n);
               }
@@ -408,10 +418,17 @@ class _PromotionCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image with discount badge
-            Stack(
-              children: [
-                promo.dishImageUrl != null && promo.dishImageUrl!.isNotEmpty
+            // Image with diagonal discount banner
+            ClipRect(
+              child: Banner(
+                message: '-${promo.discountPercent}%',
+                location: BannerLocation.topEnd,
+                color: Colors.red,
+                textStyle: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+                child: promo.dishImageUrl != null && promo.dishImageUrl!.isNotEmpty
                     ? CachedNetworkImage(
                         imageUrl: promo.dishImageUrl!,
                         height: 100,
@@ -439,28 +456,7 @@ class _PromotionCard extends StatelessWidget {
                             child: Icon(Icons.fastfood,
                                 size: 40, color: Color(0xFFFF5722))),
                       ),
-                // Discount badge
-                Positioned(
-                  top: 6,
-                  right: 6,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      '-${promo.discountPercent}%',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
             // Info
             Padding(

@@ -1102,4 +1102,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get upcoming => 'قادم';
   @override
   String get active => 'نشط';
+
+  @override
+  String get minimumDiscountError => 'يجب أن يكون التخفيض 1% على الأقل';
 }

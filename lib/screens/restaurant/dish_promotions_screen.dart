@@ -110,31 +110,44 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
           children: [
             Row(
               children: [
-                // Dish image
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: promo.dishImageUrl != null &&
-                          promo.dishImageUrl!.isNotEmpty
-                      ? Image.network(
-                          promo.dishImageUrl!,
-                          width: 60,
-                          height: 60,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(
-                            width: 60,
-                            height: 60,
-                            color: Colors.grey[200],
-                            child: const Icon(Icons.fastfood,
-                                color: Colors.grey),
-                          ),
-                        )
-                      : Container(
-                          width: 60,
-                          height: 60,
-                          color: Colors.grey[200],
-                          child:
-                              const Icon(Icons.fastfood, color: Colors.grey),
-                        ),
+                // Dish image with diagonal discount banner
+                SizedBox(
+                  width: 80,
+                  height: 80,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Banner(
+                      message: '-${promo.discountPercent}%',
+                      location: BannerLocation.topEnd,
+                      color: Colors.red,
+                      textStyle: const TextStyle(
+                        fontSize: 8,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      child: promo.dishImageUrl != null &&
+                              promo.dishImageUrl!.isNotEmpty
+                          ? Image.network(
+                              promo.dishImageUrl!,
+                              width: 80,
+                              height: 80,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Container(
+                                width: 80,
+                                height: 80,
+                                color: Colors.grey[200],
+                                child: const Icon(Icons.fastfood,
+                                    color: Colors.grey),
+                              ),
+                            )
+                          : Container(
+                              width: 80,
+                              height: 80,
+                              color: Colors.grey[200],
+                              child:
+                                  const Icon(Icons.fastfood, color: Colors.grey),
+                            ),
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -352,6 +365,7 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
                     TextField(
                       controller: promoPriceController,
                       keyboardType: TextInputType.number,
+                      onChanged: (_) => setModalState(() {}),
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12)),
@@ -361,18 +375,45 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
                     ),
                     if (selectedItem != null &&
                         promoPriceController.text.isNotEmpty) ...[
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 8),
                       Builder(builder: (_) {
                         final pp =
                             double.tryParse(promoPriceController.text) ?? 0;
                         if (pp > 0 && pp < selectedItem!.price) {
                           final disc = ((1 - pp / selectedItem!.price) * 100)
                               .round();
-                          return Text(
-                            '-$disc%',
-                            style: const TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.bold),
+                          final discColor = disc >= 1 ? Colors.green : Colors.red;
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: discColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: discColor.withOpacity(0.3)),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.discount, color: discColor, size: 20),
+                                const SizedBox(width: 8),
+                                Text(
+                                  '-$disc%',
+                                  style: TextStyle(
+                                    color: discColor,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  '${selectedItem!.price.toStringAsFixed(0)} → ${pp.toStringAsFixed(0)} ${l10n.dhs}',
+                                  style: TextStyle(
+                                    color: discColor,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            ),
                           );
                         }
                         return const SizedBox();
@@ -490,6 +531,14 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
                             promoPrice >= selectedItem!.price) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text(l10n.invalidPromoPrice)),
+                          );
+                          return;
+                        }
+                        // Minimum 1% discount validation
+                        final discountPct = ((1 - promoPrice / selectedItem!.price) * 100).round();
+                        if (discountPct < 1) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(l10n.minimumDiscountError)),
                           );
                           return;
                         }

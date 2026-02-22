@@ -1113,4 +1113,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get upcoming => 'A venir';
   @override
   String get active => 'Active';
+
+  @override
+  String get minimumDiscountError => 'La reduction doit etre d\'au moins 1%';
 }

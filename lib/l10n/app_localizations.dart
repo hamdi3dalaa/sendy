@@ -2064,6 +2064,7 @@ abstract class AppLocalizations {
   String get expired;
   String get upcoming;
   String get active;
+  String get minimumDiscountError;
 }
 
 class _AppLocalizationsDelegate
