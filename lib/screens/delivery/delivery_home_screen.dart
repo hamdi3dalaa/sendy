@@ -8,7 +8,9 @@ import 'dart:io';
 import '../../providers/auth_provider.dart';
 import '../../providers/location_provider.dart';
 import '../../providers/order_provider.dart';
+import '../../models/order_model.dart';
 import '../../models/user_model.dart';
+import 'delivery_active_order_screen.dart';
 import 'delivery_invoice_history_screen.dart';
 import 'settlement_upload_screen.dart';
 
@@ -244,7 +246,12 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
               l10n.deliverySpace,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 20),
+
+            // Active Delivery Resume Card
+            _buildActiveDeliveryCard(context, l10n, authProvider),
+
+            const SizedBox(height: 20),
             Card(
               elevation: 4,
               child: SwitchListTile(
@@ -360,6 +367,125 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildActiveDeliveryCard(
+      BuildContext context, AppLocalizations l10n, AuthProvider authProvider) {
+    final userId = authProvider.currentUser?.uid;
+    if (userId == null) return const SizedBox();
+
+    return StreamBuilder<List<OrderModel>>(
+      stream: context
+          .read<OrderProvider>()
+          .getOrdersForUser(userId, UserType.delivery),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const SizedBox();
+        }
+
+        // Find the first in-progress order
+        final activeOrder = snapshot.data!.firstWhere(
+          (o) => o.status == OrderStatus.inProgress,
+          orElse: () => snapshot.data!.first,
+        );
+
+        if (activeOrder.status != OrderStatus.inProgress &&
+            activeOrder.status != OrderStatus.accepted) {
+          return const SizedBox();
+        }
+
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    DeliveryActiveOrderScreen(order: activeOrder),
+              ),
+            );
+          },
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 4),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFFFF5722), Color(0xFFFF7043)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFFFF5722).withOpacity(0.4),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.delivery_dining,
+                    color: Colors.white,
+                    size: 32,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.youHaveActiveDelivery,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${l10n.orderNumber} #${activeOrder.orderId.substring(0, 8).toUpperCase()}',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.9),
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        l10n.tapToResume,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.8),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.arrow_forward,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

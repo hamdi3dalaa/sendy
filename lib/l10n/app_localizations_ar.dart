@@ -965,104 +965,87 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get incomingOrders => 'الطلبات الواردة';
-
   @override
   String get noIncomingOrders => 'لا توجد طلبات واردة';
-
   @override
   String get confirmAcceptOrderMessage => 'هل تريد قبول هذا الطلب؟';
-
   @override
   String get orderAcceptedByRestaurant => 'تم قبول الطلب! تم إخطار السائقين.';
-
   @override
   String get rejectOrder => 'رفض الطلب';
-
   @override
   String get rejectOrderMessage => 'هل تريد رفض هذا الطلب؟';
-
   @override
   String get orderRejectedSuccess => 'تم رفض الطلب';
-
   @override
   String get noOrdersInYourCity => 'لا توجد طلبات في مدينتك';
-
   @override
   String get chooseLanguage => 'اختر اللغة';
 
   @override
+  String get activeDelivery => 'التوصيل الجاري';
+  @override
   String get confirmDelivery => 'تأكيد التوصيل';
-
   @override
-  String get confirmDeliveryMessage =>
-      'هل أنت متأكد من أنك قمت بتوصيل هذا الطلب إلى العميل؟';
-
+  String get confirmDeliveryMessage => 'هل تؤكد أن الطلب تم توصيله للعميل؟';
   @override
-  String get markAsDelivered => 'تحديد كمُسلّم';
-
+  String get markAsDelivered => 'تم التوصيل';
   @override
-  String get deliveryCompleted => 'تم إكمال التوصيل بنجاح!';
-
+  String get deliveryCompleted => 'تم التوصيل بنجاح!';
   @override
-  String get activeDelivery => 'التوصيل النشط';
+  String get callClient => 'اتصال';
 
+  // Resume active delivery
   @override
-  String get callClient => 'اتصل بالعميل';
+  String get resumeDelivery => 'استئناف التوصيل';
+  @override
+  String get youHaveActiveDelivery => 'لديك توصيل جاري';
+  @override
+  String get tapToResume => 'اضغط للاستئناف';
 
+  // Settlement system
   @override
   String get serviceFeeBalance => 'رصيد رسوم الخدمة';
-
   @override
-  String get amountOwedToSendy => 'المبلغ المستحق لسندي';
-
+  String get amountOwedToSendy => 'المبلغ المستحق لـ Sendy';
   @override
-  String get settlementRequired => 'يتطلب التسوية - تم الوصول إلى حد 100 درهم';
-
+  String get settlementRequired => 'رصيدك وصل للحد الأقصى. يرجى إجراء التسوية.';
   @override
   String get sendPayment => 'إرسال الدفع';
-
   @override
-  String get amountToSend => 'المبلغ المراد إرساله';
-
+  String get amountToSend => 'المبلغ المطلوب إرساله';
   @override
-  String get uploadProofInstructions =>
-      'الرجاء تحميل إثبات الدفع (صورة الإيصال البنكي، لقطة شاشة للتحويل، إلخ.)';
-
+  String get uploadProofInstructions => 'أرسل المبلغ عبر تحويل بنكي أو إيداع، ثم التقط صورة لإثبات الدفع أدناه.';
   @override
-  String get tapToUploadProof => 'اضغط لتحميل الإثبات';
-
+  String get tapToUploadProof => 'اضغط لإضافة الإثبات';
   @override
-  String get proofDescription => 'إيصال بنكي أو لقطة شاشة';
-
-  @override
-  String get settlementSent => 'تم إرسال التسوية بنجاح! في انتظار التحقق.';
-
+  String get proofDescription => 'صورة وصل التحويل أو الإيداع';
   @override
   String get sending => 'جاري الإرسال...';
-
+  @override
+  String get settlementSent => 'تم إرسال التسوية بنجاح!';
   @override
   String get pendingSettlements => 'التسويات المعلقة';
-
   @override
   String get noSettlementsPending => 'لا توجد تسويات معلقة';
-
   @override
-  String confirmSettlementApproval(Object amount) {
-    return 'هل أنت متأكد من أنك تريد الموافقة على هذه التسوية بمبلغ $amount درهم؟';
-  }
-
+  String get settlementsToReview => 'تسوية(ات) للمراجعة';
   @override
-  String get settlementApproved => 'تمت الموافقة على التسوية بنجاح';
-
+  String get confirmApproval => 'تأكيد الموافقة';
+  @override
+  String confirmSettlementApproval(String amount) => 'الموافقة على تسوية $amount درهم؟';
+  @override
+  String get settlementApproved => 'تمت الموافقة على التسوية';
   @override
   String get rejectSettlement => 'رفض التسوية';
-
   @override
-  String get rejectSettlementMessage => 'الرجاء توضيح سبب الرفض:';
-
+  String get rejectSettlementMessage => 'لماذا ترفض هذه التسوية؟';
+  @override
+  String get rejectionReason => 'سبب الرفض';
   @override
   String get settlementRejected => 'تم رفض التسوية';
-
   @override
-  String get settlementsToReview => 'تسويات للمراجعة';
+  String get approve => 'موافقة';
+  @override
+  String get reject => 'رفض';
 }

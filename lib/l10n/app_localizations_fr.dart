@@ -976,109 +976,87 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get incomingOrders => 'Commandes';
-
   @override
   String get noIncomingOrders => 'Aucune commande entrante';
-
   @override
-  String get confirmAcceptOrderMessage =>
-      'Voulez-vous accepter cette commande ?';
-
+  String get confirmAcceptOrderMessage => 'Voulez-vous accepter cette commande ?';
   @override
-  String get orderAcceptedByRestaurant =>
-      'Commande acceptee ! Les livreurs sont notifies.';
-
+  String get orderAcceptedByRestaurant => 'Commande acceptee ! Les livreurs sont notifies.';
   @override
   String get rejectOrder => 'Rejeter la commande';
-
   @override
   String get rejectOrderMessage => 'Voulez-vous rejeter cette commande ?';
-
   @override
   String get orderRejectedSuccess => 'Commande rejetee';
-
   @override
   String get noOrdersInYourCity => 'Aucune commande dans votre ville';
-
   @override
   String get chooseLanguage => 'Choisir la langue';
 
   @override
-  String get confirmDelivery => 'Confirmer la livraison';
-
-  @override
-  String get confirmDeliveryMessage =>
-      'Etes-vous sur d\'avoir livre cette commande au client ?';
-
-  @override
-  String get markAsDelivered => 'Marquer comme livre';
-
-  @override
-  String get deliveryCompleted => 'Livraison terminee avec succes!';
-
-  @override
   String get activeDelivery => 'Livraison en cours';
-
   @override
-  String get callClient => 'Appeler le client';
-
+  String get confirmDelivery => 'Confirmer la livraison';
   @override
-  String get serviceFeeBalance => 'Solde des frais de service';
-
+  String get confirmDeliveryMessage => 'Confirmez-vous que la commande a ete livree au client ?';
   @override
-  String get amountOwedToSendy => 'Montant dû à Sendy';
-
+  String get markAsDelivered => 'Livree';
   @override
-  String get settlementRequired =>
-      'Règlement requis - Le seuil de 100 DHs est atteint';
+  String get deliveryCompleted => 'Livraison terminee avec succes !';
+  @override
+  String get callClient => 'Appeler';
 
+  // Resume active delivery
+  @override
+  String get resumeDelivery => 'Reprendre la livraison';
+  @override
+  String get youHaveActiveDelivery => 'Vous avez une livraison en cours';
+  @override
+  String get tapToResume => 'Appuyez pour reprendre';
+
+  // Settlement system
+  @override
+  String get serviceFeeBalance => 'Solde frais de service';
+  @override
+  String get amountOwedToSendy => 'Montant du a Sendy';
+  @override
+  String get settlementRequired => 'Votre solde a atteint le seuil. Veuillez effectuer le reglement.';
   @override
   String get sendPayment => 'Envoyer le paiement';
-
   @override
-  String get amountToSend => 'Montant à envoyer';
-
+  String get amountToSend => 'Montant a envoyer';
   @override
-  String get uploadProofInstructions =>
-      'Veuillez télécharger une preuve de paiement (photo du reçu bancaire, capture d\'écran de virement, etc.)';
-
+  String get uploadProofInstructions => 'Envoyez le montant par virement ou depot, puis prenez une photo de la preuve de paiement ci-dessous.';
   @override
-  String get tapToUploadProof => 'Toucher pour télécharger la preuve';
-
+  String get tapToUploadProof => 'Appuyez pour ajouter la preuve';
   @override
-  String get proofDescription => 'Reçu bancaire ou capture d\'écran';
-
-  @override
-  String get settlementSent =>
-      'Règlement envoyé avec succès! En attente de validation.';
-
+  String get proofDescription => 'Photo du recu de virement ou depot';
   @override
   String get sending => 'Envoi en cours...';
-
   @override
-  String get pendingSettlements => 'Règlements en attente';
-
+  String get settlementSent => 'Reglement envoye avec succes !';
   @override
-  String get noSettlementsPending => 'Aucun règlement en attente';
-
+  String get pendingSettlements => 'Reglements en attente';
   @override
-  String confirmSettlementApproval(Object amount) {
-    return 'Etes-vous sûr de vouloir approuver ce règlement de $amount DHs ?';
-  }
-
+  String get noSettlementsPending => 'Aucun reglement en attente';
   @override
-  String get settlementApproved => 'Règlement approuvé avec succès';
-
+  String get settlementsToReview => 'reglement(s) a verifier';
   @override
-  String get rejectSettlement => 'Rejeter le règlement';
-
+  String get confirmApproval => 'Confirmer l\'approbation';
   @override
-  String get rejectSettlementMessage =>
-      'Veuillez indiquer la raison du rejet :';
-
+  String confirmSettlementApproval(String amount) => 'Approuver le reglement de $amount DH ?';
   @override
-  String get settlementRejected => 'Règlement rejeté';
-
+  String get settlementApproved => 'Reglement approuve';
   @override
-  String get settlementsToReview => 'règlements à examiner';
+  String get rejectSettlement => 'Rejeter le reglement';
+  @override
+  String get rejectSettlementMessage => 'Pourquoi rejetez-vous ce reglement ?';
+  @override
+  String get rejectionReason => 'Raison du rejet';
+  @override
+  String get settlementRejected => 'Reglement rejete';
+  @override
+  String get approve => 'Approuver';
+  @override
+  String get reject => 'Rejeter';
 }

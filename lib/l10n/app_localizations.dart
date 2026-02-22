@@ -1988,203 +1988,53 @@ abstract class AppLocalizations {
   /// **'Livraison acceptee !'**
   String get orderAcceptedSuccess;
 
-  /// No description provided for @incomingOrders.
-  ///
-  /// In fr, this message translates to:
-  /// **'Commandes'**
+  // Restaurant incoming orders
   String get incomingOrders;
-
-  /// No description provided for @noIncomingOrders.
-  ///
-  /// In fr, this message translates to:
-  /// **'Aucune commande entrante'**
   String get noIncomingOrders;
-
-  /// No description provided for @confirmAcceptOrderMessage.
-  ///
-  /// In fr, this message translates to:
-  /// **'Voulez-vous accepter cette commande ?'**
   String get confirmAcceptOrderMessage;
-
-  /// No description provided for @orderAcceptedByRestaurant.
-  ///
-  /// In fr, this message translates to:
-  /// **'Commande acceptee ! Les livreurs sont notifies.'**
   String get orderAcceptedByRestaurant;
-
-  /// No description provided for @rejectOrder.
-  ///
-  /// In fr, this message translates to:
-  /// **'Rejeter la commande'**
   String get rejectOrder;
-
-  /// No description provided for @rejectOrderMessage.
-  ///
-  /// In fr, this message translates to:
-  /// **'Voulez-vous rejeter cette commande ?'**
   String get rejectOrderMessage;
-
-  /// No description provided for @orderRejectedSuccess.
-  ///
-  /// In fr, this message translates to:
-  /// **'Commande rejetee'**
   String get orderRejectedSuccess;
-
-  /// No description provided for @noOrdersInYourCity.
-  ///
-  /// In fr, this message translates to:
-  /// **'Aucune commande dans votre ville'**
   String get noOrdersInYourCity;
-
-  /// No description provided for @chooseLanguage.
-  ///
-  /// In fr, this message translates to:
-  /// **'Choisir la langue'**
   String get chooseLanguage;
 
-  /// No description provided for @confirmDelivery.
-  ///
-  /// In fr, this message translates to:
-  /// **'Confirmer la livraison'**
-  String get confirmDelivery;
-
-  /// No description provided for @confirmDeliveryMessage.
-  ///
-  /// In fr, this message translates to:
-  /// **'Etes-vous sur d\'avoir livre cette commande au client ?'**
-  String get confirmDeliveryMessage;
-
-  /// No description provided for @markAsDelivered.
-  ///
-  /// In fr, this message translates to:
-  /// **'Marquer comme livre'**
-  String get markAsDelivered;
-
-  /// No description provided for @deliveryCompleted.
-  ///
-  /// In fr, this message translates to:
-  /// **'Livraison terminee avec succes!'**
-  String get deliveryCompleted;
-
-  /// No description provided for @activeDelivery.
-  ///
-  /// In fr, this message translates to:
-  /// **'Livraison en cours'**
+  // Delivery active order
   String get activeDelivery;
-
-  /// No description provided for @callClient.
-  ///
-  /// In fr, this message translates to:
-  /// **'Appeler le client'**
+  String get confirmDelivery;
+  String get confirmDeliveryMessage;
+  String get markAsDelivered;
+  String get deliveryCompleted;
   String get callClient;
 
-  /// No description provided for @serviceFeeBalance.
-  ///
-  /// In fr, this message translates to:
-  /// **'Solde des frais de service'**
+  // Resume active delivery
+  String get resumeDelivery;
+  String get youHaveActiveDelivery;
+  String get tapToResume;
+
+  // Settlement system
   String get serviceFeeBalance;
-
-  /// No description provided for @amountOwedToSendy.
-  ///
-  /// In fr, this message translates to:
-  /// **'Montant dû à Sendy'**
   String get amountOwedToSendy;
-
-  /// No description provided for @settlementRequired.
-  ///
-  /// In fr, this message translates to:
-  /// **'Règlement requis - Le seuil de 100 DHs est atteint'**
   String get settlementRequired;
-
-  /// No description provided for @sendPayment.
-  ///
-  /// In fr, this message translates to:
-  /// **'Envoyer le paiement'**
   String get sendPayment;
-
-  /// No description provided for @amountToSend.
-  ///
-  /// In fr, this message translates to:
-  /// **'Montant à envoyer'**
   String get amountToSend;
-
-  /// No description provided for @uploadProofInstructions.
-  ///
-  /// In fr, this message translates to:
-  /// **'Veuillez télécharger une preuve de paiement (photo du reçu bancaire, capture d\'écran de virement, etc.)'**
   String get uploadProofInstructions;
-
-  /// No description provided for @tapToUploadProof.
-  ///
-  /// In fr, this message translates to:
-  /// **'Toucher pour télécharger la preuve'**
   String get tapToUploadProof;
-
-  /// No description provided for @proofDescription.
-  ///
-  /// In fr, this message translates to:
-  /// **'Reçu bancaire ou capture d\'écran'**
   String get proofDescription;
-
-  /// No description provided for @settlementSent.
-  ///
-  /// In fr, this message translates to:
-  /// **'Règlement envoyé avec succès! En attente de validation.'**
-  String get settlementSent;
-
-  /// No description provided for @sending.
-  ///
-  /// In fr, this message translates to:
-  /// **'Envoi en cours...'**
   String get sending;
-
-  /// No description provided for @pendingSettlements.
-  ///
-  /// In fr, this message translates to:
-  /// **'Règlements en attente'**
+  String get settlementSent;
   String get pendingSettlements;
-
-  /// No description provided for @noSettlementsPending.
-  ///
-  /// In fr, this message translates to:
-  /// **'Aucun règlement en attente'**
   String get noSettlementsPending;
-
-  /// No description provided for @confirmSettlementApproval.
-  ///
-  /// In fr, this message translates to:
-  /// **'Etes-vous sûr de vouloir approuver ce règlement de {amount} DHs ?'**
-  String confirmSettlementApproval(Object amount);
-
-  /// No description provided for @settlementApproved.
-  ///
-  /// In fr, this message translates to:
-  /// **'Règlement approuvé avec succès'**
-  String get settlementApproved;
-
-  /// No description provided for @rejectSettlement.
-  ///
-  /// In fr, this message translates to:
-  /// **'Rejeter le règlement'**
-  String get rejectSettlement;
-
-  /// No description provided for @rejectSettlementMessage.
-  ///
-  /// In fr, this message translates to:
-  /// **'Veuillez indiquer la raison du rejet :'**
-  String get rejectSettlementMessage;
-
-  /// No description provided for @settlementRejected.
-  ///
-  /// In fr, this message translates to:
-  /// **'Règlement rejeté'**
-  String get settlementRejected;
-
-  /// No description provided for @settlementsToReview.
-  ///
-  /// In fr, this message translates to:
-  /// **'règlements à examiner'**
   String get settlementsToReview;
+  String get confirmApproval;
+  String confirmSettlementApproval(String amount);
+  String get settlementApproved;
+  String get rejectSettlement;
+  String get rejectSettlementMessage;
+  String get rejectionReason;
+  String get settlementRejected;
+  String get approve;
+  String get reject;
 }
 
 class _AppLocalizationsDelegate
