@@ -3,7 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:provider/provider.dart';
-import 'package:lottie/lottie.dart'; // 👈 ADD THIS
+import 'package:lottie/lottie.dart';
 import 'package:sendy/l10n/app_localizations.dart';
 import 'providers/auth_provider.dart';
 import 'providers/order_provider.dart';

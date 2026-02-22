@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import '../models/order_model.dart';
+import '../models/settlement_model.dart';
 import '../services/notification_service.dart';
 import '../models/user_model.dart';
 
@@ -156,6 +157,55 @@ class OrderProvider with ChangeNotifier {
       'status': OrderStatus.delivered.index,
       'deliveredAt': DateTime.now().toIso8601String(),
     });
+
+    // Increment delivery person's owedAmount by the service fee
+    final orderDoc = await _firestore.collection('orders').doc(orderId).get();
+    if (orderDoc.exists) {
+      final orderData = orderDoc.data()!;
+      final deliveryPersonId = orderData['deliveryPersonId'] as String?;
+      final serviceFee = (orderData['serviceFee'] as num?)?.toDouble() ?? 2.0;
+
+      if (deliveryPersonId != null) {
+        await _firestore.collection('users').doc(deliveryPersonId).update({
+          'owedAmount': FieldValue.increment(serviceFee),
+        });
+
+        // Check if threshold reached (100 DHs)
+        final userDoc =
+            await _firestore.collection('users').doc(deliveryPersonId).get();
+        if (userDoc.exists) {
+          final owedAmount =
+              (userDoc.data()!['owedAmount'] as num?)?.toDouble() ?? 0.0;
+          if (owedAmount >= 100.0) {
+            // Notify delivery person
+            await _notificationService.sendNotificationToClient(
+                deliveryPersonId,
+                'Votre solde Sendy a atteint ${owedAmount.toStringAsFixed(0)} DH. Veuillez effectuer le reglement.');
+            // Notify all admins
+            await _notifyAdmins(
+                'Le livreur doit ${owedAmount.toStringAsFixed(0)} DH de frais de service.');
+          }
+        }
+      }
+    }
+  }
+
+  Future<void> _notifyAdmins(String message) async {
+    try {
+      final admins = await _firestore
+          .collection('users')
+          .where('userType', isEqualTo: UserType.admin.index)
+          .get();
+      for (final admin in admins.docs) {
+        final adminId = admin.data()['uid'] as String?;
+        if (adminId != null) {
+          await _notificationService.sendNotificationToClient(
+              adminId, message);
+        }
+      }
+    } catch (e) {
+      print('Error notifying admins: $e');
+    }
   }
 
   Future<void> updateDeliveryLocation(
@@ -205,5 +255,115 @@ class OrderProvider with ChangeNotifier {
       print('Error getting order: $e');
       return null;
     }
+  }
+
+  // ── Settlement Methods ──
+
+  /// Get the current owed amount for a delivery person
+  Stream<double> getOwedAmount(String deliveryPersonId) {
+    return _firestore
+        .collection('users')
+        .doc(deliveryPersonId)
+        .snapshots()
+        .map((doc) {
+      if (doc.exists) {
+        return (doc.data()!['owedAmount'] as num?)?.toDouble() ?? 0.0;
+      }
+      return 0.0;
+    });
+  }
+
+  /// Create a settlement request with proof image
+  Future<void> createSettlement(SettlementModel settlement) async {
+    await _firestore
+        .collection('settlements')
+        .doc(settlement.settlementId)
+        .set(settlement.toMap());
+
+    // Notify admins
+    await _notifyAdmins(
+        'Nouveau reglement de ${settlement.amount.toStringAsFixed(0)} DH envoye par ${settlement.deliveryPersonName}.');
+  }
+
+  /// Stream of pending settlements (for admin)
+  Stream<List<SettlementModel>> getPendingSettlements() {
+    return _firestore
+        .collection('settlements')
+        .where('status', isEqualTo: SettlementStatus.pending.index)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) =>
+                SettlementModel.fromMap(doc.data()))
+            .toList()
+          ..sort((a, b) => b.createdAt.compareTo(a.createdAt)));
+  }
+
+  /// Stream of settlements for a specific delivery person
+  Stream<List<SettlementModel>> getSettlementsForDelivery(
+      String deliveryPersonId) {
+    return _firestore
+        .collection('settlements')
+        .where('deliveryPersonId', isEqualTo: deliveryPersonId)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) =>
+                SettlementModel.fromMap(doc.data()))
+            .toList()
+          ..sort((a, b) => b.createdAt.compareTo(a.createdAt)));
+  }
+
+  /// Approve a settlement (admin)
+  Future<void> approveSettlement(
+      String settlementId, String adminUid) async {
+    final doc = await _firestore
+        .collection('settlements')
+        .doc(settlementId)
+        .get();
+    if (!doc.exists) return;
+
+    final settlement = SettlementModel.fromMap(doc.data()!);
+
+    await _firestore.collection('settlements').doc(settlementId).update({
+      'status': SettlementStatus.approved.index,
+      'reviewedAt': DateTime.now().toIso8601String(),
+      'reviewedBy': adminUid,
+    });
+
+    // Reset the delivery person's owedAmount
+    await _firestore
+        .collection('users')
+        .doc(settlement.deliveryPersonId)
+        .update({
+      'owedAmount': FieldValue.increment(-settlement.amount),
+    });
+
+    // Notify delivery person
+    await _notificationService.sendNotificationToClient(
+        settlement.deliveryPersonId,
+        'Votre reglement de ${settlement.amount.toStringAsFixed(0)} DH a ete approuve.');
+  }
+
+  /// Reject a settlement (admin)
+  Future<void> rejectSettlement(
+      String settlementId, String adminUid, String reason) async {
+    final doc = await _firestore
+        .collection('settlements')
+        .doc(settlementId)
+        .get();
+    if (!doc.exists) return;
+
+    final settlement = SettlementModel.fromMap(doc.data()!);
+
+    await _firestore.collection('settlements').doc(settlementId).update({
+      'status': SettlementStatus.rejected.index,
+      'reviewedAt': DateTime.now().toIso8601String(),
+      'reviewedBy': adminUid,
+      'adminNote': reason,
+    });
+
+    // Notify delivery person
+    await _notificationService.sendNotificationToClient(
+        settlement.deliveryPersonId,
+        'Votre reglement a ete refuse. Raison: $reason');
   }
 }

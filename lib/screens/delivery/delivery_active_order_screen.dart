@@ -232,9 +232,7 @@ class _DeliveryActiveOrderScreenState extends State<DeliveryActiveOrderScreen> {
     setState(() => _isCompleting = true);
 
     try {
-      await context
-          .read<OrderProvider>()
-          .completeOrder(widget.order.orderId);
+      await context.read<OrderProvider>().completeOrder(widget.order.orderId);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -323,8 +321,7 @@ class _DeliveryActiveOrderScreenState extends State<DeliveryActiveOrderScreen> {
       child: Container(
         decoration: BoxDecoration(
           color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius:
-              const BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.15),
@@ -383,8 +380,8 @@ class _DeliveryActiveOrderScreenState extends State<DeliveryActiveOrderScreen> {
                       if (_currentLatLng != null)
                         Text(
                           l10n.arrivingIn(etaMinutes.toString()),
-                          style: TextStyle(
-                              color: Colors.green[700], fontSize: 13),
+                          style:
+                              TextStyle(color: Colors.green[700], fontSize: 13),
                         ),
                     ],
                   ),

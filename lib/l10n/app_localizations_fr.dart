@@ -1021,4 +1021,64 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get callClient => 'Appeler le client';
+
+  @override
+  String get serviceFeeBalance => 'Solde des frais de service';
+
+  @override
+  String get amountOwedToSendy => 'Montant dû à Sendy';
+
+  @override
+  String get settlementRequired =>
+      'Règlement requis - Le seuil de 100 DHs est atteint';
+
+  @override
+  String get sendPayment => 'Envoyer le paiement';
+
+  @override
+  String get amountToSend => 'Montant à envoyer';
+
+  @override
+  String get uploadProofInstructions =>
+      'Veuillez télécharger une preuve de paiement (photo du reçu bancaire, capture d\'écran de virement, etc.)';
+
+  @override
+  String get tapToUploadProof => 'Toucher pour télécharger la preuve';
+
+  @override
+  String get proofDescription => 'Reçu bancaire ou capture d\'écran';
+
+  @override
+  String get settlementSent =>
+      'Règlement envoyé avec succès! En attente de validation.';
+
+  @override
+  String get sending => 'Envoi en cours...';
+
+  @override
+  String get pendingSettlements => 'Règlements en attente';
+
+  @override
+  String get noSettlementsPending => 'Aucun règlement en attente';
+
+  @override
+  String confirmSettlementApproval(Object amount) {
+    return 'Etes-vous sûr de vouloir approuver ce règlement de $amount DHs ?';
+  }
+
+  @override
+  String get settlementApproved => 'Règlement approuvé avec succès';
+
+  @override
+  String get rejectSettlement => 'Rejeter le règlement';
+
+  @override
+  String get rejectSettlementMessage =>
+      'Veuillez indiquer la raison du rejet :';
+
+  @override
+  String get settlementRejected => 'Règlement rejeté';
+
+  @override
+  String get settlementsToReview => 'règlements à examiner';
 }
