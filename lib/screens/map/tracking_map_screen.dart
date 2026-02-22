@@ -71,42 +71,50 @@ class _TrackingMapScreenState extends State<TrackingMapScreen> {
     }
   }
 
+  /// Safely parse a LatLng from a location map. Returns null if data is missing.
+  LatLng? _parseLatLng(Map<String, dynamic> loc) {
+    final lat = loc['latitude'];
+    final lng = loc['longitude'];
+    if (lat == null || lng == null) return null;
+    return LatLng((lat as num).toDouble(), (lng as num).toDouble());
+  }
+
   void _setupMarkers() {
     final restaurantLoc = widget.order.restaurantLocation;
     final deliveryLoc = widget.order.deliveryLocation;
 
-    _markers.add(
-      Marker(
-        markerId: const MarkerId('restaurant'),
-        position: LatLng(
-          (restaurantLoc['latitude'] as num).toDouble(),
-          (restaurantLoc['longitude'] as num).toDouble(),
+    final restaurantLatLng = _parseLatLng(restaurantLoc);
+    if (restaurantLatLng != null) {
+      _markers.add(
+        Marker(
+          markerId: const MarkerId('restaurant'),
+          position: restaurantLatLng,
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
+          infoWindow: const InfoWindow(title: 'Restaurant'),
         ),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
-        infoWindow: const InfoWindow(title: 'Restaurant'),
-      ),
-    );
+      );
+    }
 
-    _markers.add(
-      Marker(
-        markerId: const MarkerId('destination'),
-        position: LatLng(
-          (deliveryLoc['latitude'] as num).toDouble(),
-          (deliveryLoc['longitude'] as num).toDouble(),
+    final destinationLatLng = _parseLatLng(deliveryLoc);
+    if (destinationLatLng != null) {
+      _markers.add(
+        Marker(
+          markerId: const MarkerId('destination'),
+          position: destinationLatLng,
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+          infoWindow: const InfoWindow(title: 'Destination'),
         ),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-        infoWindow: const InfoWindow(title: 'Destination'),
-      ),
-    );
+      );
+    }
 
     // Add initial delivery person marker if available
     final currentLoc = widget.order.currentDeliveryLocation;
     if (currentLoc != null) {
-      _deliveryPersonLatLng = LatLng(
-        (currentLoc['latitude'] as num).toDouble(),
-        (currentLoc['longitude'] as num).toDouble(),
-      );
-      _updateDeliveryPersonMarker(_deliveryPersonLatLng!);
+      final currentLatLng = _parseLatLng(currentLoc);
+      if (currentLatLng != null) {
+        _deliveryPersonLatLng = currentLatLng;
+        _updateDeliveryPersonMarker(currentLatLng);
+      }
     }
   }
 
@@ -172,11 +180,8 @@ class _TrackingMapScreenState extends State<TrackingMapScreen> {
   }
 
   void _updatePolyline(LatLng deliveryPersonPos) {
-    final deliveryLoc = widget.order.deliveryLocation;
-    final destinationLatLng = LatLng(
-      (deliveryLoc['latitude'] as num).toDouble(),
-      (deliveryLoc['longitude'] as num).toDouble(),
-    );
+    final destinationLatLng = _parseLatLng(widget.order.deliveryLocation);
+    if (destinationLatLng == null) return;
 
     _polylines = {
       Polyline(
@@ -210,11 +215,8 @@ class _TrackingMapScreenState extends State<TrackingMapScreen> {
   int _calculateEtaMinutes() {
     if (_deliveryPersonLatLng == null) return 0;
 
-    final deliveryLoc = widget.order.deliveryLocation;
-    final destination = LatLng(
-      (deliveryLoc['latitude'] as num).toDouble(),
-      (deliveryLoc['longitude'] as num).toDouble(),
-    );
+    final destination = _parseLatLng(widget.order.deliveryLocation);
+    if (destination == null) return 0;
 
     final distanceKm = _haversineDistance(_deliveryPersonLatLng!, destination);
     final timeHours = distanceKm / 30.0;
@@ -240,7 +242,9 @@ class _TrackingMapScreenState extends State<TrackingMapScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final restaurantLoc = widget.order.restaurantLocation;
+    final initialTarget = _parseLatLng(widget.order.restaurantLocation)
+        ?? _parseLatLng(widget.order.deliveryLocation)
+        ?? const LatLng(33.5731, -7.5898); // Default: Casablanca
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.trackOrder)),
@@ -248,10 +252,7 @@ class _TrackingMapScreenState extends State<TrackingMapScreen> {
         children: [
           GoogleMap(
             initialCameraPosition: CameraPosition(
-              target: LatLng(
-                (restaurantLoc['latitude'] as num).toDouble(),
-                (restaurantLoc['longitude'] as num).toDouble(),
-              ),
+              target: initialTarget,
               zoom: 14,
             ),
             markers: _markers,
