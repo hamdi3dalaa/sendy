@@ -147,21 +147,19 @@ class _TrackingMapScreenState extends State<TrackingMapScreen> {
           return;
         }
 
-        if (currentLoc != null) {
-          final newLatLng = LatLng(
-            (currentLoc['latitude'] as num).toDouble(),
-            (currentLoc['longitude'] as num).toDouble(),
-          );
+        if (currentLoc != null && currentLoc is Map<String, dynamic>) {
+          final newLatLng = _parseLatLng(currentLoc);
+          if (newLatLng != null) {
+            setState(() {
+              _deliveryPersonLatLng = newLatLng;
+              _updateDeliveryPersonMarker(newLatLng);
+              _updatePolyline(newLatLng);
+            });
 
-          setState(() {
-            _deliveryPersonLatLng = newLatLng;
-            _updateDeliveryPersonMarker(newLatLng);
-            _updatePolyline(newLatLng);
-          });
-
-          _mapController?.animateCamera(
-            CameraUpdate.newLatLng(newLatLng),
-          );
+            _mapController?.animateCamera(
+              CameraUpdate.newLatLng(newLatLng),
+            );
+          }
         }
       }
     });
