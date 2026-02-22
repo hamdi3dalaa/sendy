@@ -10,6 +10,7 @@ import 'pending_users_screen.dart';
 import 'pending_menu_items_screen.dart';
 import 'pending_image_changes_screen.dart';
 import 'pending_settlements_screen.dart';
+import 'delivery_fees_screen.dart';
 import '../../screens/admin/config_management_screen.dart';
 import '../../models/user_model.dart';
 
@@ -204,6 +205,45 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                                   MaterialPageRoute(
                                     builder: (context) =>
                                         const PendingSettlementsScreen(),
+                                  ),
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                          ],
+                        );
+                      },
+                    ),
+
+                    // Delivery Fees Table
+                    StreamBuilder<List<Map<String, dynamic>>>(
+                      stream: context
+                          .read<OrderProvider>()
+                          .getAllDeliveryPersonsWithFees(),
+                      builder: (context, snapshot) {
+                        final persons = snapshot.data ?? [];
+                        final overThreshold = persons
+                            .where((p) =>
+                                (p['owedAmount'] as double) >= 100.0)
+                            .length;
+                        final subtitle = overThreshold > 0
+                            ? '$overThreshold ${l10n.overThreshold}'
+                            : l10n.deliveryFeesSubtitle;
+                        return Column(
+                          children: [
+                            _buildActionCard(
+                              title: l10n.deliveryFeesTitle,
+                              subtitle: subtitle,
+                              icon: Icons.monetization_on,
+                              iconColor: overThreshold > 0
+                                  ? Colors.red
+                                  : Colors.amber[700]!,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const DeliveryFeesScreen(),
                                   ),
                                 );
                               },

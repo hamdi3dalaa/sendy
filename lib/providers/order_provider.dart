@@ -259,6 +259,26 @@ class OrderProvider with ChangeNotifier {
 
   // ── Settlement Methods ──
 
+  /// Stream all approved delivery persons with their owedAmount
+  Stream<List<Map<String, dynamic>>> getAllDeliveryPersonsWithFees() {
+    return _firestore
+        .collection('users')
+        .where('userType', isEqualTo: UserType.delivery.index)
+        .where('approvalStatus', isEqualTo: 1) // approved
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) {
+              final data = doc.data();
+              return {
+                'uid': data['uid'] ?? doc.id,
+                'name': data['name'] ?? '',
+                'phoneNumber': data['phoneNumber'] ?? '',
+                'owedAmount':
+                    (data['owedAmount'] as num?)?.toDouble() ?? 0.0,
+                'profileImageUrl': data['profileImageUrl'],
+              };
+            }).toList());
+  }
+
   /// Get the current owed amount for a delivery person
   Stream<double> getOwedAmount(String deliveryPersonId) {
     return _firestore

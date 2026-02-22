@@ -1003,6 +1003,24 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get tapToResume => 'اضغط للاستئناف';
 
+  // Delivery fees admin
+  @override
+  String get deliveryFeesTitle => 'رسوم التوصيل';
+  @override
+  String get searchByNameOrPhone => 'البحث بالاسم، الهاتف أو المبلغ...';
+  @override
+  String get noDeliveryPersonsFound => 'لم يتم العثور على سائقين';
+  @override
+  String get totalDeliveryPersons => 'السائقون';
+  @override
+  String get overThreshold => '> 100 درهم';
+  @override
+  String get totalOwed => 'المجموع المستحق';
+  @override
+  String get amountDue => 'المبلغ المستحق';
+  @override
+  String get deliveryFeesSubtitle => 'متابعة رسوم خدمة السائقين';
+
   // Settlement system
   @override
   String get serviceFeeBalance => 'رصيد رسوم الخدمة';

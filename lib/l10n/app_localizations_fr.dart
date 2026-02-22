@@ -1014,6 +1014,24 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get tapToResume => 'Appuyez pour reprendre';
 
+  // Delivery fees admin
+  @override
+  String get deliveryFeesTitle => 'Frais de livraison';
+  @override
+  String get searchByNameOrPhone => 'Rechercher par nom, telephone ou montant...';
+  @override
+  String get noDeliveryPersonsFound => 'Aucun livreur trouve';
+  @override
+  String get totalDeliveryPersons => 'Livreurs';
+  @override
+  String get overThreshold => '> 100 DH';
+  @override
+  String get totalOwed => 'Total du';
+  @override
+  String get amountDue => 'Montant du';
+  @override
+  String get deliveryFeesSubtitle => 'Suivi des frais de service livreurs';
+
   // Settlement system
   @override
   String get serviceFeeBalance => 'Solde frais de service';

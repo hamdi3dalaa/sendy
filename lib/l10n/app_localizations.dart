@@ -2012,6 +2012,16 @@ abstract class AppLocalizations {
   String get youHaveActiveDelivery;
   String get tapToResume;
 
+  // Delivery fees admin
+  String get deliveryFeesTitle;
+  String get searchByNameOrPhone;
+  String get noDeliveryPersonsFound;
+  String get totalDeliveryPersons;
+  String get overThreshold;
+  String get totalOwed;
+  String get amountDue;
+  String get deliveryFeesSubtitle;
+
   // Settlement system
   String get serviceFeeBalance;
   String get amountOwedToSendy;
