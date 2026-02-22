@@ -341,16 +341,15 @@ class ClientProvider with ChangeNotifier {
   // Load active dish promotions (filtered by city)
   Future<void> loadDishPromotions({String? customerCity}) async {
     try {
-      final now = DateTime.now();
+      // Fetch all promotions and filter in Dart to avoid composite index issues
       final snapshot = await _firestore
           .collection('dish_promotions')
-          .where('endDate', isGreaterThan: Timestamp.fromDate(now))
           .get()
           .timeout(const Duration(seconds: 15));
 
       _dishPromotions = snapshot.docs
           .map((doc) => DishPromotion.fromMap(doc.id, doc.data()))
-          .where((p) => p.startDate.isBefore(now)) // already started
+          .where((p) => p.isActive) // currently active (started and not expired)
           .where((p) =>
               customerCity == null ||
               customerCity.isEmpty ||
@@ -359,8 +358,10 @@ class ClientProvider with ChangeNotifier {
               p.restaurantCity!.toLowerCase() == customerCity.toLowerCase())
           .toList()
         ..sort((a, b) => b.discountPercent.compareTo(a.discountPercent));
+      print('🔵 [PROMOS] Loaded ${_dishPromotions.length} global dish promotions');
       notifyListeners();
     } catch (e) {
+      print('❌ [PROMOS] Error loading dish promotions: $e');
       // ignore - promotions are non-critical
     }
   }
@@ -368,25 +369,28 @@ class ClientProvider with ChangeNotifier {
   // Load active promotions for a specific restaurant's menu items
   Future<void> loadActivePromotionsForRestaurant(String restaurantId) async {
     try {
-      final now = DateTime.now();
+      // Use single-field query to avoid needing a Firestore composite index
+      // Filter by date in Dart code instead
       final snapshot = await _firestore
           .collection('dish_promotions')
           .where('restaurantId', isEqualTo: restaurantId)
-          .where('endDate', isGreaterThan: Timestamp.fromDate(now))
           .get()
           .timeout(const Duration(seconds: 15));
 
+      final now = DateTime.now();
       final promos = snapshot.docs
           .map((doc) => DishPromotion.fromMap(doc.id, doc.data()))
-          .where((p) => p.startDate.isBefore(now))
+          .where((p) => p.isActive)
           .toList();
 
       _activeMenuPromotions = {};
       for (final promo in promos) {
         _activeMenuPromotions[promo.menuItemId] = promo;
       }
+      print('🔵 [PROMOS] Loaded ${promos.length} active promotions for restaurant $restaurantId');
       notifyListeners();
     } catch (e) {
+      print('❌ [PROMOS] Error loading promotions for restaurant $restaurantId: $e');
       _activeMenuPromotions = {};
     }
   }
