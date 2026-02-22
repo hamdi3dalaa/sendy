@@ -2045,6 +2045,25 @@ abstract class AppLocalizations {
   String get settlementRejected;
   String get approve;
   String get reject;
+
+  // Dish promotions
+  String get dishPromotions;
+  String get managePromotions;
+  String get addPromotion;
+  String get noPromotions;
+  String get addPromotionHint;
+  String get selectDish;
+  String get promoPrice;
+  String get startDate;
+  String get endDate;
+  String get invalidPromoPrice;
+  String get invalidPromoDates;
+  String get promotionAdded;
+  String get confirmDeletePromoMessage;
+  String get currentPromotions;
+  String get expired;
+  String get upcoming;
+  String get active;
 }
 
 class _AppLocalizationsDelegate

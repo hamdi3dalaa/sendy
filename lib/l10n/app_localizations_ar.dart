@@ -1066,4 +1066,40 @@ class AppLocalizationsAr extends AppLocalizations {
   String get approve => 'موافقة';
   @override
   String get reject => 'رفض';
+
+  // Dish promotions
+  @override
+  String get dishPromotions => 'العروض';
+  @override
+  String get managePromotions => 'إدارة عروض الأطباق';
+  @override
+  String get addPromotion => 'إضافة عرض';
+  @override
+  String get noPromotions => 'لا توجد عروض';
+  @override
+  String get addPromotionHint => 'أضف عروض على أطباقك لجذب المزيد من الزبائن';
+  @override
+  String get selectDish => 'اختر طبق';
+  @override
+  String get promoPrice => 'السعر الترويجي (درهم)';
+  @override
+  String get startDate => 'تاريخ البداية';
+  @override
+  String get endDate => 'تاريخ النهاية';
+  @override
+  String get invalidPromoPrice => 'السعر الترويجي يجب أن يكون أقل من السعر الأصلي';
+  @override
+  String get invalidPromoDates => 'تاريخ النهاية يجب أن يكون بعد تاريخ البداية';
+  @override
+  String get promotionAdded => 'تمت إضافة العرض بنجاح!';
+  @override
+  String get confirmDeletePromoMessage => 'هل تريد حذف هذا العرض؟';
+  @override
+  String get currentPromotions => 'العروض الحالية';
+  @override
+  String get expired => 'منتهي';
+  @override
+  String get upcoming => 'قادم';
+  @override
+  String get active => 'نشط';
 }

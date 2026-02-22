@@ -1077,4 +1077,40 @@ class AppLocalizationsFr extends AppLocalizations {
   String get approve => 'Approuver';
   @override
   String get reject => 'Rejeter';
+
+  // Dish promotions
+  @override
+  String get dishPromotions => 'Promotions';
+  @override
+  String get managePromotions => 'Gerer les promotions de vos plats';
+  @override
+  String get addPromotion => 'Ajouter une promotion';
+  @override
+  String get noPromotions => 'Aucune promotion';
+  @override
+  String get addPromotionHint => 'Ajoutez des promotions sur vos plats pour attirer plus de clients';
+  @override
+  String get selectDish => 'Selectionner un plat';
+  @override
+  String get promoPrice => 'Prix promotionnel (DHs)';
+  @override
+  String get startDate => 'Date de debut';
+  @override
+  String get endDate => 'Date de fin';
+  @override
+  String get invalidPromoPrice => 'Le prix promo doit etre inferieur au prix original';
+  @override
+  String get invalidPromoDates => 'La date de fin doit etre apres la date de debut';
+  @override
+  String get promotionAdded => 'Promotion ajoutee avec succes !';
+  @override
+  String get confirmDeletePromoMessage => 'Voulez-vous vraiment supprimer cette promotion ?';
+  @override
+  String get currentPromotions => 'Promotions en cours';
+  @override
+  String get expired => 'Expiree';
+  @override
+  String get upcoming => 'A venir';
+  @override
+  String get active => 'Active';
 }

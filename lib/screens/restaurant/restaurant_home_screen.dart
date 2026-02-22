@@ -9,6 +9,8 @@ import '../../providers/menu_provider.dart';
 import '../../models/user_model.dart';
 import 'menu_management_screen.dart';
 import 'invoice_history_screen.dart';
+import 'dish_promotions_screen.dart';
+import '../../providers/client_provider.dart';
 import '../../models/order_model.dart';
 import '../../providers/order_provider.dart';
 
@@ -571,6 +573,39 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const InvoiceHistoryScreen(),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Dish Promotions Card
+          Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.local_offer, color: Colors.orange),
+              ),
+              title: Text(
+                l10n.dishPromotions,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(l10n.managePromotions),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DishPromotionsScreen(),
                   ),
                 );
               },

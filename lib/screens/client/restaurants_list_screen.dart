@@ -39,6 +39,11 @@ class _RestaurantsListScreenState extends State<RestaurantsListScreen> {
     'desserts',
   ];
 
+  String? _getCustomerCity() {
+    final authProvider = context.read<AuthProvider>();
+    return authProvider.currentUser?.city;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -147,10 +152,21 @@ class _RestaurantsListScreenState extends State<RestaurantsListScreen> {
                 return _buildInitialState(l10n);
               }
 
-              var restaurants = clientProvider.restaurants
+              final customerCity = _getCustomerCity();
+
+              // Filter by city first
+              var restaurants = clientProvider.restaurants.where((r) {
+                if (customerCity == null || customerCity.isEmpty) return true;
+                if (r.city == null || r.city!.isEmpty) return true;
+                return r.city!.toLowerCase() == customerCity.toLowerCase();
+              }).toList();
+
+              // Then filter by search
+              restaurants = restaurants
                   .where((r) => r.name.toLowerCase().contains(_searchQuery))
                   .toList();
 
+              // Then filter by category
               if (_selectedCategory.isNotEmpty) {
                 restaurants = restaurants
                     .where((r) =>
@@ -159,20 +175,68 @@ class _RestaurantsListScreenState extends State<RestaurantsListScreen> {
                     .toList();
               }
 
-              if (restaurants.isEmpty) {
+              // Get active promotions (already filtered by city from provider)
+              final promotions = clientProvider.dishPromotions;
+
+              if (restaurants.isEmpty && promotions.isEmpty) {
                 return _buildEmptyState(l10n);
               }
 
               return RefreshIndicator(
                 onRefresh: () => _loadRestaurants(),
                 color: const Color(0xFFFF5722),
-                child: ListView.builder(
+                child: ListView(
                   padding: const EdgeInsets.all(16),
-                  itemCount: restaurants.length,
-                  itemBuilder: (context, index) {
-                    final restaurant = restaurants[index];
-                    return _RestaurantCard(restaurant: restaurant);
-                  },
+                  children: [
+                    // Promotions section at the top
+                    if (promotions.isNotEmpty && _searchQuery.isEmpty) ...[
+                      Row(
+                        children: [
+                          const Icon(Icons.local_fire_department,
+                              color: Color(0xFFFF5722), size: 22),
+                          const SizedBox(width: 6),
+                          Text(
+                            l10n.currentPromotions,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        height: 180,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: promotions.length,
+                          itemBuilder: (context, index) {
+                            return _PromotionCard(
+                                promo: promotions[index]);
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        l10n.allRestaurants,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+
+                    // Restaurant list
+                    ...restaurants.map((restaurant) =>
+                        _RestaurantCard(restaurant: restaurant)),
+
+                    if (restaurants.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 40),
+                        child: _buildEmptyState(l10n),
+                      ),
+                  ],
                 ),
               );
             },
@@ -186,7 +250,12 @@ class _RestaurantsListScreenState extends State<RestaurantsListScreen> {
     setState(() {
       _hasLoaded = true;
     });
-    await context.read<ClientProvider>().loadRestaurants();
+    final clientProvider = context.read<ClientProvider>();
+    final customerCity = _getCustomerCity();
+    await Future.wait([
+      clientProvider.loadRestaurants(),
+      clientProvider.loadDishPromotions(customerCity: customerCity),
+    ]);
   }
 
   Widget _buildInitialState(AppLocalizations l10n) {
@@ -288,6 +357,156 @@ class _RestaurantsListScreenState extends State<RestaurantsListScreen> {
                   : l10n.tryAnotherSearch,
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PromotionCard extends StatelessWidget {
+  final DishPromotion promo;
+
+  const _PromotionCard({required this.promo});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return GestureDetector(
+      onTap: () async {
+        // Navigate to the restaurant
+        final clientProvider = context.read<ClientProvider>();
+        final restaurant =
+            await clientProvider.getRestaurantById(promo.restaurantId);
+        if (restaurant != null && context.mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  RestaurantMenuScreen(restaurant: restaurant),
+            ),
+          );
+        }
+      },
+      child: Container(
+        width: 200,
+        margin: const EdgeInsets.only(right: 12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image with discount badge
+            Stack(
+              children: [
+                promo.dishImageUrl != null && promo.dishImageUrl!.isNotEmpty
+                    ? CachedNetworkImage(
+                        imageUrl: promo.dishImageUrl!,
+                        height: 100,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        placeholder: (_, __) => Container(
+                          height: 100,
+                          color: Colors.grey[200],
+                          child: const Center(
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2)),
+                        ),
+                        errorWidget: (_, __, ___) => Container(
+                          height: 100,
+                          color: const Color(0xFFFF5722).withOpacity(0.1),
+                          child: const Center(
+                              child: Icon(Icons.fastfood,
+                                  size: 40, color: Color(0xFFFF5722))),
+                        ),
+                      )
+                    : Container(
+                        height: 100,
+                        color: const Color(0xFFFF5722).withOpacity(0.1),
+                        child: const Center(
+                            child: Icon(Icons.fastfood,
+                                size: 40, color: Color(0xFFFF5722))),
+                      ),
+                // Discount badge
+                Positioned(
+                  top: 6,
+                  right: 6,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      '-${promo.discountPercent}%',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            // Info
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    promo.dishName,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 13),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    promo.restaurantName,
+                    style: TextStyle(
+                        fontSize: 11, color: Colors.grey[600]),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Text(
+                        '${promo.originalPrice.toStringAsFixed(0)} ${l10n.dhs}',
+                        style: const TextStyle(
+                          decoration: TextDecoration.lineThrough,
+                          color: Colors.grey,
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        '${promo.promoPrice.toStringAsFixed(0)} ${l10n.dhs}',
+                        style: const TextStyle(
+                          color: Color(0xFFFF5722),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ],
         ),

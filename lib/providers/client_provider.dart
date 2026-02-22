@@ -18,6 +18,7 @@ class RestaurantModel {
   final String? coverImageUrl;
   final double averageRating;
   final int totalReviews;
+  final String? city;
 
   RestaurantModel({
     required this.uid,
@@ -30,7 +31,83 @@ class RestaurantModel {
     this.coverImageUrl,
     this.averageRating = 0.0,
     this.totalReviews = 0,
+    this.city,
   });
+}
+
+class DishPromotion {
+  final String id;
+  final String restaurantId;
+  final String restaurantName;
+  final String menuItemId;
+  final String dishName;
+  final String? dishImageUrl;
+  final double originalPrice;
+  final double promoPrice;
+  final DateTime startDate;
+  final DateTime endDate;
+  final String? restaurantCity;
+  final String? restaurantImageUrl;
+
+  DishPromotion({
+    required this.id,
+    required this.restaurantId,
+    required this.restaurantName,
+    required this.menuItemId,
+    required this.dishName,
+    this.dishImageUrl,
+    required this.originalPrice,
+    required this.promoPrice,
+    required this.startDate,
+    required this.endDate,
+    this.restaurantCity,
+    this.restaurantImageUrl,
+  });
+
+  bool get isActive =>
+      DateTime.now().isAfter(startDate) && DateTime.now().isBefore(endDate);
+
+  int get discountPercent =>
+      ((1 - promoPrice / originalPrice) * 100).round();
+
+  factory DishPromotion.fromMap(String id, Map<String, dynamic> map) {
+    return DishPromotion(
+      id: id,
+      restaurantId: map['restaurantId'] ?? '',
+      restaurantName: map['restaurantName'] ?? '',
+      menuItemId: map['menuItemId'] ?? '',
+      dishName: map['dishName'] ?? '',
+      dishImageUrl: map['dishImageUrl'],
+      originalPrice: (map['originalPrice'] ?? 0).toDouble(),
+      promoPrice: (map['promoPrice'] ?? 0).toDouble(),
+      startDate: map['startDate'] is Timestamp
+          ? (map['startDate'] as Timestamp).toDate()
+          : DateTime.tryParse(map['startDate']?.toString() ?? '') ??
+              DateTime.now(),
+      endDate: map['endDate'] is Timestamp
+          ? (map['endDate'] as Timestamp).toDate()
+          : DateTime.tryParse(map['endDate']?.toString() ?? '') ??
+              DateTime.now(),
+      restaurantCity: map['restaurantCity'],
+      restaurantImageUrl: map['restaurantImageUrl'],
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'restaurantId': restaurantId,
+      'restaurantName': restaurantName,
+      'menuItemId': menuItemId,
+      'dishName': dishName,
+      'dishImageUrl': dishImageUrl,
+      'originalPrice': originalPrice,
+      'promoPrice': promoPrice,
+      'startDate': Timestamp.fromDate(startDate),
+      'endDate': Timestamp.fromDate(endDate),
+      'restaurantCity': restaurantCity,
+      'restaurantImageUrl': restaurantImageUrl,
+    };
+  }
 }
 
 class SavedAddress {
@@ -137,6 +214,9 @@ class ClientProvider with ChangeNotifier {
   PromoCode? _appliedPromo;
   double _promoDiscount = 0.0;
 
+  // Dish promotions
+  List<DishPromotion> _dishPromotions = [];
+
   List<RestaurantModel> get restaurants => _restaurants;
   List<MenuItem> get restaurantMenuItems => _restaurantMenuItems;
   Map<String, CartItem> get cart => _cart;
@@ -146,6 +226,7 @@ class ClientProvider with ChangeNotifier {
   List<SavedAddress> get savedAddresses => _savedAddresses;
   PromoCode? get appliedPromo => _appliedPromo;
   double get promoDiscount => _promoDiscount;
+  List<DishPromotion> get dishPromotions => _dishPromotions;
 
   int get cartItemCount =>
       _cart.values.fold(0, (sum, item) => sum + item.quantity);
@@ -216,6 +297,7 @@ class ClientProvider with ChangeNotifier {
           coverImageUrl: userData['profileImageUrl'],
           averageRating: avgRating,
           totalReviews: ratings.length,
+          city: userData['city'],
         ));
       }
 
@@ -230,6 +312,56 @@ class ClientProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  // Load active dish promotions (filtered by city)
+  Future<void> loadDishPromotions({String? customerCity}) async {
+    try {
+      final now = DateTime.now();
+      final snapshot = await _firestore
+          .collection('dish_promotions')
+          .where('endDate', isGreaterThan: Timestamp.fromDate(now))
+          .get()
+          .timeout(const Duration(seconds: 15));
+
+      _dishPromotions = snapshot.docs
+          .map((doc) => DishPromotion.fromMap(doc.id, doc.data()))
+          .where((p) => p.startDate.isBefore(now)) // already started
+          .where((p) =>
+              customerCity == null ||
+              customerCity.isEmpty ||
+              p.restaurantCity == null ||
+              p.restaurantCity!.isEmpty ||
+              p.restaurantCity!.toLowerCase() == customerCity.toLowerCase())
+          .toList()
+        ..sort((a, b) => b.discountPercent.compareTo(a.discountPercent));
+      notifyListeners();
+    } catch (e) {
+      // ignore - promotions are non-critical
+    }
+  }
+
+  // Add a dish promotion (restaurant side, no admin approval needed)
+  Future<void> addDishPromotion(DishPromotion promo) async {
+    final docRef = _firestore.collection('dish_promotions').doc();
+    await docRef.set(promo.toMap());
+  }
+
+  // Delete a dish promotion
+  Future<void> deleteDishPromotion(String promoId) async {
+    await _firestore.collection('dish_promotions').doc(promoId).delete();
+  }
+
+  // Stream promotions for a specific restaurant
+  Stream<List<DishPromotion>> getRestaurantPromotions(String restaurantId) {
+    return _firestore
+        .collection('dish_promotions')
+        .where('restaurantId', isEqualTo: restaurantId)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => DishPromotion.fromMap(doc.id, doc.data()))
+            .toList()
+          ..sort((a, b) => b.endDate.compareTo(a.endDate)));
   }
 
   // Load menu items
@@ -342,6 +474,7 @@ class ClientProvider with ChangeNotifier {
           name: data['restaurantName'] ?? data['name'] ?? 'Restaurant',
           phoneNumber: data['phoneNumber'],
           location: data['location'],
+          city: data['city'],
         );
       }
     } catch (e) {
