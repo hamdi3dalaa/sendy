@@ -965,33 +965,47 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get incomingOrders => 'الطلبات الواردة';
+
   @override
   String get noIncomingOrders => 'لا توجد طلبات واردة';
+
   @override
   String get confirmAcceptOrderMessage => 'هل تريد قبول هذا الطلب؟';
+
   @override
   String get orderAcceptedByRestaurant => 'تم قبول الطلب! تم إخطار السائقين.';
+
   @override
   String get rejectOrder => 'رفض الطلب';
+
   @override
   String get rejectOrderMessage => 'هل تريد رفض هذا الطلب؟';
+
   @override
   String get orderRejectedSuccess => 'تم رفض الطلب';
+
   @override
   String get noOrdersInYourCity => 'لا توجد طلبات في مدينتك';
+
   @override
   String get chooseLanguage => 'اختر اللغة';
 
   @override
-  String get activeDelivery => 'التوصيل الجاري';
-  @override
   String get confirmDelivery => 'تأكيد التوصيل';
+
   @override
-  String get confirmDeliveryMessage => 'هل تؤكد أن الطلب تم توصيله للعميل؟';
+  String get confirmDeliveryMessage =>
+      'هل أنت متأكد من أنك قمت بتوصيل هذا الطلب إلى العميل؟';
+
   @override
-  String get markAsDelivered => 'تم التوصيل';
+  String get markAsDelivered => 'تحديد كمُسلّم';
+
   @override
-  String get deliveryCompleted => 'تم التوصيل بنجاح!';
+  String get deliveryCompleted => 'تم إكمال التوصيل بنجاح!';
+
   @override
-  String get callClient => 'اتصال';
+  String get activeDelivery => 'التوصيل النشط';
+
+  @override
+  String get callClient => 'اتصل بالعميل';
 }

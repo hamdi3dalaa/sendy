@@ -1988,23 +1988,94 @@ abstract class AppLocalizations {
   /// **'Livraison acceptee !'**
   String get orderAcceptedSuccess;
 
-  // Restaurant incoming orders
+  /// No description provided for @incomingOrders.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commandes'**
   String get incomingOrders;
+
+  /// No description provided for @noIncomingOrders.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune commande entrante'**
   String get noIncomingOrders;
+
+  /// No description provided for @confirmAcceptOrderMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voulez-vous accepter cette commande ?'**
   String get confirmAcceptOrderMessage;
+
+  /// No description provided for @orderAcceptedByRestaurant.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commande acceptee ! Les livreurs sont notifies.'**
   String get orderAcceptedByRestaurant;
+
+  /// No description provided for @rejectOrder.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rejeter la commande'**
   String get rejectOrder;
+
+  /// No description provided for @rejectOrderMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voulez-vous rejeter cette commande ?'**
   String get rejectOrderMessage;
+
+  /// No description provided for @orderRejectedSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commande rejetee'**
   String get orderRejectedSuccess;
+
+  /// No description provided for @noOrdersInYourCity.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune commande dans votre ville'**
   String get noOrdersInYourCity;
+
+  /// No description provided for @chooseLanguage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir la langue'**
   String get chooseLanguage;
 
-  // Delivery active order
-  String get activeDelivery;
+  /// No description provided for @confirmDelivery.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confirmer la livraison'**
   String get confirmDelivery;
+
+  /// No description provided for @confirmDeliveryMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Etes-vous sur d\'avoir livre cette commande au client ?'**
   String get confirmDeliveryMessage;
+
+  /// No description provided for @markAsDelivered.
+  ///
+  /// In fr, this message translates to:
+  /// **'Marquer comme livre'**
   String get markAsDelivered;
+
+  /// No description provided for @deliveryCompleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Livraison terminee avec succes!'**
   String get deliveryCompleted;
+
+  /// No description provided for @activeDelivery.
+  ///
+  /// In fr, this message translates to:
+  /// **'Livraison en cours'**
+  String get activeDelivery;
+
+  /// No description provided for @callClient.
+  ///
+  /// In fr, this message translates to:
+  /// **'Appeler le client'**
   String get callClient;
 }
 

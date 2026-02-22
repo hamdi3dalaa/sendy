@@ -976,33 +976,49 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get incomingOrders => 'Commandes';
+
   @override
   String get noIncomingOrders => 'Aucune commande entrante';
+
   @override
-  String get confirmAcceptOrderMessage => 'Voulez-vous accepter cette commande ?';
+  String get confirmAcceptOrderMessage =>
+      'Voulez-vous accepter cette commande ?';
+
   @override
-  String get orderAcceptedByRestaurant => 'Commande acceptee ! Les livreurs sont notifies.';
+  String get orderAcceptedByRestaurant =>
+      'Commande acceptee ! Les livreurs sont notifies.';
+
   @override
   String get rejectOrder => 'Rejeter la commande';
+
   @override
   String get rejectOrderMessage => 'Voulez-vous rejeter cette commande ?';
+
   @override
   String get orderRejectedSuccess => 'Commande rejetee';
+
   @override
   String get noOrdersInYourCity => 'Aucune commande dans votre ville';
+
   @override
   String get chooseLanguage => 'Choisir la langue';
 
   @override
-  String get activeDelivery => 'Livraison en cours';
-  @override
   String get confirmDelivery => 'Confirmer la livraison';
+
   @override
-  String get confirmDeliveryMessage => 'Confirmez-vous que la commande a ete livree au client ?';
+  String get confirmDeliveryMessage =>
+      'Etes-vous sur d\'avoir livre cette commande au client ?';
+
   @override
-  String get markAsDelivered => 'Livree';
+  String get markAsDelivered => 'Marquer comme livre';
+
   @override
-  String get deliveryCompleted => 'Livraison terminee avec succes !';
+  String get deliveryCompleted => 'Livraison terminee avec succes!';
+
   @override
-  String get callClient => 'Appeler';
+  String get activeDelivery => 'Livraison en cours';
+
+  @override
+  String get callClient => 'Appeler le client';
 }
