@@ -366,5 +366,13 @@
   "settlementRejected": "Règlement rejeté",
   "settlementsToReview": "règlements à examiner",
   "youHaveActiveDelivery": "Vous avez une livraison active",
-  "tapToResume": "Appuyez pour reprendre"
+  "tapToResume": "Appuyez pour reprendre",
+  "deliveryFeesTitle": "Frais de livraison",
+  "deliveryFeesSubtitle": "Gestion des frais de service",
+  "searchByNameOrPhone": "Rechercher par nom ou téléphone...",
+  "noDeliveryPersonsFound": "Aucun livreur trouvé",
+  "totalDeliveryPersons": "Total livreurs",
+  "overThreshold": "Au-dessus du seuil",
+  "totalOwed": "Total dû",
+  "amountDue": "Montant dû"
 }

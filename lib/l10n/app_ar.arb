@@ -366,5 +366,13 @@
   "settlementRejected": "تم رفض التسوية",
   "settlementsToReview": "تسويات للمراجعة",
   "youHaveActiveDelivery": "لديك توصيل نشط",
-  "tapToResume": "اضغط للاستئناف"
+  "tapToResume": "اضغط للاستئناف",
+  "deliveryFeesTitle": "رسوم التوصيل",
+  "deliveryFeesSubtitle": "إدارة رسوم الخدمة",
+  "searchByNameOrPhone": "البحث بالاسم أو رقم الهاتف...",
+  "noDeliveryPersonsFound": "لم يتم العثور على سائقين",
+  "totalDeliveryPersons": "إجمالي السائقين",
+  "overThreshold": "فوق الحد",
+  "totalOwed": "إجمالي المستحق",
+  "amountDue": "المبلغ المستحق"
 }
