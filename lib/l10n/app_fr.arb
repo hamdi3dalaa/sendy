@@ -364,5 +364,7 @@
   "rejectSettlement": "Rejeter le règlement",
   "rejectSettlementMessage": "Veuillez indiquer la raison du rejet :",
   "settlementRejected": "Règlement rejeté",
-  "settlementsToReview": "règlements à examiner"
+  "settlementsToReview": "règlements à examiner",
+  "youHaveActiveDelivery": "Vous avez une livraison active",
+  "tapToResume": "Appuyez pour reprendre"
 }

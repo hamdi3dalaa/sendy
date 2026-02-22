@@ -364,5 +364,7 @@
   "rejectSettlement": "رفض التسوية",
   "rejectSettlementMessage": "الرجاء توضيح سبب الرفض:",
   "settlementRejected": "تم رفض التسوية",
-  "settlementsToReview": "تسويات للمراجعة"
+  "settlementsToReview": "تسويات للمراجعة",
+  "youHaveActiveDelivery": "لديك توصيل نشط",
+  "tapToResume": "اضغط للاستئناف"
 }
