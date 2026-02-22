@@ -28,7 +28,9 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ClientProvider>().loadRestaurantMenu(widget.restaurant.uid);
+      final cp = context.read<ClientProvider>();
+      cp.loadRestaurantMenu(widget.restaurant.uid);
+      cp.loadActivePromotionsForRestaurant(widget.restaurant.uid);
     });
   }
 
@@ -194,7 +196,8 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
                   itemCount: filteredItems.length,
                   itemBuilder: (context, index) {
                     final item = filteredItems[index];
-                    return _MenuItemCard(item: item);
+                    final promo = clientProvider.getActivePromotion(item.id);
+                    return _MenuItemCard(item: item, promotion: promo);
                   },
                 ),
               ),
@@ -208,8 +211,9 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
 
 class _MenuItemCard extends StatelessWidget {
   final MenuItem item;
+  final DishPromotion? promotion;
 
-  const _MenuItemCard({required this.item});
+  const _MenuItemCard({required this.item, this.promotion});
 
   void _showQuantitySelector(BuildContext context, ClientProvider clientProvider) {
     final l10n = AppLocalizations.of(context)!;
@@ -275,14 +279,53 @@ class _MenuItemCard extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              '${item.price.toStringAsFixed(2)} ${l10n.dhs}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Color(0xFFFF5722),
-                                fontWeight: FontWeight.w600,
+                            if (promotion != null) ...[
+                              Text(
+                                '${item.price.toStringAsFixed(0)} ${l10n.dhs}',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey,
+                                  decoration: TextDecoration.lineThrough,
+                                ),
                               ),
-                            ),
+                              Row(
+                                children: [
+                                  Text(
+                                    '${promotion!.promoPrice.toStringAsFixed(0)} ${l10n.dhs}',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Color(0xFFFF5722),
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      '-${promotion!.discountPercent}%',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ] else
+                              Text(
+                                '${item.price.toStringAsFixed(2)} ${l10n.dhs}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Color(0xFFFF5722),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                           ],
                         ),
                       ),
@@ -351,7 +394,7 @@ class _MenuItemCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   // Total line
                   Text(
-                    '${l10n.total}: ${(item.price * quantity).toStringAsFixed(2)} ${l10n.dhs}',
+                    '${l10n.total}: ${((promotion?.promoPrice ?? item.price) * quantity).toStringAsFixed(2)} ${l10n.dhs}',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.grey[600],
@@ -381,7 +424,7 @@ class _MenuItemCard extends StatelessWidget {
                       },
                       icon: const Icon(Icons.add_shopping_cart),
                       label: Text(
-                        '${l10n.addedToCart} - ${(item.price * quantity).toStringAsFixed(2)} ${l10n.dhs}',
+                        '${l10n.addedToCart} - ${((promotion?.promoPrice ?? item.price) * quantity).toStringAsFixed(2)} ${l10n.dhs}',
                         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       style: ElevatedButton.styleFrom(
@@ -399,6 +442,29 @@ class _MenuItemCard extends StatelessWidget {
           },
         );
       },
+    );
+  }
+
+  Widget _buildItemImage() {
+    if (item.imageUrl != null) {
+      return CachedNetworkImage(
+        imageUrl: item.imageUrl!,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+        placeholder: (context, url) => Container(
+          color: Colors.grey[200],
+          child: const Center(child: CircularProgressIndicator()),
+        ),
+        errorWidget: (context, url, error) => Container(
+          color: Colors.grey[200],
+          child: const Icon(Icons.restaurant, size: 40),
+        ),
+      );
+    }
+    return Container(
+      color: Colors.grey[200],
+      child: const Icon(Icons.restaurant, size: 40),
     );
   }
 
@@ -420,38 +486,31 @@ class _MenuItemCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Image with Quantity Badge
+                // Image with Quantity Badge and Promo Banner
                 Expanded(
                   child: Stack(
                     children: [
                       ClipRRect(
                         borderRadius:
                             const BorderRadius.vertical(top: Radius.circular(12)),
-                        child: item.imageUrl != null
-                            ? CachedNetworkImage(
-                                imageUrl: item.imageUrl!,
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                placeholder: (context, url) => Container(
-                                  color: Colors.grey[200],
-                                  child: const Center(
-                                      child: CircularProgressIndicator()),
+                        child: promotion != null
+                            ? Banner(
+                                message: '-${promotion!.discountPercent}%',
+                                location: BannerLocation.topEnd,
+                                color: Colors.red,
+                                textStyle: const TextStyle(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                                errorWidget: (context, url, error) => Container(
-                                  color: Colors.grey[200],
-                                  child: const Icon(Icons.restaurant, size: 40),
-                                ),
+                                child: _buildItemImage(),
                               )
-                            : Container(
-                                color: Colors.grey[200],
-                                child: const Icon(Icons.restaurant, size: 40),
-                              ),
+                            : _buildItemImage(),
                       ),
                       // Quantity Badge
                       if (isInCart)
                         Positioned(
                           top: 8,
-                          right: 8,
+                          left: 8,
                           child: Container(
                             padding: const EdgeInsets.all(6),
                             decoration: const BoxDecoration(
@@ -501,13 +560,37 @@ class _MenuItemCard extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            '${item.price.toStringAsFixed(2)} ${l10n.dhs}',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: Color(0xFFFF5722),
-                            ),
+                          Flexible(
+                            child: promotion != null
+                                ? Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${item.price.toStringAsFixed(0)} ${l10n.dhs}',
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey,
+                                          decoration: TextDecoration.lineThrough,
+                                        ),
+                                      ),
+                                      Text(
+                                        '${promotion!.promoPrice.toStringAsFixed(0)} ${l10n.dhs}',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15,
+                                          color: Color(0xFFFF5722),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : Text(
+                                    '${item.price.toStringAsFixed(2)} ${l10n.dhs}',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Color(0xFFFF5722),
+                                    ),
+                                  ),
                           ),
                           if (isInCart)
                             // Quick quantity controls inline

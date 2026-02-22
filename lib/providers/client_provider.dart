@@ -217,6 +217,9 @@ class ClientProvider with ChangeNotifier {
   // Dish promotions
   List<DishPromotion> _dishPromotions = [];
 
+  // Active promotions for current restaurant menu (menuItemId -> promo)
+  Map<String, DishPromotion> _activeMenuPromotions = {};
+
   List<RestaurantModel> get restaurants => _restaurants;
   List<MenuItem> get restaurantMenuItems => _restaurantMenuItems;
   Map<String, CartItem> get cart => _cart;
@@ -227,6 +230,10 @@ class ClientProvider with ChangeNotifier {
   PromoCode? get appliedPromo => _appliedPromo;
   double get promoDiscount => _promoDiscount;
   List<DishPromotion> get dishPromotions => _dishPromotions;
+  Map<String, DishPromotion> get activeMenuPromotions => _activeMenuPromotions;
+
+  DishPromotion? getActivePromotion(String menuItemId) =>
+      _activeMenuPromotions[menuItemId];
 
   int get cartItemCount =>
       _cart.values.fold(0, (sum, item) => sum + item.quantity);
@@ -338,6 +345,32 @@ class ClientProvider with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       // ignore - promotions are non-critical
+    }
+  }
+
+  // Load active promotions for a specific restaurant's menu items
+  Future<void> loadActivePromotionsForRestaurant(String restaurantId) async {
+    try {
+      final now = DateTime.now();
+      final snapshot = await _firestore
+          .collection('dish_promotions')
+          .where('restaurantId', isEqualTo: restaurantId)
+          .where('endDate', isGreaterThan: Timestamp.fromDate(now))
+          .get()
+          .timeout(const Duration(seconds: 15));
+
+      final promos = snapshot.docs
+          .map((doc) => DishPromotion.fromMap(doc.id, doc.data()))
+          .where((p) => p.startDate.isBefore(now))
+          .toList();
+
+      _activeMenuPromotions = {};
+      for (final promo in promos) {
+        _activeMenuPromotions[promo.menuItemId] = promo;
+      }
+      notifyListeners();
+    } catch (e) {
+      _activeMenuPromotions = {};
     }
   }
 
