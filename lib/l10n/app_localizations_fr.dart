@@ -1005,4 +1005,50 @@ class AppLocalizationsFr extends AppLocalizations {
   String get deliveryCompleted => 'Livraison terminee avec succes !';
   @override
   String get callClient => 'Appeler';
+
+  // Settlement system
+  @override
+  String get serviceFeeBalance => 'Solde frais de service';
+  @override
+  String get amountOwedToSendy => 'Montant du a Sendy';
+  @override
+  String get settlementRequired => 'Votre solde a atteint le seuil. Veuillez effectuer le reglement.';
+  @override
+  String get sendPayment => 'Envoyer le paiement';
+  @override
+  String get amountToSend => 'Montant a envoyer';
+  @override
+  String get uploadProofInstructions => 'Envoyez le montant par virement ou depot, puis prenez une photo de la preuve de paiement ci-dessous.';
+  @override
+  String get tapToUploadProof => 'Appuyez pour ajouter la preuve';
+  @override
+  String get proofDescription => 'Photo du recu de virement ou depot';
+  @override
+  String get sending => 'Envoi en cours...';
+  @override
+  String get settlementSent => 'Reglement envoye avec succes !';
+  @override
+  String get pendingSettlements => 'Reglements en attente';
+  @override
+  String get noSettlementsPending => 'Aucun reglement en attente';
+  @override
+  String get settlementsToReview => 'reglement(s) a verifier';
+  @override
+  String get confirmApproval => 'Confirmer l\'approbation';
+  @override
+  String confirmSettlementApproval(String amount) => 'Approuver le reglement de $amount DH ?';
+  @override
+  String get settlementApproved => 'Reglement approuve';
+  @override
+  String get rejectSettlement => 'Rejeter le reglement';
+  @override
+  String get rejectSettlementMessage => 'Pourquoi rejetez-vous ce reglement ?';
+  @override
+  String get rejectionReason => 'Raison du rejet';
+  @override
+  String get settlementRejected => 'Reglement rejete';
+  @override
+  String get approve => 'Approuver';
+  @override
+  String get reject => 'Rejeter';
 }

@@ -2006,6 +2006,30 @@ abstract class AppLocalizations {
   String get markAsDelivered;
   String get deliveryCompleted;
   String get callClient;
+
+  // Settlement system
+  String get serviceFeeBalance;
+  String get amountOwedToSendy;
+  String get settlementRequired;
+  String get sendPayment;
+  String get amountToSend;
+  String get uploadProofInstructions;
+  String get tapToUploadProof;
+  String get proofDescription;
+  String get sending;
+  String get settlementSent;
+  String get pendingSettlements;
+  String get noSettlementsPending;
+  String get settlementsToReview;
+  String get confirmApproval;
+  String confirmSettlementApproval(String amount);
+  String get settlementApproved;
+  String get rejectSettlement;
+  String get rejectSettlementMessage;
+  String get rejectionReason;
+  String get settlementRejected;
+  String get approve;
+  String get reject;
 }
 
 class _AppLocalizationsDelegate

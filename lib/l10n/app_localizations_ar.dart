@@ -994,4 +994,50 @@ class AppLocalizationsAr extends AppLocalizations {
   String get deliveryCompleted => 'تم التوصيل بنجاح!';
   @override
   String get callClient => 'اتصال';
+
+  // Settlement system
+  @override
+  String get serviceFeeBalance => 'رصيد رسوم الخدمة';
+  @override
+  String get amountOwedToSendy => 'المبلغ المستحق لـ Sendy';
+  @override
+  String get settlementRequired => 'رصيدك وصل للحد الأقصى. يرجى إجراء التسوية.';
+  @override
+  String get sendPayment => 'إرسال الدفع';
+  @override
+  String get amountToSend => 'المبلغ المطلوب إرساله';
+  @override
+  String get uploadProofInstructions => 'أرسل المبلغ عبر تحويل بنكي أو إيداع، ثم التقط صورة لإثبات الدفع أدناه.';
+  @override
+  String get tapToUploadProof => 'اضغط لإضافة الإثبات';
+  @override
+  String get proofDescription => 'صورة وصل التحويل أو الإيداع';
+  @override
+  String get sending => 'جاري الإرسال...';
+  @override
+  String get settlementSent => 'تم إرسال التسوية بنجاح!';
+  @override
+  String get pendingSettlements => 'التسويات المعلقة';
+  @override
+  String get noSettlementsPending => 'لا توجد تسويات معلقة';
+  @override
+  String get settlementsToReview => 'تسوية(ات) للمراجعة';
+  @override
+  String get confirmApproval => 'تأكيد الموافقة';
+  @override
+  String confirmSettlementApproval(String amount) => 'الموافقة على تسوية $amount درهم؟';
+  @override
+  String get settlementApproved => 'تمت الموافقة على التسوية';
+  @override
+  String get rejectSettlement => 'رفض التسوية';
+  @override
+  String get rejectSettlementMessage => 'لماذا ترفض هذه التسوية؟';
+  @override
+  String get rejectionReason => 'سبب الرفض';
+  @override
+  String get settlementRejected => 'تم رفض التسوية';
+  @override
+  String get approve => 'موافقة';
+  @override
+  String get reject => 'رفض';
 }

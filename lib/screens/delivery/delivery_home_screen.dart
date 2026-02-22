@@ -7,8 +7,10 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../providers/auth_provider.dart';
 import '../../providers/location_provider.dart';
+import '../../providers/order_provider.dart';
 import '../../models/user_model.dart';
 import 'delivery_invoice_history_screen.dart';
+import 'settlement_upload_screen.dart';
 
 class DeliveryHomeScreen extends StatefulWidget {
   const DeliveryHomeScreen({Key? key}) : super(key: key);
@@ -316,6 +318,11 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
               ),
             const SizedBox(height: 20),
 
+            // Service Fee Balance Card
+            _buildBalanceCard(context, l10n, authProvider),
+
+            const SizedBox(height: 20),
+
             // Invoice History Card
             Card(
               elevation: 4,
@@ -353,6 +360,138 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildBalanceCard(
+      BuildContext context, AppLocalizations l10n, AuthProvider authProvider) {
+    final userId = authProvider.currentUser?.uid;
+    if (userId == null) return const SizedBox();
+
+    return StreamBuilder<double>(
+      stream: context.read<OrderProvider>().getOwedAmount(userId),
+      builder: (context, snapshot) {
+        final owedAmount = snapshot.data ?? 0.0;
+        final isThresholdReached = owedAmount >= 100.0;
+
+        return Card(
+          elevation: 4,
+          color: isThresholdReached ? Colors.red[50] : null,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: isThresholdReached
+                ? BorderSide(color: Colors.red[300]!, width: 2)
+                : BorderSide.none,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: isThresholdReached
+                            ? Colors.red.withOpacity(0.1)
+                            : const Color(0xFFFF5722).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.account_balance_wallet,
+                        color: isThresholdReached
+                            ? Colors.red
+                            : const Color(0xFFFF5722),
+                        size: 28,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.serviceFeeBalance,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          ),
+                          Text(
+                            l10n.amountOwedToSendy,
+                            style: TextStyle(
+                                fontSize: 12, color: Colors.grey[600]),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Text(
+                      '${owedAmount.toStringAsFixed(0)} ${l10n.dhs}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 22,
+                        color: isThresholdReached
+                            ? Colors.red
+                            : const Color(0xFFFF5722),
+                      ),
+                    ),
+                  ],
+                ),
+                if (isThresholdReached) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.red[100],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.warning_amber_rounded,
+                            color: Colors.red, size: 20),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            l10n.settlementRequired,
+                            style: TextStyle(
+                                fontSize: 12, color: Colors.red[800]),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SettlementUploadScreen(
+                              owedAmount: owedAmount,
+                            ),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.send, size: 18),
+                      label: Text(l10n.sendPayment),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

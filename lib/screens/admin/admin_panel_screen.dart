@@ -4,9 +4,12 @@ import 'package:sendy/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../../providers/admin_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/order_provider.dart';
+import '../../models/settlement_model.dart';
 import 'pending_users_screen.dart';
 import 'pending_menu_items_screen.dart';
 import 'pending_image_changes_screen.dart';
+import 'pending_settlements_screen.dart';
 import '../../screens/admin/config_management_screen.dart';
 import '../../models/user_model.dart';
 
@@ -178,6 +181,38 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                       ),
                     if (adminProvider.pendingImageUsers.isNotEmpty)
                       const SizedBox(height: 16),
+
+                    // Pending Settlements
+                    StreamBuilder<List<SettlementModel>>(
+                      stream: context
+                          .read<OrderProvider>()
+                          .getPendingSettlements(),
+                      builder: (context, snapshot) {
+                        final count = snapshot.data?.length ?? 0;
+                        if (count == 0) return const SizedBox();
+                        return Column(
+                          children: [
+                            _buildActionCard(
+                              title: l10n.pendingSettlements,
+                              subtitle:
+                                  '$count ${l10n.settlementsToReview}',
+                              icon: Icons.account_balance_wallet,
+                              iconColor: Colors.red,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const PendingSettlementsScreen(),
+                                  ),
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                          ],
+                        );
+                      },
+                    ),
 
                     // Configuration
                     _buildActionCard(
