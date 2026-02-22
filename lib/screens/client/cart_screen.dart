@@ -152,6 +152,9 @@ class _CartScreenState extends State<CartScreen> {
 
           final subtotal = clientProvider.cartTotal;
           final promoDiscount = clientProvider.promoDiscount;
+          // Calculate savings from dish promotions
+          final dishPromoSavings = cartItems.fold(0.0, (sum, item) =>
+              sum + (item.hasPromo ? (item.menuItem.price - item.effectivePrice) * item.quantity : 0.0));
           final total = subtotal + _deliveryFee + _serviceFee - promoDiscount;
 
           return Column(
@@ -302,7 +305,7 @@ class _CartScreenState extends State<CartScreen> {
                       _buildPromoCodeSection(subtotal, clientProvider),
 
                       // Price Summary
-                      _buildPriceSummary(subtotal, total, promoDiscount),
+                      _buildPriceSummary(subtotal, total, promoDiscount, dishPromoSavings),
 
                       const SizedBox(height: 100), // Space for bottom button
                     ],
@@ -507,7 +510,7 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Widget _buildPriceSummary(
-      double subtotal, double total, double promoDiscount) {
+      double subtotal, double total, double promoDiscount, double dishPromoSavings) {
     final l10n = AppLocalizations.of(context)!;
     return Card(
       margin: const EdgeInsets.all(16),
@@ -529,6 +532,27 @@ class _CartScreenState extends State<CartScreen> {
             ),
             const SizedBox(height: 16),
             _buildPriceRow(l10n.subtotal, subtotal),
+            if (dishPromoSavings > 0) ...[
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.local_offer, size: 16, color: Colors.green[700]),
+                      const SizedBox(width: 4),
+                      Text(l10n.promotions,
+                          style: TextStyle(fontSize: 14, color: Colors.green[700])),
+                    ],
+                  ),
+                  Text('-${dishPromoSavings.toStringAsFixed(2)} ${l10n.dhs}',
+                      style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.green[700],
+                          fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ],
             const SizedBox(height: 8),
             _buildPriceRow(l10n.deliveryFee, _deliveryFee),
             const SizedBox(height: 8),

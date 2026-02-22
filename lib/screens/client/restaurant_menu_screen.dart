@@ -28,10 +28,18 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final cp = context.read<ClientProvider>();
-      cp.loadRestaurantMenu(widget.restaurant.uid);
-      cp.loadActivePromotionsForRestaurant(widget.restaurant.uid);
+      _loadMenuAndPromotions();
     });
+  }
+
+  Future<void> _loadMenuAndPromotions() async {
+    final cp = context.read<ClientProvider>();
+    // Load both in parallel and wait for both to complete
+    // so promotions are ready when menu items display
+    await Future.wait([
+      cp.loadRestaurantMenu(widget.restaurant.uid),
+      cp.loadActivePromotionsForRestaurant(widget.restaurant.uid),
+    ]);
   }
 
   @override

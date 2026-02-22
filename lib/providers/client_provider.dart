@@ -239,8 +239,18 @@ class ClientProvider with ChangeNotifier {
   List<DishPromotion> get dishPromotions => _dishPromotions;
   Map<String, DishPromotion> get activeMenuPromotions => _activeMenuPromotions;
 
-  DishPromotion? getActivePromotion(String menuItemId) =>
-      _activeMenuPromotions[menuItemId];
+  DishPromotion? getActivePromotion(String menuItemId) {
+    // First check restaurant-specific promotions
+    final restaurantPromo = _activeMenuPromotions[menuItemId];
+    if (restaurantPromo != null) return restaurantPromo;
+    // Fallback: check global dish promotions list (loaded on home screen)
+    for (final promo in _dishPromotions) {
+      if (promo.menuItemId == menuItemId && promo.isActive) {
+        return promo;
+      }
+    }
+    return null;
+  }
 
   int get cartItemCount =>
       _cart.values.fold(0, (sum, item) => sum + item.quantity);
@@ -446,8 +456,24 @@ class ClientProvider with ChangeNotifier {
 
   // Cart management with quantity
   void addToCart(MenuItem item, {int quantity = 1, double? promoPrice}) {
+    // Auto-detect promo price if not explicitly passed
+    if (promoPrice == null) {
+      final promo = getActivePromotion(item.id);
+      if (promo != null) {
+        promoPrice = promo.promoPrice;
+      }
+    }
     if (_cart.containsKey(item.id)) {
-      _cart[item.id]!.quantity += quantity;
+      // Update promoPrice if cart item didn't have one but now we found one
+      final existing = _cart[item.id]!;
+      existing.quantity += quantity;
+      if (!existing.hasPromo && promoPrice != null) {
+        _cart[item.id] = CartItem(
+          menuItem: item,
+          quantity: existing.quantity,
+          promoPrice: promoPrice,
+        );
+      }
     } else {
       _cart[item.id] = CartItem(menuItem: item, quantity: quantity, promoPrice: promoPrice);
     }
