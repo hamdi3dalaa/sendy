@@ -19,6 +19,7 @@ class DeliveryHomeScreen extends StatefulWidget {
 
 class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
   bool _isAvailable = false;
+  LocationProvider? _locationProvider;
 
   @override
   void initState() {
@@ -26,6 +27,12 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeLocation();
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _locationProvider = context.read<LocationProvider>();
   }
 
   Future<void> _initializeLocation() async {
@@ -398,7 +405,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
   @override
   void dispose() {
     if (_isAvailable) {
-      context.read<LocationProvider>().stopTracking();
+      _locationProvider?.stopTracking();
     }
     super.dispose();
   }
