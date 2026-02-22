@@ -1006,6 +1006,14 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get callClient => 'Appeler';
 
+  // Resume active delivery
+  @override
+  String get resumeDelivery => 'Reprendre la livraison';
+  @override
+  String get youHaveActiveDelivery => 'Vous avez une livraison en cours';
+  @override
+  String get tapToResume => 'Appuyez pour reprendre';
+
   // Settlement system
   @override
   String get serviceFeeBalance => 'Solde frais de service';

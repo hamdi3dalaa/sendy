@@ -995,6 +995,14 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get callClient => 'اتصال';
 
+  // Resume active delivery
+  @override
+  String get resumeDelivery => 'استئناف التوصيل';
+  @override
+  String get youHaveActiveDelivery => 'لديك توصيل جاري';
+  @override
+  String get tapToResume => 'اضغط للاستئناف';
+
   // Settlement system
   @override
   String get serviceFeeBalance => 'رصيد رسوم الخدمة';

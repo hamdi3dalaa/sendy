@@ -2007,6 +2007,11 @@ abstract class AppLocalizations {
   String get deliveryCompleted;
   String get callClient;
 
+  // Resume active delivery
+  String get resumeDelivery;
+  String get youHaveActiveDelivery;
+  String get tapToResume;
+
   // Settlement system
   String get serviceFeeBalance;
   String get amountOwedToSendy;
