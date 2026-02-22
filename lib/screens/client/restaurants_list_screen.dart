@@ -239,7 +239,10 @@ class _RestaurantsListScreenState extends State<RestaurantsListScreen> {
 
                     // Restaurant list
                     ...restaurants.map((restaurant) =>
-                        _RestaurantCard(restaurant: restaurant)),
+                        _RestaurantCard(
+                          restaurant: restaurant,
+                          hasPromotion: promoRestaurantIds.contains(restaurant.uid),
+                        )),
 
                     if (restaurants.isEmpty)
                       Padding(
@@ -513,8 +516,9 @@ class _PromotionCard extends StatelessWidget {
 
 class _RestaurantCard extends StatelessWidget {
   final RestaurantModel restaurant;
+  final bool hasPromotion;
 
-  const _RestaurantCard({required this.restaurant});
+  const _RestaurantCard({required this.restaurant, this.hasPromotion = false});
 
   @override
   Widget build(BuildContext context) {
@@ -590,6 +594,41 @@ class _RestaurantCard extends StatelessWidget {
                             color: Colors.white,
                             fontSize: 11,
                             fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                // Promotions band
+                if (hasPromotion)
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.red.shade700,
+                            Colors.red.shade400,
+                          ],
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.local_offer,
+                              color: Colors.white, size: 14),
+                          const SizedBox(width: 6),
+                          Text(
+                            l10n.promotions,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),

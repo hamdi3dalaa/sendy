@@ -661,7 +661,7 @@ class _CartScreenState extends State<CartScreen> {
         return OrderItem(
           name: cartItem.menuItem.name,
           quantity: cartItem.quantity,
-          price: cartItem.menuItem.price,
+          price: cartItem.effectivePrice,
         );
       }).toList();
 
@@ -795,13 +795,53 @@ class _CartItemCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    '${cartItem.menuItem.price.toStringAsFixed(2)} ${l10n.dhs} ${l10n.perUnit}',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.grey[600],
+                  if (cartItem.hasPromo) ...[
+                    Row(
+                      children: [
+                        Text(
+                          '${cartItem.menuItem.price.toStringAsFixed(0)} ${l10n.dhs}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                            decoration: TextDecoration.lineThrough,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '${cartItem.effectivePrice.toStringAsFixed(0)} ${l10n.dhs} ${l10n.perUnit}',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Color(0xFFFF5722),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 4, vertical: 1),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            '-${cartItem.discountPercent}%',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
+                  ] else
+                    Text(
+                      '${cartItem.menuItem.price.toStringAsFixed(2)} ${l10n.dhs} ${l10n.perUnit}',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey[600],
+                      ),
+                    ),
                   const SizedBox(height: 8),
                   Row(
                     children: [

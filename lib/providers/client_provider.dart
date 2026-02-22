@@ -186,13 +186,20 @@ class PromoCode {
 class CartItem {
   final MenuItem menuItem;
   int quantity;
+  final double? promoPrice;
 
   CartItem({
     required this.menuItem,
     this.quantity = 1,
+    this.promoPrice,
   });
 
-  double get totalPrice => menuItem.price * quantity;
+  double get effectivePrice => promoPrice ?? menuItem.price;
+  double get totalPrice => effectivePrice * quantity;
+  bool get hasPromo => promoPrice != null && promoPrice! < menuItem.price;
+  int get discountPercent => hasPromo
+      ? ((1 - promoPrice! / menuItem.price) * 100).round()
+      : 0;
 }
 
 class ClientProvider with ChangeNotifier {
@@ -438,11 +445,11 @@ class ClientProvider with ChangeNotifier {
   }
 
   // Cart management with quantity
-  void addToCart(MenuItem item, {int quantity = 1}) {
+  void addToCart(MenuItem item, {int quantity = 1, double? promoPrice}) {
     if (_cart.containsKey(item.id)) {
       _cart[item.id]!.quantity += quantity;
     } else {
-      _cart[item.id] = CartItem(menuItem: item, quantity: quantity);
+      _cart[item.id] = CartItem(menuItem: item, quantity: quantity, promoPrice: promoPrice);
     }
     print('🛒 [CLIENT_PROVIDER] Added ${item.name} (qty: $quantity)');
     notifyListeners();

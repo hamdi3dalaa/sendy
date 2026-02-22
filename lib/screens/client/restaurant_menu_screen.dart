@@ -411,7 +411,7 @@ class _MenuItemCard extends StatelessWidget {
                         if (cp.isInCart(item.id)) {
                           cp.updateQuantity(item.id, quantity);
                         } else {
-                          cp.addToCart(item, quantity: quantity);
+                          cp.addToCart(item, quantity: quantity, promoPrice: promotion?.promoPrice);
                         }
                         Navigator.pop(ctx);
                         ScaffoldMessenger.of(context).showSnackBar(
