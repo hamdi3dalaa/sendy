@@ -306,6 +306,12 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildMenuItemTile(MenuItem item, AppLocalizations l10n) {
+    final clientProvider = context.read<ClientProvider>();
+    // Check if there's an active promotion for this menu item
+    final promo = clientProvider.dishPromotions
+        .where((p) => p.menuItemId == item.id && p.isActive)
+        .fold<DishPromotion?>(null, (prev, p) => prev ?? p);
+
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
@@ -324,8 +330,35 @@ class _SearchScreenState extends State<SearchScreen> {
                 child: const Icon(Icons.restaurant)),
         title: Text(item.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
         subtitle: Text(item.category, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-        trailing: Text('${item.price.toStringAsFixed(2)} ${l10n.dhs}',
-            style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFF5722))),
+        trailing: promo != null
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text('${item.price.toStringAsFixed(0)} ${l10n.dhs}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                        decoration: TextDecoration.lineThrough,
+                      )),
+                  Text('${promo.promoPrice.toStringAsFixed(0)} ${l10n.dhs}',
+                      style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFF5722))),
+                ],
+              )
+            : Text('${item.price.toStringAsFixed(2)} ${l10n.dhs}',
+                style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFF5722))),
+        onTap: () async {
+          // Navigate to the restaurant menu
+          final restaurant = await clientProvider.getRestaurantById(item.restaurantId);
+          if (restaurant != null && mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => RestaurantMenuScreen(restaurant: restaurant),
+              ),
+            );
+          }
+        },
       ),
     );
   }
