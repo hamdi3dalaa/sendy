@@ -268,6 +268,7 @@ class _RestaurantsListScreenState extends State<RestaurantsListScreen> {
     await Future.wait([
       clientProvider.loadRestaurants(),
       clientProvider.loadDishPromotions(customerCity: customerCity),
+      clientProvider.refreshCartPromotions(),
     ]);
   }
 

@@ -42,6 +42,10 @@ class _CartScreenState extends State<CartScreen> {
   void initState() {
     super.initState();
     _loadSavedAddresses();
+    // Re-validate cart promotions against Firestore (handles deleted/expired promos)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<ClientProvider>(context, listen: false).refreshCartPromotions();
+    });
   }
 
   Future<void> _loadSavedAddresses() async {

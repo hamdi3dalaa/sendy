@@ -34,11 +34,13 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
 
   Future<void> _loadMenuAndPromotions() async {
     final cp = context.read<ClientProvider>();
-    // Load both in parallel and wait for both to complete
+    // Load menu, promotions, and refresh cart promos in parallel
     // so promotions are ready when menu items display
+    // and cart items reflect deleted/expired promos
     await Future.wait([
       cp.loadRestaurantMenu(widget.restaurant.uid),
       cp.loadActivePromotionsForRestaurant(widget.restaurant.uid),
+      cp.refreshCartPromotions(),
     ]);
   }
 

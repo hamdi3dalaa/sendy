@@ -186,7 +186,7 @@ class PromoCode {
 class CartItem {
   final MenuItem menuItem;
   int quantity;
-  final double? promoPrice;
+  double? promoPrice;
 
   CartItem({
     required this.menuItem,
@@ -531,6 +531,64 @@ class ClientProvider with ChangeNotifier {
 
   int getQuantity(String itemId) {
     return _cart[itemId]?.quantity ?? 0;
+  }
+
+  /// Re-validates all cart items against current Firestore promotions.
+  /// If a promotion was deleted or expired, reverts the item to original price.
+  /// If a new promotion exists for a cart item, applies it.
+  Future<void> refreshCartPromotions() async {
+    if (_cart.isEmpty) return;
+
+    try {
+      // Fetch current promotions from Firestore for all items in cart
+      final snapshot = await _firestore
+          .collection('dish_promotions')
+          .get()
+          .timeout(const Duration(seconds: 10));
+
+      final now = DateTime.now();
+      final activePromos = <String, DishPromotion>{};
+      for (final doc in snapshot.docs) {
+        final promo = DishPromotion.fromMap(doc.id, doc.data());
+        if (promo.isActive) {
+          activePromos[promo.menuItemId] = promo;
+        }
+      }
+
+      bool changed = false;
+      for (final entry in _cart.entries) {
+        final cartItem = entry.value;
+        final activePromo = activePromos[cartItem.menuItem.id];
+
+        if (activePromo != null) {
+          // Promo exists and is active - apply or update it
+          if (cartItem.promoPrice != activePromo.promoPrice) {
+            cartItem.promoPrice = activePromo.promoPrice;
+            changed = true;
+          }
+        } else {
+          // No active promo - revert to original price
+          if (cartItem.promoPrice != null) {
+            cartItem.promoPrice = null;
+            changed = true;
+          }
+        }
+      }
+
+      // Also refresh the global dish promotions list
+      _dishPromotions = snapshot.docs
+          .map((doc) => DishPromotion.fromMap(doc.id, doc.data()))
+          .where((p) => p.isActive)
+          .toList()
+        ..sort((a, b) => b.discountPercent.compareTo(a.discountPercent));
+
+      if (changed) {
+        print('🛒 [PROMOS] Cart promotions refreshed - some items updated');
+      }
+      notifyListeners();
+    } catch (e) {
+      print('❌ [PROMOS] Error refreshing cart promotions: $e');
+    }
   }
 
   // Get restaurant by ID
