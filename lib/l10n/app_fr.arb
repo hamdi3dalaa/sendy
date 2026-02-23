@@ -374,5 +374,24 @@
   "totalDeliveryPersons": "Total livreurs",
   "overThreshold": "Au-dessus du seuil",
   "totalOwed": "Total dû",
-  "amountDue": "Montant dû"
+  "amountDue": "Montant dû",
+
+  "dishPromotions": "Promotions",
+  "managePromotions": "Gerer les promotions de vos plats",
+  "addPromotion": "Ajouter une promotion",
+  "noPromotions": "Aucune promotion",
+  "addPromotionHint": "Ajoutez des promotions sur vos plats pour attirer plus de clients",
+  "selectDish": "Selectionner un plat",
+  "promoPrice": "Prix promotionnel (DHs)",
+  "startDate": "Date de debut",
+  "endDate": "Date de fin",
+  "invalidPromoPrice": "Le prix promo doit etre inferieur au prix original",
+  "invalidPromoDates": "La date de fin doit etre apres la date de debut",
+  "promotionAdded": "Promotion ajoutee avec succes !",
+  "confirmDeletePromoMessage": "Voulez-vous vraiment supprimer cette promotion ?",
+  "currentPromotions": "Promotions en cours",
+  "expired": "Expiree",
+  "upcoming": "A venir",
+  "active": "Active",
+  "minimumDiscountError": "La reduction doit etre d'au moins 1%"
 }
