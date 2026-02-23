@@ -8,6 +8,7 @@ import '../../providers/client_provider.dart';
 import '../../providers/order_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/order_model.dart';
+import '../../theme/neumorphic_theme.dart';
 import 'package:uuid/uuid.dart';
 import 'package:sendy/l10n/app_localizations.dart';
 import 'package:geolocator/geolocator.dart';
@@ -141,9 +142,12 @@ class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: NeuColors.background,
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.myCart),
-        backgroundColor: const Color(0xFFFF5722),
+        backgroundColor: NeuColors.accent,
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: Consumer<ClientProvider>(
         builder: (context, clientProvider, child) {
@@ -188,33 +192,50 @@ class _CartScreenState extends State<CartScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            TextField(
-                              controller: _addressController,
-                              maxLines: 2,
-                              decoration: InputDecoration(
-                                labelText: '${l10n.deliveryAddress} *',
-                                hintText: l10n.enterFullAddress,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                prefixIcon: const Icon(Icons.location_on,
-                                    color: Color(0xFFFF5722)),
-                                suffixIcon: _isGettingLocation
-                                    ? const Padding(
-                                        padding: EdgeInsets.all(12),
-                                        child: SizedBox(
-                                          width: 20,
-                                          height: 20,
-                                          child: CircularProgressIndicator(
-                                              strokeWidth: 2),
+                            Container(
+                              decoration: NeuDecoration.pressed(radius: 14),
+                              child: TextField(
+                                controller: _addressController,
+                                maxLines: 2,
+                                style: const TextStyle(color: NeuColors.textPrimary),
+                                decoration: InputDecoration(
+                                  labelText: '${l10n.deliveryAddress} *',
+                                  hintText: l10n.enterFullAddress,
+                                  hintStyle: const TextStyle(color: NeuColors.textHint),
+                                  labelStyle: const TextStyle(color: NeuColors.textSecondary),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                    borderSide: const BorderSide(color: NeuColors.accent, width: 1.5),
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.transparent,
+                                  prefixIcon: const Icon(Icons.location_on,
+                                      color: NeuColors.accent),
+                                  suffixIcon: _isGettingLocation
+                                      ? const Padding(
+                                          padding: EdgeInsets.all(12),
+                                          child: SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                                strokeWidth: 2),
+                                          ),
+                                        )
+                                      : IconButton(
+                                          icon: const Icon(Icons.my_location,
+                                              color: NeuColors.accent),
+                                          onPressed: _getLocationByGPS,
+                                          tooltip: l10n.useGPS,
                                         ),
-                                      )
-                                    : IconButton(
-                                        icon: const Icon(Icons.my_location,
-                                            color: Color(0xFFFF5722)),
-                                        onPressed: _getLocationByGPS,
-                                        tooltip: l10n.useGPS,
-                                      ),
+                                ),
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -223,37 +244,71 @@ class _CartScreenState extends State<CartScreen> {
                               scrollDirection: Axis.horizontal,
                               child: Row(
                                 children: [
-                                  ActionChip(
-                                    avatar:
-                                        const Icon(Icons.gps_fixed, size: 16),
-                                    label: Text(l10n.useGPS),
-                                    onPressed: _isGettingLocation
+                                  GestureDetector(
+                                    onTap: _isGettingLocation
                                         ? null
                                         : _getLocationByGPS,
-                                    backgroundColor: const Color(0xFFFF5722)
-                                        .withOpacity(0.1),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 14, vertical: 8),
+                                      decoration: NeuDecoration.raised(
+                                          radius: 20, intensity: 0.6),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.gps_fixed,
+                                              size: 16,
+                                              color: NeuColors.textPrimary),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            l10n.useGPS,
+                                            style: const TextStyle(
+                                              color: NeuColors.textPrimary,
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ),
                                   if (_lastUsedAddress != null &&
                                       _lastUsedAddress!.isNotEmpty &&
                                       _addressController.text !=
                                           _lastUsedAddress) ...[
                                     const SizedBox(width: 8),
-                                    ActionChip(
-                                      avatar:
-                                          const Icon(Icons.history, size: 16),
-                                      label: Text(
-                                        _lastUsedAddress!.length > 25
-                                            ? '${_lastUsedAddress!.substring(0, 25)}...'
-                                            : _lastUsedAddress!,
-                                      ),
-                                      onPressed: () {
+                                    GestureDetector(
+                                      onTap: () {
                                         setState(() {
                                           _addressController.text =
                                               _lastUsedAddress!;
                                         });
                                       },
-                                      backgroundColor:
-                                          Colors.blue.withOpacity(0.1),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 14, vertical: 8),
+                                        decoration: NeuDecoration.raised(
+                                            radius: 20, intensity: 0.6),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Icon(Icons.history,
+                                                size: 16,
+                                                color: NeuColors.textPrimary),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              _lastUsedAddress!.length > 25
+                                                  ? '${_lastUsedAddress!.substring(0, 25)}...'
+                                                  : _lastUsedAddress!,
+                                              style: const TextStyle(
+                                                color: NeuColors.textPrimary,
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 13,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ],
                                   ..._savedAddresses
@@ -264,20 +319,46 @@ class _CartScreenState extends State<CartScreen> {
                                       .map((addr) => Padding(
                                             padding:
                                                 const EdgeInsets.only(left: 8),
-                                            child: ActionChip(
-                                              avatar: const Icon(Icons.bookmark,
-                                                  size: 16),
-                                              label: Text(
-                                                addr.length > 20
-                                                    ? '${addr.substring(0, 20)}...'
-                                                    : addr,
-                                              ),
-                                              onPressed: () {
+                                            child: GestureDetector(
+                                              onTap: () {
                                                 setState(() {
                                                   _addressController.text =
                                                       addr;
                                                 });
                                               },
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 14,
+                                                        vertical: 8),
+                                                decoration:
+                                                    NeuDecoration.raised(
+                                                        radius: 20,
+                                                        intensity: 0.6),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    const Icon(Icons.bookmark,
+                                                        size: 16,
+                                                        color: NeuColors
+                                                            .textPrimary),
+                                                    const SizedBox(width: 6),
+                                                    Text(
+                                                      addr.length > 20
+                                                          ? '${addr.substring(0, 20)}...'
+                                                          : addr,
+                                                      style: const TextStyle(
+                                                        color: NeuColors
+                                                            .textPrimary,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontSize: 13,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
                                             ),
                                           )),
                                 ],
@@ -290,17 +371,34 @@ class _CartScreenState extends State<CartScreen> {
                       // Comment
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: TextField(
-                          controller: _commentController,
-                          maxLines: 3,
-                          decoration: InputDecoration(
-                            labelText: l10n.commentOptional,
-                            hintText: l10n.specialInstructions,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          decoration: NeuDecoration.pressed(radius: 14),
+                          child: TextField(
+                            controller: _commentController,
+                            maxLines: 3,
+                            style: const TextStyle(color: NeuColors.textPrimary),
+                            decoration: InputDecoration(
+                              labelText: l10n.commentOptional,
+                              hintText: l10n.specialInstructions,
+                              hintStyle: const TextStyle(color: NeuColors.textHint),
+                              labelStyle: const TextStyle(color: NeuColors.textSecondary),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide: BorderSide.none,
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide: BorderSide.none,
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide: const BorderSide(color: NeuColors.accent, width: 1.5),
+                              ),
+                              filled: true,
+                              fillColor: Colors.transparent,
+                              prefixIcon: const Icon(Icons.comment,
+                                  color: NeuColors.accent),
                             ),
-                            prefixIcon: const Icon(Icons.comment,
-                                color: Color(0xFFFF5722)),
                           ),
                         ),
                       ),
@@ -335,36 +433,45 @@ class _CartScreenState extends State<CartScreen> {
           Icon(
             Icons.shopping_cart_outlined,
             size: 100,
-            color: Colors.grey[300],
+            color: NeuColors.textHint,
           ),
           const SizedBox(height: 24),
           Text(
             l10n.emptyCart,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Colors.grey[600],
+              color: NeuColors.textSecondary,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             l10n.addDishesToOrder,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 14,
-              color: Colors.grey[500],
+              color: NeuColors.textHint,
             ),
           ),
           const SizedBox(height: 32),
-          ElevatedButton.icon(
-            onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.restaurant_menu),
-            label: Text(l10n.viewMenu),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF5722),
-              foregroundColor: Colors.white,
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
+              decoration: NeuDecoration.accentRaised(radius: 30),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.restaurant_menu, color: Colors.white),
+                  const SizedBox(width: 8),
+                  Text(
+                    l10n.viewMenu,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -376,20 +483,16 @@ class _CartScreenState extends State<CartScreen> {
   Widget _buildRestaurantHeader() {
     final l10n = AppLocalizations.of(context)!;
     return Container(
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        border: Border(
-          bottom: BorderSide(color: Colors.grey[200]!),
-        ),
-      ),
+      decoration: NeuDecoration.raised(),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFFFF5722), Color(0xFFFF7043)],
+                colors: [NeuColors.accent, NeuColors.accentLight],
               ),
               borderRadius: BorderRadius.circular(12),
             ),
@@ -406,9 +509,9 @@ class _CartScreenState extends State<CartScreen> {
               children: [
                 Text(
                   l10n.restaurant,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
-                    color: Colors.grey,
+                    color: NeuColors.textSecondary,
                   ),
                 ),
                 Text(
@@ -416,6 +519,7 @@ class _CartScreenState extends State<CartScreen> {
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
+                    color: NeuColors.textPrimary,
                   ),
                 ),
               ],
@@ -440,19 +544,19 @@ class _CartScreenState extends State<CartScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.green[50],
+                color: NeuColors.success.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.green[300]!),
+                border: Border.all(color: NeuColors.success),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.check_circle, color: Colors.green[700], size: 20),
+                  const Icon(Icons.check_circle, color: NeuColors.success, size: 20),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       '${l10n.promoApplied} -${clientProvider.promoDiscount.toStringAsFixed(2)} ${l10n.dhs}',
-                      style: TextStyle(
-                          color: Colors.green[700],
+                      style: const TextStyle(
+                          color: NeuColors.success,
                           fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -463,7 +567,7 @@ class _CartScreenState extends State<CartScreen> {
                       setState(() => _promoError = null);
                     },
                     child:
-                        Icon(Icons.close, color: Colors.green[700], size: 20),
+                        const Icon(Icons.close, color: NeuColors.success, size: 20),
                   ),
                 ],
               ),
@@ -472,23 +576,37 @@ class _CartScreenState extends State<CartScreen> {
             Row(
               children: [
                 Expanded(
-                  child: TextField(
-                    controller: _promoController,
-                    decoration: InputDecoration(
-                      hintText: l10n.enterPromoCode,
-                      prefixIcon: const Icon(Icons.local_offer,
-                          color: Color(0xFFFF5722)),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
-                      errorText: _promoError,
+                  child: Container(
+                    decoration: NeuDecoration.pressed(radius: 14),
+                    child: TextField(
+                      controller: _promoController,
+                      style: const TextStyle(color: NeuColors.textPrimary),
+                      decoration: InputDecoration(
+                        hintText: l10n.enterPromoCode,
+                        hintStyle: const TextStyle(color: NeuColors.textHint),
+                        prefixIcon: const Icon(Icons.local_offer,
+                            color: NeuColors.accent),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide.none),
+                        enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide.none),
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: const BorderSide(color: NeuColors.accent, width: 1.5)),
+                        filled: true,
+                        fillColor: Colors.transparent,
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
+                        errorText: _promoError,
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () async {
+                GestureDetector(
+                  onTap: () async {
                     if (_promoController.text.trim().isEmpty) return;
                     final result = await clientProvider.validatePromoCode(
                       _promoController.text.trim(),
@@ -496,15 +614,19 @@ class _CartScreenState extends State<CartScreen> {
                     );
                     setState(() => _promoError = result);
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFF5722),
-                    foregroundColor: Colors.white,
+                  child: Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 14),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                    decoration: NeuDecoration.accentRaised(radius: 14),
+                    child: Text(
+                      l10n.apply,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
                   ),
-                  child: Text(l10n.apply),
                 ),
               ],
             ),
@@ -516,70 +638,66 @@ class _CartScreenState extends State<CartScreen> {
   Widget _buildPriceSummary(
       double subtotal, double total, double promoDiscount, double dishPromoSavings) {
     final l10n = AppLocalizations.of(context)!;
-    return Card(
+    return Container(
       margin: const EdgeInsets.all(16),
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l10n.summary,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+      padding: const EdgeInsets.all(16),
+      decoration: NeuDecoration.raised(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.summary,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: NeuColors.textPrimary,
             ),
-            const SizedBox(height: 16),
-            _buildPriceRow(l10n.subtotal, subtotal),
-            if (dishPromoSavings > 0) ...[
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.local_offer, size: 16, color: Colors.green[700]),
-                      const SizedBox(width: 4),
-                      Text(l10n.promotions,
-                          style: TextStyle(fontSize: 14, color: Colors.green[700])),
-                    ],
-                  ),
-                  Text('-${dishPromoSavings.toStringAsFixed(2)} ${l10n.dhs}',
-                      style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.green[700],
-                          fontWeight: FontWeight.bold)),
-                ],
-              ),
-            ],
+          ),
+          const SizedBox(height: 16),
+          _buildPriceRow(l10n.subtotal, subtotal),
+          if (dishPromoSavings > 0) ...[
             const SizedBox(height: 8),
-            _buildPriceRow(l10n.deliveryFee, _deliveryFee),
-            const SizedBox(height: 8),
-            _buildPriceRow(l10n.serviceFee, _serviceFee),
-            if (promoDiscount > 0) ...[
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(l10n.discount,
-                      style: TextStyle(fontSize: 16, color: Colors.green[700])),
-                  Text('-${promoDiscount.toStringAsFixed(2)} ${l10n.dhs}',
-                      style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.green[700],
-                          fontWeight: FontWeight.bold)),
-                ],
-              ),
-            ],
-            const Divider(height: 24, thickness: 2),
-            _buildPriceRow(l10n.total, total, isTotal: true),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.local_offer, size: 16, color: NeuColors.success),
+                    const SizedBox(width: 4),
+                    Text(l10n.promotions,
+                        style: const TextStyle(fontSize: 14, color: NeuColors.success)),
+                  ],
+                ),
+                Text('-${dishPromoSavings.toStringAsFixed(2)} ${l10n.dhs}',
+                    style: const TextStyle(
+                        fontSize: 14,
+                        color: NeuColors.success,
+                        fontWeight: FontWeight.bold)),
+              ],
+            ),
           ],
-        ),
+          const SizedBox(height: 8),
+          _buildPriceRow(l10n.deliveryFee, _deliveryFee),
+          const SizedBox(height: 8),
+          _buildPriceRow(l10n.serviceFee, _serviceFee),
+          if (promoDiscount > 0) ...[
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(l10n.discount,
+                    style: const TextStyle(fontSize: 16, color: NeuColors.success)),
+                Text('-${promoDiscount.toStringAsFixed(2)} ${l10n.dhs}',
+                    style: const TextStyle(
+                        fontSize: 16,
+                        color: NeuColors.success,
+                        fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ],
+          const Divider(height: 24, thickness: 2),
+          _buildPriceRow(l10n.total, total, isTotal: true),
+        ],
       ),
     );
   }
@@ -594,6 +712,7 @@ class _CartScreenState extends State<CartScreen> {
           style: TextStyle(
             fontSize: isTotal ? 18 : 16,
             fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+            color: NeuColors.textPrimary,
           ),
         ),
         Text(
@@ -601,7 +720,7 @@ class _CartScreenState extends State<CartScreen> {
           style: TextStyle(
             fontSize: isTotal ? 20 : 16,
             fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
-            color: isTotal ? const Color(0xFFFF5722) : null,
+            color: isTotal ? NeuColors.accent : NeuColors.textPrimary,
           ),
         ),
       ],
@@ -613,52 +732,53 @@ class _CartScreenState extends State<CartScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: NeuColors.background,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: NeuColors.darkShadow.withOpacity(0.2),
             blurRadius: 10,
             offset: const Offset(0, -5),
+          ),
+          BoxShadow(
+            color: NeuColors.lightShadow.withOpacity(0.8),
+            blurRadius: 4,
+            offset: const Offset(0, -1),
           ),
         ],
       ),
       child: SafeArea(
-        child: SizedBox(
-          width: double.infinity,
-          height: 56,
-          child: ElevatedButton(
-            onPressed: _isLoading ? null : () => _placeOrder(cartItems, total),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF5722),
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 0,
-            ),
-            child: _isLoading
-                ? const SizedBox(
-                    height: 24,
-                    width: 24,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.payment, size: 24),
-                      const SizedBox(width: 12),
-                      Text(
-                        '${l10n.pay} ${total.toStringAsFixed(2)} ${l10n.dhs}',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+        child: GestureDetector(
+          onTap: _isLoading ? null : () => _placeOrder(cartItems, total),
+          child: Container(
+            width: double.infinity,
+            height: 56,
+            decoration: NeuDecoration.accentRaised(radius: 12),
+            child: Center(
+              child: _isLoading
+                  ? const SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
                       ),
-                    ],
-                  ),
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.payment, size: 24, color: Colors.white),
+                        const SizedBox(width: 12),
+                        Text(
+                          '${l10n.pay} ${total.toStringAsFixed(2)} ${l10n.dhs}',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+            ),
           ),
         ),
       ),
@@ -768,182 +888,182 @@ class _CartItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Card(
+    return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          children: [
-            // Image
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: cartItem.menuItem.imageUrl != null
-                  ? CachedNetworkImage(
-                      imageUrl: cartItem.menuItem.imageUrl!,
+      padding: const EdgeInsets.all(12),
+      decoration: NeuDecoration.raised(),
+      child: Row(
+        children: [
+          // Image
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: cartItem.menuItem.imageUrl != null
+                ? CachedNetworkImage(
+                    imageUrl: cartItem.menuItem.imageUrl!,
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
                       width: 80,
                       height: 80,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(
-                        width: 80,
-                        height: 80,
-                        color: Colors.grey[200],
-                        child: const Center(
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
+                      color: NeuColors.darkShadow.withOpacity(0.15),
+                      child: const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
                       ),
-                      errorWidget: (context, url, error) => Container(
-                        width: 80,
-                        height: 80,
-                        color: Colors.grey[200],
-                        child: const Icon(Icons.restaurant),
-                      ),
-                    )
-                  : Container(
+                    ),
+                    errorWidget: (context, url, error) => Container(
                       width: 80,
                       height: 80,
-                      color: Colors.grey[200],
-                      child: const Icon(Icons.restaurant),
+                      color: NeuColors.darkShadow.withOpacity(0.15),
+                      child: const Icon(Icons.restaurant,
+                          color: NeuColors.textSecondary),
                     ),
-            ),
-            const SizedBox(width: 12),
-
-            // Item Info
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    cartItem.menuItem.name,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+                  )
+                : Container(
+                    width: 80,
+                    height: 80,
+                    color: NeuColors.darkShadow.withOpacity(0.15),
+                    child: const Icon(Icons.restaurant,
+                        color: NeuColors.textSecondary),
                   ),
-                  const SizedBox(height: 4),
-                  if (cartItem.hasPromo) ...[
-                    Row(
-                      children: [
-                        Text(
-                          '${cartItem.menuItem.price.toStringAsFixed(0)} ${l10n.dhs}',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey,
-                            decoration: TextDecoration.lineThrough,
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          '${cartItem.effectivePrice.toStringAsFixed(0)} ${l10n.dhs} ${l10n.perUnit}',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Color(0xFFFF5722),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 4, vertical: 1),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            '-${cartItem.discountPercent}%',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ] else
-                    Text(
-                      '${cartItem.menuItem.price.toStringAsFixed(2)} ${l10n.dhs} ${l10n.perUnit}',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  const SizedBox(height: 8),
+          ),
+          const SizedBox(width: 12),
+
+          // Item Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  cartItem.menuItem.name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: NeuColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                if (cartItem.hasPromo) ...[
                   Row(
                     children: [
-                      // Quantity Controls
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey[300]!),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            _buildQuantityButton(
-                              icon: Icons.remove,
-                              onPressed: () {
-                                context
-                                    .read<ClientProvider>()
-                                    .decrementQuantity(cartItem.menuItem.id);
-                              },
-                            ),
-                            Container(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
-                              child: Text(
-                                '${cartItem.quantity}',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            _buildQuantityButton(
-                              icon: Icons.add,
-                              onPressed: () {
-                                context
-                                    .read<ClientProvider>()
-                                    .incrementQuantity(cartItem.menuItem.id);
-                              },
-                            ),
-                          ],
+                      Text(
+                        '${cartItem.menuItem.price.toStringAsFixed(0)} ${l10n.dhs}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: NeuColors.textHint,
+                          decoration: TextDecoration.lineThrough,
                         ),
                       ),
-                      const Spacer(),
-                      // Total Price
+                      const SizedBox(width: 6),
                       Text(
-                        '${cartItem.totalPrice.toStringAsFixed(2)} ${l10n.dhs}',
+                        '${cartItem.effectivePrice.toStringAsFixed(0)} ${l10n.dhs} ${l10n.perUnit}',
                         style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: Color(0xFFFF5722),
+                          fontSize: 13,
+                          color: NeuColors.accent,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 4, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: NeuColors.error,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          '-${cartItem.discountPercent}%',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
-
-            // Delete Button
-            IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
-              onPressed: () {
-                context
-                    .read<ClientProvider>()
-                    .removeFromCart(cartItem.menuItem.id);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(l10n.removedFromCart),
-                    duration: Duration(seconds: 1),
+                ] else
+                  Text(
+                    '${cartItem.menuItem.price.toStringAsFixed(2)} ${l10n.dhs} ${l10n.perUnit}',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: NeuColors.textSecondary,
+                    ),
                   ),
-                );
-              },
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    // Quantity Controls
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: NeuColors.darkShadow.withOpacity(0.3)),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          _buildQuantityButton(
+                            icon: Icons.remove,
+                            onPressed: () {
+                              context
+                                  .read<ClientProvider>()
+                                  .decrementQuantity(cartItem.menuItem.id);
+                            },
+                          ),
+                          Container(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16),
+                            child: Text(
+                              '${cartItem.quantity}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: NeuColors.textPrimary,
+                              ),
+                            ),
+                          ),
+                          _buildQuantityButton(
+                            icon: Icons.add,
+                            onPressed: () {
+                              context
+                                  .read<ClientProvider>()
+                                  .incrementQuantity(cartItem.menuItem.id);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Spacer(),
+                    // Total Price
+                    Text(
+                      '${cartItem.totalPrice.toStringAsFixed(2)} ${l10n.dhs}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: NeuColors.accent,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+
+          // Delete Button
+          IconButton(
+            icon: const Icon(Icons.delete, color: NeuColors.error),
+            onPressed: () {
+              context
+                  .read<ClientProvider>()
+                  .removeFromCart(cartItem.menuItem.id);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(l10n.removedFromCart),
+                  duration: Duration(seconds: 1),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
@@ -956,7 +1076,7 @@ class _CartItemCard extends StatelessWidget {
       onTap: onPressed,
       child: Container(
         padding: const EdgeInsets.all(8),
-        child: Icon(icon, size: 20),
+        child: Icon(icon, size: 20, color: NeuColors.textPrimary),
       ),
     );
   }

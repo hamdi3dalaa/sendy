@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:sendy/l10n/app_localizations.dart';
 import '../../providers/client_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../theme/neumorphic_theme.dart';
 import 'restaurant_menu_screen.dart';
 
 class RestaurantsListScreen extends StatefulWidget {
@@ -60,202 +61,209 @@ class _RestaurantsListScreenState extends State<RestaurantsListScreen> {
       'desserts': l10n.desserts,
     };
 
-    return Column(
-      children: [
-        // Search Bar
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
+    return Container(
+      color: NeuColors.background,
+      child: Column(
+        children: [
+          // Search Bar
+          Container(
+            padding: const EdgeInsets.all(16),
+            color: NeuColors.background,
+            child: Container(
+              decoration: NeuDecoration.pressed(radius: 30),
+              child: TextField(
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value.toLowerCase();
+                  });
+                },
+                style: const TextStyle(color: NeuColors.textPrimary),
+                decoration: InputDecoration(
+                  hintText: l10n.searchRestaurants,
+                  hintStyle: const TextStyle(color: NeuColors.textHint),
+                  prefixIcon: const Icon(Icons.search, color: NeuColors.accent),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide.none,
+                  ),
+                  filled: true,
+                  fillColor: Colors.transparent,
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                ),
               ),
-            ],
-          ),
-          child: TextField(
-            onChanged: (value) {
-              setState(() {
-                _searchQuery = value.toLowerCase();
-              });
-            },
-            decoration: InputDecoration(
-              hintText: l10n.searchRestaurants,
-              prefixIcon: const Icon(Icons.search, color: Color(0xFFFF5722)),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30),
-                borderSide: BorderSide.none,
-              ),
-              filled: true,
-              fillColor: Colors.grey[100],
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
             ),
           ),
-        ),
 
-        // Category Chips
-        SizedBox(
-          height: 50,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            itemCount: _categoryKeys.length,
-            itemBuilder: (context, index) {
-              final key = _categoryKeys[index];
-              final isSelected = key == _selectedCategory;
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-                child: ChoiceChip(
-                  label: Text(categoryLabels[key] ?? key),
-                  selected: isSelected,
-                  onSelected: (_) {
-                    setState(() {
-                      _selectedCategory = key;
-                    });
-                  },
-                  selectedColor: const Color(0xFFFF5722),
-                  labelStyle: TextStyle(
-                    color: isSelected ? Colors.white : Colors.black,
-                    fontSize: 12,
+          // Category Chips
+          SizedBox(
+            height: 56,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              itemCount: _categoryKeys.length,
+              itemBuilder: (context, index) {
+                final key = _categoryKeys[index];
+                final isSelected = key == _selectedCategory;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                  child: NeuChip(
+                    label: categoryLabels[key] ?? key,
+                    isSelected: isSelected,
+                    onTap: () {
+                      setState(() {
+                        _selectedCategory = key;
+                      });
+                    },
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
-        ),
 
-        // Restaurants List
-        Expanded(
-          child: Consumer<ClientProvider>(
-            builder: (context, clientProvider, child) {
-              if (clientProvider.isLoading) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+          // Restaurants List
+          Expanded(
+            child: Consumer<ClientProvider>(
+              builder: (context, clientProvider, child) {
+                if (clientProvider.isLoading) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const CircularProgressIndicator(color: NeuColors.accent),
+                        const SizedBox(height: 16),
+                        Text(
+                          l10n.loadingRestaurants,
+                          style: const TextStyle(color: NeuColors.textSecondary),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                if (clientProvider.error != null) {
+                  return _buildErrorState(clientProvider, l10n);
+                }
+
+                if (!_hasLoaded && clientProvider.restaurants.isEmpty) {
+                  return _buildInitialState(l10n);
+                }
+
+                final customerCity = _getCustomerCity();
+
+                // Filter by city first
+                var restaurants = clientProvider.restaurants.where((r) {
+                  if (customerCity == null || customerCity.isEmpty) return true;
+                  if (r.city == null || r.city!.isEmpty) return true;
+                  return r.city!.toLowerCase() == customerCity.toLowerCase();
+                }).toList();
+
+                // Then filter by search
+                restaurants = restaurants
+                    .where((r) => r.name.toLowerCase().contains(_searchQuery))
+                    .toList();
+
+                // Then filter by category
+                if (_selectedCategory.isNotEmpty) {
+                  restaurants = restaurants
+                      .where((r) =>
+                          r.category.toLowerCase() ==
+                          _selectedCategory.toLowerCase())
+                      .toList();
+                }
+
+                // Get active promotions (already filtered by city from provider)
+                final promotions = clientProvider.dishPromotions;
+
+                // Sort: restaurants with active promotions appear first
+                final promoRestaurantIds = promotions.map((p) => p.restaurantId).toSet();
+                restaurants.sort((a, b) {
+                  final aHasPromo = promoRestaurantIds.contains(a.uid);
+                  final bHasPromo = promoRestaurantIds.contains(b.uid);
+                  if (aHasPromo && !bHasPromo) return -1;
+                  if (!aHasPromo && bHasPromo) return 1;
+                  return 0;
+                });
+
+                if (restaurants.isEmpty && promotions.isEmpty) {
+                  return _buildEmptyState(l10n);
+                }
+
+                return RefreshIndicator(
+                  onRefresh: () => _loadRestaurants(),
+                  color: NeuColors.accent,
+                  child: ListView(
+                    padding: const EdgeInsets.all(16),
                     children: [
-                      const CircularProgressIndicator(color: Color(0xFFFF5722)),
-                      const SizedBox(height: 16),
-                      Text(l10n.loadingRestaurants),
+                      // Promotions section at the top
+                      if (promotions.isNotEmpty && _searchQuery.isEmpty) ...[
+                        Row(
+                          children: [
+                            const Icon(Icons.local_fire_department,
+                                color: NeuColors.accent, size: 22),
+                            const SizedBox(width: 6),
+                            Text(
+                              l10n.currentPromotions,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: NeuColors.textPrimary,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        SizedBox(
+                          height: 180,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: promotions.length,
+                            itemBuilder: (context, index) {
+                              return _PromotionCard(
+                                  promo: promotions[index]);
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          l10n.allRestaurants,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: NeuColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                      ],
+
+                      // Restaurant list
+                      ...restaurants.map((restaurant) =>
+                          _RestaurantCard(
+                            restaurant: restaurant,
+                            hasPromotion: promoRestaurantIds.contains(restaurant.uid),
+                          )),
+
+                      if (restaurants.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 40),
+                          child: _buildEmptyState(l10n),
+                        ),
                     ],
                   ),
                 );
-              }
-
-              if (clientProvider.error != null) {
-                return _buildErrorState(clientProvider, l10n);
-              }
-
-              if (!_hasLoaded && clientProvider.restaurants.isEmpty) {
-                return _buildInitialState(l10n);
-              }
-
-              final customerCity = _getCustomerCity();
-
-              // Filter by city first
-              var restaurants = clientProvider.restaurants.where((r) {
-                if (customerCity == null || customerCity.isEmpty) return true;
-                if (r.city == null || r.city!.isEmpty) return true;
-                return r.city!.toLowerCase() == customerCity.toLowerCase();
-              }).toList();
-
-              // Then filter by search
-              restaurants = restaurants
-                  .where((r) => r.name.toLowerCase().contains(_searchQuery))
-                  .toList();
-
-              // Then filter by category
-              if (_selectedCategory.isNotEmpty) {
-                restaurants = restaurants
-                    .where((r) =>
-                        r.category.toLowerCase() ==
-                        _selectedCategory.toLowerCase())
-                    .toList();
-              }
-
-              // Get active promotions (already filtered by city from provider)
-              final promotions = clientProvider.dishPromotions;
-
-              // Sort: restaurants with active promotions appear first
-              final promoRestaurantIds = promotions.map((p) => p.restaurantId).toSet();
-              restaurants.sort((a, b) {
-                final aHasPromo = promoRestaurantIds.contains(a.uid);
-                final bHasPromo = promoRestaurantIds.contains(b.uid);
-                if (aHasPromo && !bHasPromo) return -1;
-                if (!aHasPromo && bHasPromo) return 1;
-                return 0;
-              });
-
-              if (restaurants.isEmpty && promotions.isEmpty) {
-                return _buildEmptyState(l10n);
-              }
-
-              return RefreshIndicator(
-                onRefresh: () => _loadRestaurants(),
-                color: const Color(0xFFFF5722),
-                child: ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    // Promotions section at the top
-                    if (promotions.isNotEmpty && _searchQuery.isEmpty) ...[
-                      Row(
-                        children: [
-                          const Icon(Icons.local_fire_department,
-                              color: Color(0xFFFF5722), size: 22),
-                          const SizedBox(width: 6),
-                          Text(
-                            l10n.currentPromotions,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      SizedBox(
-                        height: 180,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: promotions.length,
-                          itemBuilder: (context, index) {
-                            return _PromotionCard(
-                                promo: promotions[index]);
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        l10n.allRestaurants,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                    ],
-
-                    // Restaurant list
-                    ...restaurants.map((restaurant) =>
-                        _RestaurantCard(
-                          restaurant: restaurant,
-                          hasPromotion: promoRestaurantIds.contains(restaurant.uid),
-                        )),
-
-                    if (restaurants.isEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 40),
-                        child: _buildEmptyState(l10n),
-                      ),
-                  ],
-                ),
-              );
-            },
+              },
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -282,27 +290,30 @@ class _RestaurantsListScreenState extends State<RestaurantsListScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFFFF5722).withOpacity(0.1),
+                color: NeuColors.accent.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.restaurant,
-                  size: 80, color: Color(0xFFFF5722)),
+                  size: 80, color: NeuColors.accent),
             ),
             const SizedBox(height: 24),
             Text(l10n.discoverRestaurants,
-                style:
-                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: NeuColors.textPrimary)),
             const SizedBox(height: 8),
             Text(l10n.tapToLoadRestaurants,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+                style: const TextStyle(
+                    fontSize: 14, color: NeuColors.textSecondary)),
             const SizedBox(height: 32),
             ElevatedButton.icon(
               onPressed: _loadRestaurants,
               icon: const Icon(Icons.refresh),
               label: Text(l10n.loadRestaurants),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF5722),
+                backgroundColor: NeuColors.accent,
                 foregroundColor: Colors.white,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
@@ -324,22 +335,25 @@ class _RestaurantsListScreenState extends State<RestaurantsListScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: Colors.red.shade300),
+            Icon(Icons.error_outline, size: 64, color: NeuColors.error),
             const SizedBox(height: 24),
             Text(l10n.error,
-                style:
-                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: NeuColors.textPrimary)),
             const SizedBox(height: 8),
             Text(clientProvider.error ?? '',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+                style: const TextStyle(
+                    fontSize: 12, color: NeuColors.textHint)),
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: _loadRestaurants,
               icon: const Icon(Icons.refresh),
               label: Text(l10n.retry),
               style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF5722),
+                  backgroundColor: NeuColors.accent,
                   foregroundColor: Colors.white),
             ),
           ],
@@ -356,13 +370,16 @@ class _RestaurantsListScreenState extends State<RestaurantsListScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(_searchQuery.isEmpty ? Icons.restaurant : Icons.search_off,
-                size: 64, color: Colors.grey.shade400),
+                size: 64, color: NeuColors.textHint),
             const SizedBox(height: 24),
             Text(
               _searchQuery.isEmpty
                   ? l10n.noRestaurantsAvailable
                   : l10n.noResultsFound,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: NeuColors.textPrimary),
             ),
             const SizedBox(height: 8),
             Text(
@@ -370,7 +387,8 @@ class _RestaurantsListScreenState extends State<RestaurantsListScreen> {
                   ? l10n.restaurantsWillAppear
                   : l10n.tryAnotherSearch,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              style: const TextStyle(
+                  fontSize: 14, color: NeuColors.textSecondary),
             ),
           ],
         ),
@@ -407,59 +425,56 @@ class _PromotionCard extends StatelessWidget {
       child: Container(
         width: 200,
         margin: const EdgeInsets.only(right: 12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14),
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
+        decoration: NeuDecoration.raised(radius: 14),
         clipBehavior: Clip.antiAlias,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image with diagonal discount banner
-            ClipRect(
-              child: Banner(
-                message: '-${promo.discountPercent}%',
-                location: BannerLocation.topEnd,
-                color: Colors.red,
-                textStyle: const TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                ),
-                child: promo.dishImageUrl != null && promo.dishImageUrl!.isNotEmpty
-                    ? CachedNetworkImage(
-                        imageUrl: promo.dishImageUrl!,
-                        height: 100,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                        placeholder: (_, __) => Container(
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(14),
+                topRight: Radius.circular(14),
+              ),
+              child: ClipRect(
+                child: Banner(
+                  message: '-${promo.discountPercent}%',
+                  location: BannerLocation.topEnd,
+                  color: Colors.red,
+                  textStyle: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  child: promo.dishImageUrl != null && promo.dishImageUrl!.isNotEmpty
+                      ? CachedNetworkImage(
+                          imageUrl: promo.dishImageUrl!,
                           height: 100,
-                          color: Colors.grey[200],
-                          child: const Center(
-                              child: CircularProgressIndicator(
-                                  strokeWidth: 2)),
-                        ),
-                        errorWidget: (_, __, ___) => Container(
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          placeholder: (_, __) => Container(
+                            height: 100,
+                            color: NeuColors.darkShadow.withOpacity(0.1),
+                            child: const Center(
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: NeuColors.accent)),
+                          ),
+                          errorWidget: (_, __, ___) => Container(
+                            height: 100,
+                            color: NeuColors.accent.withOpacity(0.1),
+                            child: const Center(
+                                child: Icon(Icons.fastfood,
+                                    size: 40, color: NeuColors.accent)),
+                          ),
+                        )
+                      : Container(
                           height: 100,
-                          color: const Color(0xFFFF5722).withOpacity(0.1),
+                          color: NeuColors.accent.withOpacity(0.1),
                           child: const Center(
                               child: Icon(Icons.fastfood,
-                                  size: 40, color: Color(0xFFFF5722))),
+                                  size: 40, color: NeuColors.accent)),
                         ),
-                      )
-                    : Container(
-                        height: 100,
-                        color: const Color(0xFFFF5722).withOpacity(0.1),
-                        child: const Center(
-                            child: Icon(Icons.fastfood,
-                                size: 40, color: Color(0xFFFF5722))),
-                      ),
+                ),
               ),
             ),
             // Info
@@ -471,15 +486,17 @@ class _PromotionCard extends StatelessWidget {
                   Text(
                     promo.dishName,
                     style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 13),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                        color: NeuColors.textPrimary),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 2),
                   Text(
                     promo.restaurantName,
-                    style: TextStyle(
-                        fontSize: 11, color: Colors.grey[600]),
+                    style: const TextStyle(
+                        fontSize: 11, color: NeuColors.textSecondary),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -490,7 +507,7 @@ class _PromotionCard extends StatelessWidget {
                         '${promo.originalPrice.toStringAsFixed(0)} ${l10n.dhs}',
                         style: const TextStyle(
                           decoration: TextDecoration.lineThrough,
-                          color: Colors.grey,
+                          color: NeuColors.textHint,
                           fontSize: 12,
                         ),
                       ),
@@ -498,7 +515,7 @@ class _PromotionCard extends StatelessWidget {
                       Text(
                         '${promo.promoPrice.toStringAsFixed(0)} ${l10n.dhs}',
                         style: const TextStyle(
-                          color: Color(0xFFFF5722),
+                          color: NeuColors.accent,
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                         ),
@@ -526,167 +543,180 @@ class _RestaurantCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final authProvider = context.read<AuthProvider>();
 
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      decoration: NeuDecoration.raised(radius: 16),
       clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  RestaurantMenuScreen(restaurant: restaurant),
-            ),
-          );
-        },
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Cover image or gradient header
-            Stack(
-              children: [
-                _buildHeader(),
-                // Favorite button
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: Consumer<ClientProvider>(
-                    builder: (context, clientProvider, _) {
-                      final isFav = clientProvider.isFavorite(restaurant.uid);
-                      return GestureDetector(
-                        onTap: () {
-                          if (authProvider.currentUser != null) {
-                            clientProvider.toggleFavorite(
-                                authProvider.currentUser!.uid, restaurant.uid);
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.9),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            isFav ? Icons.favorite : Icons.favorite_border,
-                            color: isFav ? Colors.red : Colors.grey,
-                            size: 22,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    RestaurantMenuScreen(restaurant: restaurant),
+              ),
+            );
+          },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Cover image or gradient header
+              ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
                 ),
-                if (restaurant.category.isNotEmpty)
-                  Positioned(
-                    top: 8,
-                    left: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFF5722),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        restaurant.category,
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold),
+                child: Stack(
+                  children: [
+                    _buildHeader(),
+                    // Favorite button
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Consumer<ClientProvider>(
+                        builder: (context, clientProvider, _) {
+                          final isFav = clientProvider.isFavorite(restaurant.uid);
+                          return GestureDetector(
+                            onTap: () {
+                              if (authProvider.currentUser != null) {
+                                clientProvider.toggleFavorite(
+                                    authProvider.currentUser!.uid, restaurant.uid);
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: NeuColors.background.withOpacity(0.9),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                isFav ? Icons.favorite : Icons.favorite_border,
+                                color: isFav ? Colors.red : NeuColors.textHint,
+                                size: 22,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
-                  ),
-                // Promotions band
-                if (hasPromotion)
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.red.shade700,
-                            Colors.red.shade400,
-                          ],
+                    if (restaurant.category.isNotEmpty)
+                      Positioned(
+                        top: 8,
+                        left: 8,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: NeuColors.accent,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            restaurant.category,
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.local_offer,
-                              color: Colors.white, size: 14),
-                          const SizedBox(width: 6),
-                          Text(
-                            l10n.promotions,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
+                    // Promotions band
+                    if (hasPromotion)
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.red.shade700,
+                                Colors.red.shade400,
+                              ],
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            // Restaurant info
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          restaurant.name,
-                          style: const TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.local_offer,
+                                  color: Colors.white, size: 14),
+                              const SizedBox(width: 6),
+                              Text(
+                                l10n.promotions,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      if (restaurant.averageRating > 0) ...[
-                        const Icon(Icons.star, color: Colors.amber, size: 18),
-                        const SizedBox(width: 2),
-                        Text(restaurant.averageRating.toStringAsFixed(1),
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 14)),
-                        Text(' (${restaurant.totalReviews})',
-                            style: TextStyle(
-                                color: Colors.grey[600], fontSize: 12)),
-                      ],
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Icon(Icons.restaurant_menu,
-                          size: 14, color: Colors.grey[600]),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${restaurant.approvedItemsCount} ${restaurant.approvedItemsCount > 1 ? l10n.dishes : l10n.dish}',
-                        style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-                      ),
-                      const SizedBox(width: 16),
-                      Icon(Icons.delivery_dining,
-                          size: 14, color: Colors.grey[600]),
-                      const SizedBox(width: 4),
-                      Text('14.00 ${l10n.dhs}',
-                          style:
-                              TextStyle(fontSize: 13, color: Colors.grey[600])),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+              // Restaurant info
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            restaurant.name,
+                            style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: NeuColors.textPrimary),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        if (restaurant.averageRating > 0) ...[
+                          const Icon(Icons.star, color: Colors.amber, size: 18),
+                          const SizedBox(width: 2),
+                          Text(restaurant.averageRating.toStringAsFixed(1),
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                  color: NeuColors.textPrimary)),
+                          Text(' (${restaurant.totalReviews})',
+                              style: const TextStyle(
+                                  color: NeuColors.textSecondary, fontSize: 12)),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        const Icon(Icons.restaurant_menu,
+                            size: 14, color: NeuColors.textSecondary),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${restaurant.approvedItemsCount} ${restaurant.approvedItemsCount > 1 ? l10n.dishes : l10n.dish}',
+                          style: const TextStyle(
+                              fontSize: 13, color: NeuColors.textSecondary),
+                        ),
+                        const SizedBox(width: 16),
+                        const Icon(Icons.delivery_dining,
+                            size: 14, color: NeuColors.textSecondary),
+                        const SizedBox(width: 4),
+                        Text('14.00 ${l10n.dhs}',
+                            style: const TextStyle(
+                                fontSize: 13, color: NeuColors.textSecondary)),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -705,10 +735,10 @@ class _RestaurantCard extends StatelessWidget {
         fit: BoxFit.cover,
         placeholder: (context, url) => Container(
           height: 150,
-          color: Colors.grey[200],
+          color: NeuColors.darkShadow.withOpacity(0.1),
           child: const Center(
             child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF5722)),
+              valueColor: AlwaysStoppedAnimation<Color>(NeuColors.accent),
             ),
           ),
         ),
@@ -725,7 +755,7 @@ class _RestaurantCard extends StatelessWidget {
       height: 150,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFFFF5722), Color(0xFFFF7043)],
+          colors: [NeuColors.accent, NeuColors.accentLight],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

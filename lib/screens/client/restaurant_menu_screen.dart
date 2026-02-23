@@ -7,6 +7,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:sendy/l10n/app_localizations.dart';
 import '../../providers/client_provider.dart';
 import '../../models/menu_item_model.dart';
+import '../../theme/neumorphic_theme.dart';
 import 'cart_screen.dart';
 
 class RestaurantMenuScreen extends StatefulWidget {
@@ -47,9 +48,12 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: NeuColors.background,
       appBar: AppBar(
         title: Text(widget.restaurant.name),
-        backgroundColor: const Color(0xFFFF5722),
+        backgroundColor: NeuColors.accent,
+        foregroundColor: Colors.white,
+        elevation: 0,
         actions: [
           Stack(
             children: [
@@ -106,7 +110,7 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
           if (clientProvider.isLoading) {
             return const Center(
               child: CircularProgressIndicator(
-                color: Color(0xFFFF5722),
+                color: NeuColors.accent,
               ),
             );
           }
@@ -143,7 +147,8 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
                   const SizedBox(height: 16),
                   Text(
                     l10n.noDishesAvailable,
-                    style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                    style: const TextStyle(
+                        fontSize: 18, color: NeuColors.textSecondary),
                   ),
                 ],
               ),
@@ -164,7 +169,7 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
             children: [
               // Category Filter
               Container(
-                height: 50,
+                height: 56,
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
@@ -174,18 +179,34 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
                     final category = categories[index];
                     final isSelected = category == _selectedCategory;
                     return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: ChoiceChip(
-                        label: Text(category),
-                        selected: isSelected,
-                        onSelected: (selected) {
+                      padding: const EdgeInsets.only(right: 10),
+                      child: GestureDetector(
+                        onTap: () {
                           setState(() {
                             _selectedCategory = category;
                           });
                         },
-                        selectedColor: const Color(0xFFFF5722),
-                        labelStyle: TextStyle(
-                          color: isSelected ? Colors.white : Colors.black,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          decoration: isSelected
+                              ? NeuDecoration.accentRaised(radius: 20)
+                              : NeuDecoration.raised(
+                                  radius: 20, intensity: 0.6),
+                          child: Center(
+                            child: Text(
+                              category,
+                              style: TextStyle(
+                                color: isSelected
+                                    ? Colors.white
+                                    : NeuColors.textPrimary,
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.w500,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     );
@@ -232,6 +253,7 @@ class _MenuItemCard extends StatelessWidget {
 
     showModalBottomSheet(
       context: context,
+      backgroundColor: NeuColors.background,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -248,7 +270,7 @@ class _MenuItemCard extends StatelessWidget {
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: Colors.grey[300],
+                      color: NeuColors.textHint,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -286,6 +308,7 @@ class _MenuItemCard extends StatelessWidget {
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
+                                color: NeuColors.textPrimary,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -294,7 +317,7 @@ class _MenuItemCard extends StatelessWidget {
                                 '${item.price.toStringAsFixed(0)} ${l10n.dhs}',
                                 style: const TextStyle(
                                   fontSize: 14,
-                                  color: Colors.grey,
+                                  color: NeuColors.textHint,
                                   decoration: TextDecoration.lineThrough,
                                 ),
                               ),
@@ -304,7 +327,7 @@ class _MenuItemCard extends StatelessWidget {
                                     '${promotion!.promoPrice.toStringAsFixed(0)} ${l10n.dhs}',
                                     style: const TextStyle(
                                       fontSize: 16,
-                                      color: Color(0xFFFF5722),
+                                      color: NeuColors.accent,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -332,7 +355,7 @@ class _MenuItemCard extends StatelessWidget {
                                 '${item.price.toStringAsFixed(2)} ${l10n.dhs}',
                                 style: const TextStyle(
                                   fontSize: 16,
-                                  color: Color(0xFFFF5722),
+                                  color: NeuColors.accent,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -347,23 +370,21 @@ class _MenuItemCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       // Minus button
-                      Material(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(12),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(12),
-                          onTap: quantity > 1
-                              ? () => setModalState(() => quantity--)
-                              : null,
-                          child: Container(
-                            width: 48,
-                            height: 48,
-                            alignment: Alignment.center,
-                            child: Icon(
-                              Icons.remove,
-                              color: quantity > 1 ? Colors.black : Colors.grey[400],
-                              size: 28,
-                            ),
+                      GestureDetector(
+                        onTap: quantity > 1
+                            ? () => setModalState(() => quantity--)
+                            : null,
+                        child: Container(
+                          width: 48,
+                          height: 48,
+                          alignment: Alignment.center,
+                          decoration: NeuDecoration.raised(radius: 12),
+                          child: Icon(
+                            Icons.remove,
+                            color: quantity > 1
+                                ? NeuColors.textPrimary
+                                : NeuColors.textHint,
+                            size: 28,
                           ),
                         ),
                       ),
@@ -376,26 +397,24 @@ class _MenuItemCard extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
+                            color: NeuColors.textPrimary,
                           ),
                         ),
                       ),
                       // Plus button
-                      Material(
-                        color: const Color(0xFFFF5722).withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(12),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(12),
-                          onTap: quantity < 99
-                              ? () => setModalState(() => quantity++)
-                              : null,
-                          child: const SizedBox(
-                            width: 48,
-                            height: 48,
-                            child: Icon(
-                              Icons.add,
-                              color: Color(0xFFFF5722),
-                              size: 28,
-                            ),
+                      GestureDetector(
+                        onTap: quantity < 99
+                            ? () => setModalState(() => quantity++)
+                            : null,
+                        child: Container(
+                          width: 48,
+                          height: 48,
+                          alignment: Alignment.center,
+                          decoration: NeuDecoration.raised(radius: 12),
+                          child: const Icon(
+                            Icons.add,
+                            color: NeuColors.accent,
+                            size: 28,
                           ),
                         ),
                       ),
@@ -405,44 +424,49 @@ class _MenuItemCard extends StatelessWidget {
                   // Total line
                   Text(
                     '${l10n.total}: ${((promotion?.promoPrice ?? item.price) * quantity).toStringAsFixed(2)} ${l10n.dhs}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 15,
-                      color: Colors.grey[600],
+                      color: NeuColors.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 20),
                   // Add to cart button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        final cp = Provider.of<ClientProvider>(ctx, listen: false);
-                        if (cp.isInCart(item.id)) {
-                          cp.updateQuantity(item.id, quantity);
-                        } else {
-                          cp.addToCart(item, quantity: quantity, promoPrice: promotion?.promoPrice);
-                        }
-                        Navigator.pop(ctx);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('${item.name} x$quantity ${l10n.addedToCart}'),
-                            duration: const Duration(seconds: 1),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                      },
-                      icon: const Icon(Icons.add_shopping_cart),
-                      label: Text(
-                        '${l10n.addedToCart} - ${((promotion?.promoPrice ?? item.price) * quantity).toStringAsFixed(2)} ${l10n.dhs}',
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFF5722),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                  GestureDetector(
+                    onTap: () {
+                      final cp = Provider.of<ClientProvider>(ctx, listen: false);
+                      if (cp.isInCart(item.id)) {
+                        cp.updateQuantity(item.id, quantity);
+                      } else {
+                        cp.addToCart(item, quantity: quantity, promoPrice: promotion?.promoPrice);
+                      }
+                      Navigator.pop(ctx);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('${item.name} x$quantity ${l10n.addedToCart}'),
+                          duration: const Duration(seconds: 1),
+                          backgroundColor: Colors.green,
                         ),
+                      );
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      height: 50,
+                      decoration: NeuDecoration.accentRaised(radius: 12),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.add_shopping_cart,
+                              color: Colors.white),
+                          const SizedBox(width: 8),
+                          Text(
+                            '${l10n.addedToCart} - ${((promotion?.promoPrice ?? item.price) * quantity).toStringAsFixed(2)} ${l10n.dhs}',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -488,11 +512,9 @@ class _MenuItemCard extends StatelessWidget {
 
         return GestureDetector(
           onTap: () => _showQuantitySelector(context, clientProvider),
-          child: Card(
-            elevation: 3,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+          child: Container(
+            decoration: NeuDecoration.raised(radius: 12),
+            clipBehavior: Clip.antiAlias,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -524,7 +546,7 @@ class _MenuItemCard extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(6),
                             decoration: const BoxDecoration(
-                              color: Color(0xFFFF5722),
+                              color: NeuColors.accent,
                               shape: BoxShape.circle,
                             ),
                             child: Text(
@@ -552,6 +574,7 @@ class _MenuItemCard extends StatelessWidget {
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
+                          color: NeuColors.textPrimary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -559,9 +582,9 @@ class _MenuItemCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         item.description,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 12,
-                          color: Colors.grey[600],
+                          color: NeuColors.textSecondary,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -579,7 +602,7 @@ class _MenuItemCard extends StatelessWidget {
                                         '${item.price.toStringAsFixed(0)} ${l10n.dhs}',
                                         style: const TextStyle(
                                           fontSize: 12,
-                                          color: Colors.grey,
+                                          color: NeuColors.textHint,
                                           decoration: TextDecoration.lineThrough,
                                         ),
                                       ),
@@ -588,7 +611,7 @@ class _MenuItemCard extends StatelessWidget {
                                         style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 15,
-                                          color: Color(0xFFFF5722),
+                                          color: NeuColors.accent,
                                         ),
                                       ),
                                     ],
@@ -598,7 +621,7 @@ class _MenuItemCard extends StatelessWidget {
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
-                                      color: Color(0xFFFF5722),
+                                      color: NeuColors.accent,
                                     ),
                                   ),
                           ),
@@ -606,7 +629,7 @@ class _MenuItemCard extends StatelessWidget {
                             // Quick quantity controls inline
                             Container(
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFF5722).withOpacity(0.1),
+                                color: NeuColors.accent.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Row(
@@ -618,7 +641,7 @@ class _MenuItemCard extends StatelessWidget {
                                     },
                                     child: const Padding(
                                       padding: EdgeInsets.all(4),
-                                      child: Icon(Icons.remove, size: 18, color: Color(0xFFFF5722)),
+                                      child: Icon(Icons.remove, size: 18, color: NeuColors.accent),
                                     ),
                                   ),
                                   Padding(
@@ -628,7 +651,7 @@ class _MenuItemCard extends StatelessWidget {
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 14,
-                                        color: Color(0xFFFF5722),
+                                        color: NeuColors.accent,
                                       ),
                                     ),
                                   ),
@@ -638,7 +661,7 @@ class _MenuItemCard extends StatelessWidget {
                                     },
                                     child: const Padding(
                                       padding: EdgeInsets.all(4),
-                                      child: Icon(Icons.add, size: 18, color: Color(0xFFFF5722)),
+                                      child: Icon(Icons.add, size: 18, color: NeuColors.accent),
                                     ),
                                   ),
                                 ],
@@ -648,7 +671,7 @@ class _MenuItemCard extends StatelessWidget {
                             IconButton(
                               icon: const Icon(
                                 Icons.add_shopping_cart,
-                                color: Color(0xFFFF5722),
+                                color: NeuColors.accent,
                               ),
                               onPressed: () => _showQuantitySelector(context, clientProvider),
                               padding: EdgeInsets.zero,

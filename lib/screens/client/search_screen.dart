@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:sendy/l10n/app_localizations.dart';
 import '../../providers/client_provider.dart';
 import '../../models/menu_item_model.dart';
+import '../../theme/neumorphic_theme.dart';
 import 'restaurant_menu_screen.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -22,14 +23,14 @@ class _SearchScreenState extends State<SearchScreen> {
   List<String> _recentSearches = [];
 
   final List<Map<String, dynamic>> _categoryFilters = [
-    {'key': 'fastFood', 'icon': Icons.fastfood},
-    {'key': 'moroccan', 'icon': Icons.restaurant},
-    {'key': 'pizza', 'icon': Icons.local_pizza},
-    {'key': 'sushi', 'icon': Icons.set_meal},
-    {'key': 'burger', 'icon': Icons.lunch_dining},
-    {'key': 'chicken', 'icon': Icons.restaurant_menu},
-    {'key': 'tacos', 'icon': Icons.food_bank},
-    {'key': 'desserts', 'icon': Icons.cake},
+    {'key': 'fastFood', 'icon': Icons.fastfood_rounded},
+    {'key': 'moroccan', 'icon': Icons.restaurant_rounded},
+    {'key': 'pizza', 'icon': Icons.local_pizza_rounded},
+    {'key': 'sushi', 'icon': Icons.set_meal_rounded},
+    {'key': 'burger', 'icon': Icons.lunch_dining_rounded},
+    {'key': 'chicken', 'icon': Icons.restaurant_menu_rounded},
+    {'key': 'tacos', 'icon': Icons.food_bank_rounded},
+    {'key': 'desserts', 'icon': Icons.cake_rounded},
   ];
 
   String _getCategoryLabel(AppLocalizations l10n, String key) {
@@ -95,80 +96,69 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Column(
-      children: [
-        // Search Bar
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: TextField(
-            controller: _searchController,
-            decoration: InputDecoration(
+    return Container(
+      color: NeuColors.background,
+      child: Column(
+        children: [
+          // Search Bar
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: NeuTextField(
+              controller: _searchController,
               hintText: l10n.searchRestaurantsAndDishes,
-              prefixIcon: const Icon(Icons.search, color: Color(0xFFFF5722)),
+              prefixIcon: const Icon(Icons.search_rounded, color: NeuColors.accent),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
-                      icon: const Icon(Icons.clear),
+                      icon: const Icon(Icons.clear_rounded, color: NeuColors.textHint),
                       onPressed: () {
                         _searchController.clear();
                         _performSearch('');
                       },
                     )
                   : null,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30),
-                borderSide: BorderSide.none,
-              ),
-              filled: true,
-              fillColor: Colors.grey[100],
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              onChanged: (value) => _performSearch(value),
             ),
-            onChanged: (value) => _performSearch(value),
           ),
-        ),
 
-        // Category Filter Chips
-        SizedBox(
-          height: 45,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: _categoryFilters.length,
-            itemBuilder: (context, index) {
-              final cat = _categoryFilters[index];
-              final key = cat['key'] as String;
-              final isSelected = _selectedCategory == key;
-              return Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: FilterChip(
-                  avatar: Icon(cat['icon'] as IconData, size: 18,
-                      color: isSelected ? Colors.white : const Color(0xFFFF5722)),
-                  label: Text(_getCategoryLabel(l10n, key)),
-                  selected: isSelected,
-                  selectedColor: const Color(0xFFFF5722),
-                  labelStyle: TextStyle(
-                    color: isSelected ? Colors.white : Colors.black87,
-                    fontSize: 13,
+          // Category Filter Chips
+          SizedBox(
+            height: 48,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: _categoryFilters.length,
+              itemBuilder: (context, index) {
+                final cat = _categoryFilters[index];
+                final key = cat['key'] as String;
+                final isSelected = _selectedCategory == key;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: NeuChip(
+                    label: _getCategoryLabel(l10n, key),
+                    isSelected: isSelected,
+                    avatar: Icon(cat['icon'] as IconData, size: 16,
+                        color: isSelected ? Colors.white : NeuColors.accent),
+                    onTap: () {
+                      setState(() {
+                        _selectedCategory = isSelected ? '' : key;
+                      });
+                      _performSearch(_searchController.text);
+                    },
                   ),
-                  onSelected: (selected) {
-                    setState(() {
-                      _selectedCategory = selected ? key : '';
-                    });
-                    _performSearch(_searchController.text);
-                  },
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
+          const SizedBox(height: 8),
 
-        // Results
-        Expanded(
-          child: _isSearching
-              ? const Center(child: CircularProgressIndicator(color: Color(0xFFFF5722)))
-              : _buildResults(l10n),
-        ),
-      ],
+          // Results
+          Expanded(
+            child: _isSearching
+                ? const Center(child: CircularProgressIndicator(color: NeuColors.accent))
+                : _buildResults(l10n),
+          ),
+        ],
+      ),
     );
   }
 
@@ -184,11 +174,15 @@ class _SearchScreenState extends State<SearchScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.search_off, size: 80, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            Text(l10n.noResultsFound, style: TextStyle(fontSize: 18, color: Colors.grey[600])),
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: NeuDecoration.raised(radius: 40),
+              child: const Icon(Icons.search_off_rounded, size: 50, color: NeuColors.textHint),
+            ),
+            const SizedBox(height: 20),
+            Text(l10n.noResultsFound, style: const TextStyle(fontSize: 18, color: NeuColors.textSecondary, fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
-            Text(l10n.tryAnotherSearch, style: TextStyle(fontSize: 14, color: Colors.grey[500])),
+            Text(l10n.tryAnotherSearch, style: const TextStyle(fontSize: 14, color: NeuColors.textHint)),
           ],
         ),
       );
@@ -200,7 +194,7 @@ class _SearchScreenState extends State<SearchScreen> {
         // Restaurant results
         if (_restaurantResults.isNotEmpty) ...[
           Text(l10n.restaurants,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: NeuColors.textPrimary)),
           const SizedBox(height: 12),
           ..._restaurantResults.map((r) => _buildRestaurantTile(r, l10n)),
           const SizedBox(height: 24),
@@ -209,7 +203,7 @@ class _SearchScreenState extends State<SearchScreen> {
         // Menu item results
         if (_menuResults.isNotEmpty) ...[
           Text('${l10n.dishes} (${_menuResults.length})',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: NeuColors.textPrimary)),
           const SizedBox(height: 12),
           ..._menuResults.map((item) => _buildMenuItemTile(item, l10n)),
         ],
@@ -223,10 +217,14 @@ class _SearchScreenState extends State<SearchScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.search, size: 80, color: Colors.grey[300]),
-            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: NeuDecoration.raised(radius: 40),
+              child: const Icon(Icons.search_rounded, size: 50, color: NeuColors.textHint),
+            ),
+            const SizedBox(height: 20),
             Text(l10n.searchRestaurantsAndDishes,
-                style: TextStyle(fontSize: 16, color: Colors.grey[500])),
+                style: const TextStyle(fontSize: 16, color: NeuColors.textHint)),
           ],
         ),
       );
@@ -238,16 +236,21 @@ class _SearchScreenState extends State<SearchScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(l10n.recentSearches,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: NeuColors.textPrimary)),
           const SizedBox(height: 12),
-          ..._recentSearches.map((search) => ListTile(
-                leading: const Icon(Icons.history, color: Colors.grey),
-                title: Text(search),
-                onTap: () {
-                  _searchController.text = search;
-                  _performSearch(search);
-                },
-                contentPadding: EdgeInsets.zero,
+          ..._recentSearches.map((search) => Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                decoration: NeuDecoration.raised(radius: 12, intensity: 0.5),
+                child: ListTile(
+                  leading: const Icon(Icons.history_rounded, color: NeuColors.textHint),
+                  title: Text(search, style: const TextStyle(color: NeuColors.textPrimary)),
+                  onTap: () {
+                    _searchController.text = search;
+                    _performSearch(search);
+                  },
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
               )),
         ],
       ),
@@ -255,52 +258,53 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildRestaurantTile(RestaurantModel restaurant, AppLocalizations l10n) {
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(12),
-        leading: Container(
-          width: 56,
-          height: 56,
-          decoration: BoxDecoration(
-            color: const Color(0xFFFF5722).withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
+      decoration: NeuDecoration.raised(radius: 14),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(14),
+        child: ListTile(
+          contentPadding: const EdgeInsets.all(12),
+          leading: Container(
+            width: 56,
+            height: 56,
+            decoration: NeuDecoration.pressed(radius: 12),
+            child: restaurant.coverImageUrl != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(restaurant.coverImageUrl!, fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) =>
+                            const Icon(Icons.restaurant_rounded, color: NeuColors.accent)),
+                  )
+                : const Icon(Icons.restaurant_rounded, color: NeuColors.accent),
           ),
-          child: restaurant.coverImageUrl != null
-              ? ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.network(restaurant.coverImageUrl!, fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) =>
-                          const Icon(Icons.restaurant, color: Color(0xFFFF5722))),
-                )
-              : const Icon(Icons.restaurant, color: Color(0xFFFF5722)),
+          title: Text(restaurant.name, style: const TextStyle(fontWeight: FontWeight.bold, color: NeuColors.textPrimary)),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (restaurant.category.isNotEmpty)
+                Text(restaurant.category, style: const TextStyle(fontSize: 12, color: NeuColors.textSecondary)),
+              if (restaurant.averageRating > 0)
+                Row(
+                  children: [
+                    const Icon(Icons.star_rounded, size: 14, color: Colors.amber),
+                    const SizedBox(width: 4),
+                    Text('${restaurant.averageRating.toStringAsFixed(1)} (${restaurant.totalReviews})',
+                        style: const TextStyle(fontSize: 12, color: NeuColors.textSecondary)),
+                  ],
+                ),
+            ],
+          ),
+          trailing: Text('${restaurant.approvedItemsCount} ${l10n.dishes}',
+              style: const TextStyle(fontSize: 12, color: NeuColors.textHint)),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => RestaurantMenuScreen(restaurant: restaurant)),
+            );
+          },
         ),
-        title: Text(restaurant.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (restaurant.category.isNotEmpty)
-              Text(restaurant.category, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-            if (restaurant.averageRating > 0)
-              Row(
-                children: [
-                  const Icon(Icons.star, size: 14, color: Colors.amber),
-                  const SizedBox(width: 4),
-                  Text('${restaurant.averageRating.toStringAsFixed(1)} (${restaurant.totalReviews})',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-                ],
-              ),
-          ],
-        ),
-        trailing: Text('${restaurant.approvedItemsCount} ${l10n.dishes}',
-            style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => RestaurantMenuScreen(restaurant: restaurant)),
-          );
-        },
       ),
     );
   }
@@ -312,53 +316,59 @@ class _SearchScreenState extends State<SearchScreen> {
         .where((p) => p.menuItemId == item.id && p.isActive)
         .fold<DishPromotion?>(null, (prev, p) => prev ?? p);
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(8),
-        leading: item.imageUrl != null
-            ? ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.network(item.imageUrl!, width: 50, height: 50, fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                        width: 50, height: 50, color: Colors.grey[200],
-                        child: const Icon(Icons.restaurant))),
-              )
-            : Container(
-                width: 50, height: 50,
-                decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(8)),
-                child: const Icon(Icons.restaurant)),
-        title: Text(item.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-        subtitle: Text(item.category, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-        trailing: promo != null
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text('${item.price.toStringAsFixed(0)} ${l10n.dhs}',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                        decoration: TextDecoration.lineThrough,
-                      )),
-                  Text('${promo.promoPrice.toStringAsFixed(0)} ${l10n.dhs}',
-                      style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFF5722))),
-                ],
-              )
-            : Text('${item.price.toStringAsFixed(2)} ${l10n.dhs}',
-                style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFF5722))),
-        onTap: () async {
-          // Navigate to the restaurant menu
-          final restaurant = await clientProvider.getRestaurantById(item.restaurantId);
-          if (restaurant != null && mounted) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => RestaurantMenuScreen(restaurant: restaurant),
-              ),
-            );
-          }
-        },
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: NeuDecoration.raised(radius: 14),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(14),
+        child: ListTile(
+          contentPadding: const EdgeInsets.all(10),
+          leading: item.imageUrl != null
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.network(item.imageUrl!, width: 50, height: 50, fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                          width: 50, height: 50,
+                          decoration: NeuDecoration.pressed(radius: 10),
+                          child: const Icon(Icons.restaurant_rounded, color: NeuColors.textHint))),
+                )
+              : Container(
+                  width: 50, height: 50,
+                  decoration: NeuDecoration.pressed(radius: 10),
+                  child: const Icon(Icons.restaurant_rounded, color: NeuColors.textHint)),
+          title: Text(item.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: NeuColors.textPrimary)),
+          subtitle: Text(item.category, style: const TextStyle(fontSize: 12, color: NeuColors.textSecondary)),
+          trailing: promo != null
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text('${item.price.toStringAsFixed(0)} ${l10n.dhs}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: NeuColors.textHint,
+                          decoration: TextDecoration.lineThrough,
+                        )),
+                    Text('${promo.promoPrice.toStringAsFixed(0)} ${l10n.dhs}',
+                        style: const TextStyle(fontWeight: FontWeight.bold, color: NeuColors.accent)),
+                  ],
+                )
+              : Text('${item.price.toStringAsFixed(2)} ${l10n.dhs}',
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: NeuColors.accent)),
+          onTap: () async {
+            // Navigate to the restaurant menu
+            final restaurant = await clientProvider.getRestaurantById(item.restaurantId);
+            if (restaurant != null && mounted) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RestaurantMenuScreen(restaurant: restaurant),
+                ),
+              );
+            }
+          },
+        ),
       ),
     );
   }

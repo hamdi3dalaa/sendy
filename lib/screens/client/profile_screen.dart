@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:sendy/l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/client_provider.dart';
+import '../../theme/neumorphic_theme.dart';
 import 'saved_addresses_screen.dart';
 import 'restaurant_menu_screen.dart';
 
@@ -17,67 +18,56 @@ class ProfileScreen extends StatelessWidget {
     final clientProvider = Provider.of<ClientProvider>(context);
     final user = authProvider.currentUser;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          // User Info Card
-          Card(
-            elevation: 3,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            child: Padding(
+    return Container(
+      color: NeuColors.background,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            // User Info Card
+            Container(
               padding: const EdgeInsets.all(24),
+              decoration: NeuDecoration.raised(radius: 20),
               child: Column(
                 children: [
-                  CircleAvatar(
-                    radius: 45,
-                    backgroundColor: const Color(0xFFFF5722).withOpacity(0.1),
-                    child: const Icon(Icons.person,
-                        size: 50, color: Color(0xFFFF5722)),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: NeuDecoration.pressed(radius: 50),
+                    child: const Icon(Icons.person_rounded,
+                        size: 50, color: NeuColors.accent),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     user?.displayName ?? l10n.client,
                     style: const TextStyle(
-                        fontSize: 22, fontWeight: FontWeight.bold),
+                        fontSize: 22, fontWeight: FontWeight.bold, color: NeuColors.textPrimary),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     user?.phoneNumber ?? '',
-                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                    style: const TextStyle(fontSize: 16, color: NeuColors.textSecondary),
                   ),
                 ],
               ),
             ),
-          ),
-          const SizedBox(height: 24),
+            const SizedBox(height: 24),
 
-          // Language Switcher
-          Card(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            child: ListTile(
-              leading: const Icon(Icons.language, color: Color(0xFFFF5722)),
-              title: Text(l10n.language),
-              subtitle: Text(authProvider.locale.languageCode == 'fr'
+            // Language Switcher
+            _buildNeuMenuTile(
+              icon: Icons.language_rounded,
+              title: l10n.language,
+              subtitle: authProvider.locale.languageCode == 'fr'
                   ? l10n.french
-                  : l10n.arabic),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                  : l10n.arabic,
               onTap: () => _showLanguageDialog(context, l10n, authProvider),
             ),
-          ),
-          const SizedBox(height: 12),
+            const SizedBox(height: 12),
 
-          // Saved Addresses
-          Card(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            child: ListTile(
-              leading: const Icon(Icons.location_on, color: Color(0xFFFF5722)),
-              title: Text(l10n.savedAddresses),
-              subtitle: Text('${clientProvider.savedAddresses.length}'),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            // Saved Addresses
+            _buildNeuMenuTile(
+              icon: Icons.location_on_rounded,
+              title: l10n.savedAddresses,
+              subtitle: '${clientProvider.savedAddresses.length}',
               onTap: () {
                 Navigator.push(
                   context,
@@ -86,54 +76,107 @@ class ProfileScreen extends StatelessWidget {
                 );
               },
             ),
-          ),
-          const SizedBox(height: 12),
+            const SizedBox(height: 12),
 
-          // Favorites
-          Card(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            child: ListTile(
-              leading: const Icon(Icons.favorite, color: Color(0xFFFF5722)),
-              title: Text(l10n.favorites),
-              subtitle: Text('${clientProvider.favoriteRestaurantIds.length}'),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            // Favorites
+            _buildNeuMenuTile(
+              icon: Icons.favorite_rounded,
+              title: l10n.favorites,
+              subtitle: '${clientProvider.favoriteRestaurantIds.length}',
               onTap: () => _showFavorites(context, l10n, clientProvider),
             ),
-          ),
-          const SizedBox(height: 12),
+            const SizedBox(height: 12),
 
-          // Settings
-          Card(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            child: ListTile(
-              leading: const Icon(Icons.settings, color: Color(0xFFFF5722)),
-              title: Text(l10n.settings),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            // Settings
+            _buildNeuMenuTile(
+              icon: Icons.settings_rounded,
+              title: l10n.settings,
               onTap: () {},
             ),
-          ),
-          const SizedBox(height: 24),
+            const SizedBox(height: 24),
 
-          // Logout Button
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () => _confirmLogout(context, l10n, authProvider),
-              icon: const Icon(Icons.logout),
-              label: Text(l10n.logout),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+            // Logout Button
+            GestureDetector(
+              onTap: () => _confirmLogout(context, l10n, authProvider),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                decoration: BoxDecoration(
+                  color: NeuColors.background,
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: NeuColors.lightShadow.withOpacity(0.8),
+                      offset: const Offset(-4, -4),
+                      blurRadius: 8,
+                    ),
+                    BoxShadow(
+                      color: Colors.red.withOpacity(0.15),
+                      offset: const Offset(4, 4),
+                      blurRadius: 8,
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.logout_rounded, color: NeuColors.error),
+                    const SizedBox(width: 8),
+                    Text(l10n.logout, style: const TextStyle(
+                      color: NeuColors.error,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    )),
+                  ],
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 16),
-        ],
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNeuMenuTile({
+    required IconData icon,
+    required String title,
+    String? subtitle,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: NeuDecoration.raised(radius: 14),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: NeuDecoration.pressed(radius: 12),
+              child: Icon(icon, color: NeuColors.accent, size: 22),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    color: NeuColors.textPrimary,
+                  )),
+                  if (subtitle != null)
+                    Text(subtitle, style: const TextStyle(
+                      fontSize: 13,
+                      color: NeuColors.textSecondary,
+                    )),
+                ],
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: NeuColors.textHint),
+          ],
+        ),
       ),
     );
   }
@@ -143,32 +186,53 @@ class ProfileScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(l10n.switchLanguage),
+        backgroundColor: NeuColors.background,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(l10n.switchLanguage, style: const TextStyle(color: NeuColors.textPrimary)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ListTile(
-              leading: const Text('🇫🇷', style: TextStyle(fontSize: 24)),
-              title: Text(l10n.french),
-              trailing: authProvider.locale.languageCode == 'fr'
-                  ? const Icon(Icons.check, color: Color(0xFFFF5722))
-                  : null,
-              onTap: () {
-                authProvider.changeLanguage('fr');
-                Navigator.pop(context);
-              },
+            _buildLanguageOption(
+              context, authProvider,
+              flag: '🇫🇷', label: l10n.french, code: 'fr',
+              isSelected: authProvider.locale.languageCode == 'fr',
             ),
-            ListTile(
-              leading: const Text('🇲🇦', style: TextStyle(fontSize: 24)),
-              title: Text(l10n.arabic),
-              trailing: authProvider.locale.languageCode == 'ar'
-                  ? const Icon(Icons.check, color: Color(0xFFFF5722))
-                  : null,
-              onTap: () {
-                authProvider.changeLanguage('fr');
-                Navigator.pop(context);
-              },
+            const SizedBox(height: 8),
+            _buildLanguageOption(
+              context, authProvider,
+              flag: '🇲🇦', label: l10n.arabic, code: 'ar',
+              isSelected: authProvider.locale.languageCode == 'ar',
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLanguageOption(
+    BuildContext context, AuthProvider authProvider, {
+    required String flag,
+    required String label,
+    required String code,
+    required bool isSelected,
+  }) {
+    return GestureDetector(
+      onTap: () {
+        authProvider.changeLanguage(code);
+        Navigator.pop(context);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: isSelected
+            ? NeuDecoration.pressed(radius: 12)
+            : NeuDecoration.raised(radius: 12),
+        child: Row(
+          children: [
+            Text(flag, style: const TextStyle(fontSize: 24)),
+            const SizedBox(width: 12),
+            Expanded(child: Text(label, style: const TextStyle(fontSize: 16, color: NeuColors.textPrimary))),
+            if (isSelected)
+              const Icon(Icons.check_circle_rounded, color: NeuColors.accent),
           ],
         ),
       ),
@@ -186,22 +250,28 @@ class ProfileScreen extends StatelessWidget {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text(l10n.favorites),
+          backgroundColor: NeuColors.background,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text(l10n.favorites, style: const TextStyle(color: NeuColors.textPrimary)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.favorite_border, size: 60, color: Colors.grey[400]),
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: NeuDecoration.raised(radius: 40),
+                child: const Icon(Icons.favorite_border_rounded, size: 40, color: NeuColors.textHint),
+              ),
               const SizedBox(height: 16),
-              Text(l10n.noFavorites, style: TextStyle(color: Colors.grey[600])),
+              Text(l10n.noFavorites, style: const TextStyle(color: NeuColors.textSecondary)),
               const SizedBox(height: 8),
               Text(l10n.favoritesWillAppear,
-                  style: TextStyle(fontSize: 13, color: Colors.grey[500])),
+                  style: const TextStyle(fontSize: 13, color: NeuColors.textHint)),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
+              child: const Text('OK', style: TextStyle(color: NeuColors.accent)),
             ),
           ],
         ),
@@ -213,54 +283,55 @@ class ProfileScreen extends StatelessWidget {
       context,
       MaterialPageRoute(
         builder: (context) => Scaffold(
+          backgroundColor: NeuColors.background,
           appBar: AppBar(
             title: Text(l10n.favorites),
-            backgroundColor: const Color(0xFFFF5722),
+            backgroundColor: NeuColors.accent,
+            foregroundColor: Colors.white,
+            elevation: 0,
           ),
           body: ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: favoriteRestaurants.length,
             itemBuilder: (context, index) {
               final restaurant = favoriteRestaurants[index];
-              return Card(
+              return Container(
                 margin: const EdgeInsets.only(bottom: 12),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.all(12),
-                  leading: Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFF5722).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
+                decoration: NeuDecoration.raised(radius: 14),
+                child: Material(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(14),
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.all(12),
+                    leading: Container(
+                      width: 50,
+                      height: 50,
+                      decoration: NeuDecoration.pressed(radius: 12),
+                      child: const Icon(Icons.restaurant_rounded, color: NeuColors.accent),
                     ),
-                    child:
-                        const Icon(Icons.restaurant, color: Color(0xFFFF5722)),
+                    title: Text(restaurant.name,
+                        style: const TextStyle(fontWeight: FontWeight.bold, color: NeuColors.textPrimary)),
+                    subtitle: restaurant.averageRating > 0
+                        ? Row(
+                            children: [
+                              const Icon(Icons.star_rounded, size: 14, color: Colors.amber),
+                              const SizedBox(width: 4),
+                              Text('${restaurant.averageRating.toStringAsFixed(1)}',
+                                  style: const TextStyle(color: NeuColors.textSecondary)),
+                            ],
+                          )
+                        : null,
+                    trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: NeuColors.textHint),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              RestaurantMenuScreen(restaurant: restaurant),
+                        ),
+                      );
+                    },
                   ),
-                  title: Text(restaurant.name,
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: restaurant.averageRating > 0
-                      ? Row(
-                          children: [
-                            const Icon(Icons.star,
-                                size: 14, color: Colors.amber),
-                            const SizedBox(width: 4),
-                            Text(
-                                '${restaurant.averageRating.toStringAsFixed(1)}'),
-                          ],
-                        )
-                      : null,
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            RestaurantMenuScreen(restaurant: restaurant),
-                      ),
-                    );
-                  },
                 ),
               );
             },
@@ -275,19 +346,21 @@ class ProfileScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(l10n.logout),
-        content: Text(l10n.logoutConfirm),
+        backgroundColor: NeuColors.background,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(l10n.logout, style: const TextStyle(color: NeuColors.textPrimary)),
+        content: Text(l10n.logoutConfirm, style: const TextStyle(color: NeuColors.textSecondary)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(l10n.cancel),
+            child: Text(l10n.cancel, style: const TextStyle(color: NeuColors.textSecondary)),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               authProvider.signOut();
             },
-            child: Text(l10n.logout, style: const TextStyle(color: Colors.red)),
+            child: Text(l10n.logout, style: const TextStyle(color: NeuColors.error, fontWeight: FontWeight.bold)),
           ),
         ],
       ),

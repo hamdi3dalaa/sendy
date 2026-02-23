@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:sendy/l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/client_provider.dart';
+import '../../theme/neumorphic_theme.dart';
 import 'restaurants_list_screen.dart';
 import 'my_orders_screen.dart';
 import 'search_screen.dart';
@@ -45,10 +46,15 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     ];
 
     return Scaffold(
+      backgroundColor: NeuColors.background,
       appBar: AppBar(
-        title: const Text('SENDY'),
-        backgroundColor: const Color(0xFFFF5722),
+        title: const Text(
+          'SENDY',
+          style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5),
+        ),
+        backgroundColor: NeuColors.accent,
         foregroundColor: Colors.white,
+        elevation: 0,
         actions: [
           Stack(
             children: [
@@ -80,13 +86,20 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                     if (count == 0) return const SizedBox();
                     return Container(
                       padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: Colors.red,
                         shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.red.withOpacity(0.4),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       constraints: const BoxConstraints(
-                        minWidth: 16,
-                        minHeight: 16,
+                        minWidth: 18,
+                        minHeight: 18,
                       ),
                       child: Text(
                         count.toString(),
@@ -109,34 +122,41 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
         index: _selectedIndex,
         children: screens,
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: const Color(0xFFFF5722),
-        unselectedItemColor: Colors.grey,
-        items: [
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.home),
-            label: l10n.home,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.search),
-            label: l10n.search,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.receipt_long),
-            label: l10n.myOrders,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.person),
-            label: l10n.profile,
-          ),
-        ],
+      bottomNavigationBar: Container(
+        decoration: neuBottomNavDecoration(),
+        child: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: NeuColors.background,
+          selectedItemColor: NeuColors.accent,
+          unselectedItemColor: NeuColors.textHint,
+          selectedFontSize: 12,
+          unselectedFontSize: 11,
+          elevation: 0,
+          items: [
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.home_rounded),
+              label: l10n.home,
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.search_rounded),
+              label: l10n.search,
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.receipt_long_rounded),
+              label: l10n.myOrders,
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.person_rounded),
+              label: l10n.profile,
+            ),
+          ],
+        ),
       ),
     );
   }
