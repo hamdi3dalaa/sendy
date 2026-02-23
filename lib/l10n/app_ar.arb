@@ -374,5 +374,8 @@
   "totalDeliveryPersons": "إجمالي السائقين",
   "overThreshold": "فوق الحد",
   "totalOwed": "إجمالي المستحق",
-  "amountDue": "المبلغ المستحق"
+  "amountDue": "المبلغ المستحق",
+  "myPositionMap": "موقعي على الخريطة",
+  "tapToExpandMap": "اضغط للتكبير",
+  "tapToShrinkMap": "اضغط للتصغير"
 }

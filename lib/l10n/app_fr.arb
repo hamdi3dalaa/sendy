@@ -374,5 +374,8 @@
   "totalDeliveryPersons": "Total livreurs",
   "overThreshold": "Au-dessus du seuil",
   "totalOwed": "Total dû",
-  "amountDue": "Montant dû"
+  "amountDue": "Montant dû",
+  "myPositionMap": "Ma position sur la carte",
+  "tapToExpandMap": "Appuyez pour agrandir",
+  "tapToShrinkMap": "Appuyez pour réduire"
 }

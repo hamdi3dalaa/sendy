@@ -1105,4 +1105,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get minimumDiscountError => 'يجب أن يكون التخفيض 1% على الأقل';
+
+  // Delivery map
+  @override
+  String get myPositionMap => 'موقعي على الخريطة';
+  @override
+  String get tapToExpandMap => 'اضغط للتكبير';
+  @override
+  String get tapToShrinkMap => 'اضغط للتصغير';
 }

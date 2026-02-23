@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sendy/l10n/app_localizations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../providers/auth_provider.dart';
@@ -24,6 +25,8 @@ class DeliveryHomeScreen extends StatefulWidget {
 
 class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
   bool _isAvailable = false;
+  bool _isMapExpanded = false;
+  GoogleMapController? _mapController;
   LocationProvider? _locationProvider;
 
   @override
@@ -309,29 +312,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
             ),
             const SizedBox(height: 20),
             if (locationProvider.currentPosition != null)
-              NeuCard(
-                padding: EdgeInsets.zero,
-                child: ListTile(
-                  leading: const Icon(
-                    Icons.location_on,
-                    color: NeuColors.accent,
-                  ),
-                  title: Text(
-                    l10n.currentPosition,
-                    style: const TextStyle(color: NeuColors.textPrimary),
-                  ),
-                  subtitle: Text(
-                    'Lat: ${locationProvider.currentPosition!.latitude.toStringAsFixed(4)}\n'
-                    'Lng: ${locationProvider.currentPosition!.longitude.toStringAsFixed(4)}',
-                    style: const TextStyle(color: NeuColors.textSecondary),
-                  ),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.refresh, color: NeuColors.accent),
-                    onPressed: () => locationProvider.initializeLocation(),
-                    tooltip: l10n.refresh,
-                  ),
-                ),
-              )
+              _buildMapCard(locationProvider, l10n)
             else
               NeuCard(
                 padding: EdgeInsets.zero,
@@ -403,6 +384,110 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildMapCard(LocationProvider locationProvider, AppLocalizations l10n) {
+    final position = locationProvider.currentPosition!;
+    final latLng = LatLng(position.latitude, position.longitude);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: NeuDecoration.raised(radius: 16),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          // Map header with expand/collapse toggle
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _isMapExpanded = !_isMapExpanded;
+              });
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              color: NeuColors.background,
+              child: Row(
+                children: [
+                  const Icon(Icons.map, color: NeuColors.accent, size: 22),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.myPositionMap,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: NeuColors.textPrimary,
+                          ),
+                        ),
+                        Text(
+                          _isMapExpanded ? l10n.tapToShrinkMap : l10n.tapToExpandMap,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: NeuColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.my_location, color: NeuColors.accent, size: 20),
+                    onPressed: () {
+                      _mapController?.animateCamera(
+                        CameraUpdate.newLatLng(latLng),
+                      );
+                    },
+                    tooltip: l10n.currentPosition,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                  const SizedBox(width: 8),
+                  AnimatedRotation(
+                    turns: _isMapExpanded ? 0.5 : 0,
+                    duration: const Duration(milliseconds: 300),
+                    child: const Icon(
+                      Icons.expand_more,
+                      color: NeuColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Animated map container
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.easeInOut,
+            height: _isMapExpanded ? 300 : 150,
+            child: GoogleMap(
+              initialCameraPosition: CameraPosition(
+                target: latLng,
+                zoom: 15,
+              ),
+              markers: {
+                Marker(
+                  markerId: const MarkerId('my_position'),
+                  position: latLng,
+                  icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+                  infoWindow: InfoWindow(title: l10n.myLocation),
+                ),
+              },
+              myLocationEnabled: true,
+              myLocationButtonEnabled: false,
+              zoomControlsEnabled: _isMapExpanded,
+              mapToolbarEnabled: false,
+              compassEnabled: _isMapExpanded,
+              liteModeEnabled: false,
+              onMapCreated: (controller) {
+                _mapController = controller;
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -690,6 +775,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
     if (_isAvailable) {
       _locationProvider?.stopTracking();
     }
+    _mapController?.dispose();
     super.dispose();
   }
 }

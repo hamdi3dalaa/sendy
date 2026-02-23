@@ -2065,6 +2065,11 @@ abstract class AppLocalizations {
   String get upcoming;
   String get active;
   String get minimumDiscountError;
+
+  // Delivery map
+  String get myPositionMap;
+  String get tapToExpandMap;
+  String get tapToShrinkMap;
 }
 
 class _AppLocalizationsDelegate
