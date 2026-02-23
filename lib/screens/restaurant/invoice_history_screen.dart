@@ -7,6 +7,7 @@ import 'package:sendy/l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/order_model.dart';
 import '../../services/invoice_service.dart';
+import '../../theme/neumorphic_theme.dart';
 
 class InvoiceHistoryScreen extends StatefulWidget {
   const InvoiceHistoryScreen({Key? key}) : super(key: key);
@@ -88,9 +89,12 @@ class _InvoiceHistoryScreenState extends State<InvoiceHistoryScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
+      backgroundColor: NeuColors.background,
       appBar: AppBar(
         title: Text(l10n.invoiceHistory),
-        backgroundColor: const Color(0xFFFF5722),
+        backgroundColor: NeuColors.accent,
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: Column(
         children: [
@@ -99,12 +103,7 @@ class _InvoiceHistoryScreenState extends State<InvoiceHistoryScreen> {
             width: double.infinity,
             margin: const EdgeInsets.all(16),
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFFFF5722), Color(0xFFFF8A65)],
-              ),
-              borderRadius: BorderRadius.circular(16),
-            ),
+            decoration: NeuDecoration.accentRaised(radius: 16),
             child: Column(
               children: [
                 Text(
@@ -140,8 +139,10 @@ class _InvoiceHistoryScreenState extends State<InvoiceHistoryScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                Text(l10n.period,
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                const Text('Periode',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: NeuColors.textPrimary)),
                 const SizedBox(width: 12),
                 Expanded(
                   child: SingleChildScrollView(
@@ -164,20 +165,27 @@ class _InvoiceHistoryScreenState extends State<InvoiceHistoryScreen> {
           // Orders list
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(
+                    child: CircularProgressIndicator(
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(NeuColors.accent),
+                    ),
+                  )
                 : _orders.isEmpty
                     ? Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.receipt_long,
-                                size: 80, color: Colors.grey[400]),
+                            const Icon(Icons.receipt_long,
+                                size: 80, color: NeuColors.textHint),
                             const SizedBox(height: 16),
                             Text(l10n.noInvoices,
-                                style: TextStyle(
-                                    fontSize: 16, color: Colors.grey[600])),
+                                style: const TextStyle(
+                                    fontSize: 16,
+                                    color: NeuColors.textSecondary)),
                             Text(l10n.invoicesWillAppear,
-                                style: TextStyle(color: Colors.grey[500])),
+                                style: const TextStyle(
+                                    color: NeuColors.textHint)),
                           ],
                         ),
                       )
@@ -200,81 +208,83 @@ class _InvoiceHistoryScreenState extends State<InvoiceHistoryScreen> {
     final isSelected = _selectedPeriod == value;
     return Padding(
       padding: const EdgeInsets.only(right: 8),
-      child: ChoiceChip(
-        label: Text(label),
-        selected: isSelected,
-        selectedColor: const Color(0xFFFF5722),
-        labelStyle: TextStyle(
-          color: isSelected ? Colors.white : Colors.black87,
-        ),
-        onSelected: (selected) {
-          if (selected) {
-            setState(() => _selectedPeriod = value);
-            _loadOrders();
-          }
+      child: NeuChip(
+        label: label,
+        isSelected: isSelected,
+        onTap: () {
+          setState(() => _selectedPeriod = value);
+          _loadOrders();
         },
       ),
     );
   }
 
   Widget _buildOrderCard(OrderModel order, AppLocalizations l10n) {
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        leading: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: const Color(0xFFFF5722).withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
+      decoration: NeuDecoration.raised(radius: 12),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        clipBehavior: Clip.antiAlias,
+        child: ListTile(
+          leading: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: NeuColors.accent.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(Icons.receipt, color: NeuColors.accent),
           ),
-          child: const Icon(Icons.receipt, color: Color(0xFFFF5722)),
-        ),
-        title: Text(
-          '${l10n.orderNumber} #${order.orderId.substring(0, 8).toUpperCase()}',
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(DateFormat('dd/MM/yyyy HH:mm').format(order.createdAt)),
-            Text(
-              '${order.items.length} ${order.items.length > 1 ? l10n.articles : l10n.article}',
-              style: TextStyle(color: Colors.grey[600]),
-            ),
-          ],
-        ),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              '${order.total.toStringAsFixed(2)} ${l10n.dhs}',
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Color(0xFFFF5722),
-                fontSize: 16,
+          title: Text(
+            '${l10n.orderNumber} #${order.orderId.substring(0, 8).toUpperCase()}',
+            style: const TextStyle(
+                fontWeight: FontWeight.bold, color: NeuColors.textPrimary),
+          ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(DateFormat('dd/MM/yyyy HH:mm').format(order.createdAt),
+                  style: const TextStyle(color: NeuColors.textSecondary)),
+              Text(
+                '${order.items.length} ${order.items.length > 1 ? l10n.articles : l10n.article}',
+                style: const TextStyle(color: NeuColors.textHint),
               ),
-            ),
-            const SizedBox(height: 4),
-            InkWell(
-              onTap: () =>
-                  InvoiceService.generateAndDownloadInvoice(order, l10n),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.download, size: 16, color: Colors.blue),
-                  const SizedBox(width: 4),
-                  Text(
-                    l10n.invoice,
-                    style: const TextStyle(
-                      color: Colors.blue,
-                      fontSize: 12,
+            ],
+          ),
+          trailing: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '${order.total.toStringAsFixed(2)} ${l10n.dhs}',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: NeuColors.accent,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 4),
+              InkWell(
+                onTap: () =>
+                    InvoiceService.generateAndDownloadInvoice(order, l10n),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.download, size: 16, color: Colors.blue),
+                    SizedBox(width: 4),
+                    Text(
+                      'Facture',
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: 12,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

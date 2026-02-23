@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:sendy/l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/client_provider.dart';
+import '../../theme/neumorphic_theme.dart';
 import '../client/restaurants_list_screen.dart';
 import '../client/search_screen.dart';
 import '../client/my_orders_screen.dart';
@@ -44,34 +45,40 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
     ];
 
     return Scaffold(
+      backgroundColor: NeuColors.background,
       body: IndexedStack(
         index: _selectedIndex,
         children: screens,
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: const Color(0xFFFF5722),
-        unselectedItemColor: Colors.grey,
-        items: [
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.admin_panel_settings),
-            label: l10n.administration,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.shopping_bag),
-            label: l10n.orderFood,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.receipt_long),
-            label: l10n.myOrders,
-          ),
-        ],
+      bottomNavigationBar: Container(
+        decoration: neuBottomNavDecoration(),
+        child: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: NeuColors.background,
+          selectedItemColor: NeuColors.accent,
+          unselectedItemColor: Colors.grey,
+          elevation: 0,
+          items: [
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.admin_panel_settings),
+              label: l10n.administration,
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.shopping_bag),
+              label: l10n.orderFood,
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.receipt_long),
+              label: l10n.myOrders,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -98,10 +105,12 @@ class _ClientOrderingViewState extends State<_ClientOrderingView> {
     ];
 
     return Scaffold(
+      backgroundColor: NeuColors.background,
       appBar: AppBar(
         title: const Text('SENDY'),
-        backgroundColor: const Color(0xFFFF5722),
+        backgroundColor: NeuColors.accent,
         foregroundColor: Colors.white,
+        elevation: 0,
         actions: [
           _buildCartIcon(context),
         ],
@@ -109,7 +118,7 @@ class _ClientOrderingViewState extends State<_ClientOrderingView> {
       body: Column(
         children: [
           Container(
-            color: Colors.white,
+            color: NeuColors.background,
             child: Row(
               children: [
                 Expanded(
@@ -121,7 +130,7 @@ class _ClientOrderingViewState extends State<_ClientOrderingView> {
                         border: Border(
                           bottom: BorderSide(
                             color: _tabIndex == 0
-                                ? const Color(0xFFFF5722)
+                                ? NeuColors.accent
                                 : Colors.transparent,
                             width: 3,
                           ),
@@ -133,8 +142,8 @@ class _ClientOrderingViewState extends State<_ClientOrderingView> {
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: _tabIndex == 0
-                              ? const Color(0xFFFF5722)
-                              : Colors.grey,
+                              ? NeuColors.accent
+                              : NeuColors.textHint,
                         ),
                       ),
                     ),
@@ -149,7 +158,7 @@ class _ClientOrderingViewState extends State<_ClientOrderingView> {
                         border: Border(
                           bottom: BorderSide(
                             color: _tabIndex == 1
-                                ? const Color(0xFFFF5722)
+                                ? NeuColors.accent
                                 : Colors.transparent,
                             width: 3,
                           ),
@@ -161,8 +170,8 @@ class _ClientOrderingViewState extends State<_ClientOrderingView> {
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: _tabIndex == 1
-                              ? const Color(0xFFFF5722)
-                              : Colors.grey,
+                              ? NeuColors.accent
+                              : NeuColors.textHint,
                         ),
                       ),
                     ),

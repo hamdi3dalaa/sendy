@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../theme/neumorphic_theme.dart';
 
 class ConfigManagementScreen extends StatefulWidget {
   const ConfigManagementScreen({Key? key}) : super(key: key);
@@ -81,7 +82,7 @@ class _ConfigManagementScreenState extends State<ConfigManagementScreen> {
       });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Configuration Twilio sauvegardée!'),
+          content: Text('Configuration Twilio sauvegardee!'),
           backgroundColor: Colors.green,
         ),
       );
@@ -107,7 +108,7 @@ class _ConfigManagementScreenState extends State<ConfigManagementScreen> {
       });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Configuration OTP sauvegardée!'),
+          content: Text('Configuration OTP sauvegardee!'),
           backgroundColor: Colors.green,
         ),
       );
@@ -118,17 +119,46 @@ class _ConfigManagementScreenState extends State<ConfigManagementScreen> {
     }
   }
 
+  InputDecoration _neuInputDecoration(String labelText, {String? hintText, String? helperText}) {
+    return InputDecoration(
+      labelText: labelText,
+      hintText: hintText,
+      helperText: helperText,
+      hintStyle: const TextStyle(color: NeuColors.textHint),
+      labelStyle: const TextStyle(color: NeuColors.textSecondary),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: NeuColors.accent, width: 1.5),
+      ),
+      filled: true,
+      fillColor: Colors.transparent,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+      return Scaffold(
+        backgroundColor: NeuColors.background,
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
     return Scaffold(
+      backgroundColor: NeuColors.background,
       appBar: AppBar(
         title: const Text('Configuration App'),
-        backgroundColor: const Color(0xFFFF5722),
+        backgroundColor: NeuColors.accent,
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -136,7 +166,8 @@ class _ConfigManagementScreenState extends State<ConfigManagementScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Twilio Configuration
-            Card(
+            Container(
+              decoration: NeuDecoration.raised(),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -144,7 +175,7 @@ class _ConfigManagementScreenState extends State<ConfigManagementScreen> {
                   children: [
                     Row(
                       children: const [
-                        const FaIcon(
+                        FaIcon(
                           FontAwesomeIcons.whatsapp,
                           size: 80,
                           color: Color(0xFF25D366),
@@ -155,64 +186,73 @@ class _ConfigManagementScreenState extends State<ConfigManagementScreen> {
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
+                            color: NeuColors.textPrimary,
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 20),
-                    TextField(
-                      controller: _accountSidController,
-                      decoration: const InputDecoration(
-                        labelText: 'Account SID',
-                        border: OutlineInputBorder(),
+                    Container(
+                      decoration: NeuDecoration.pressed(radius: 14),
+                      child: TextField(
+                        controller: _accountSidController,
+                        style: const TextStyle(color: NeuColors.textPrimary),
+                        decoration: _neuInputDecoration('Account SID'),
                       ),
                     ),
                     const SizedBox(height: 16),
-                    TextField(
-                      controller: _authTokenController,
-                      obscureText: true,
-                      decoration: const InputDecoration(
-                        labelText: 'Auth Token',
-                        border: OutlineInputBorder(),
+                    Container(
+                      decoration: NeuDecoration.pressed(radius: 14),
+                      child: TextField(
+                        controller: _authTokenController,
+                        obscureText: true,
+                        style: const TextStyle(color: NeuColors.textPrimary),
+                        decoration: _neuInputDecoration('Auth Token'),
                       ),
                     ),
                     const SizedBox(height: 16),
-                    TextField(
-                      controller: _whatsappNumberController,
-                      decoration: const InputDecoration(
-                        labelText: 'WhatsApp Number',
-                        hintText: 'whatsapp:+14155238886',
-                        border: OutlineInputBorder(),
+                    Container(
+                      decoration: NeuDecoration.pressed(radius: 14),
+                      child: TextField(
+                        controller: _whatsappNumberController,
+                        style: const TextStyle(color: NeuColors.textPrimary),
+                        decoration: _neuInputDecoration(
+                          'WhatsApp Number',
+                          hintText: 'whatsapp:+14155238886',
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
-                    TextField(
-                      controller: _contentSidController,
-                      decoration: const InputDecoration(
-                        labelText: 'Content SID (Template WhatsApp)',
-                        hintText: 'HXb5b62575e6e4ff6129ad7c8efe1f983e',
-                        border: OutlineInputBorder(),
-                        helperText: 'Template approuvé par WhatsApp',
+                    Container(
+                      decoration: NeuDecoration.pressed(radius: 14),
+                      child: TextField(
+                        controller: _contentSidController,
+                        style: const TextStyle(color: NeuColors.textPrimary),
+                        decoration: _neuInputDecoration(
+                          'Content SID (Template WhatsApp)',
+                          hintText: 'HXb5b62575e6e4ff6129ad7c8efe1f983e',
+                          helperText: 'Template approuve par WhatsApp',
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
                     SwitchListTile(
-                      title: const Text('Service activé'),
+                      title: const Text('Service active', style: TextStyle(color: NeuColors.textPrimary)),
                       value: _twilioEnabled,
                       onChanged: (value) {
                         setState(() => _twilioEnabled = value);
                       },
-                      activeColor: Colors.green,
+                      activeColor: NeuColors.accent,
                     ),
                     SwitchListTile(
-                      title: const Text('Utiliser Content Template'),
+                      title: const Text('Utiliser Content Template', style: TextStyle(color: NeuColors.textPrimary)),
                       subtitle:
-                          const Text('Désactiver pour message texte simple'),
+                          const Text('Desactiver pour message texte simple', style: TextStyle(color: NeuColors.textSecondary)),
                       value: _useContentTemplate,
                       onChanged: (value) {
                         setState(() => _useContentTemplate = value);
                       },
-                      activeColor: Colors.green,
+                      activeColor: NeuColors.accent,
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton.icon(
@@ -220,7 +260,7 @@ class _ConfigManagementScreenState extends State<ConfigManagementScreen> {
                       icon: const Icon(Icons.save),
                       label: const Text('Sauvegarder Twilio Config'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFF5722),
+                        backgroundColor: NeuColors.accent,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.all(16),
                       ),
@@ -232,59 +272,65 @@ class _ConfigManagementScreenState extends State<ConfigManagementScreen> {
             const SizedBox(height: 20),
 
             // OTP Configuration
-            Card(
+            Container(
+              decoration: NeuDecoration.raised(),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: const [
-                        Icon(Icons.lock, color: Color(0xFFFF5722), size: 32),
+                    const Row(
+                      children: [
+                        Icon(Icons.lock, color: NeuColors.accent, size: 32),
                         SizedBox(width: 10),
                         Text(
                           'Configuration OTP',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
+                            color: NeuColors.textPrimary,
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 20),
-                    TextField(
-                      controller: _otpLengthController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Longueur du code OTP',
-                        border: OutlineInputBorder(),
+                    Container(
+                      decoration: NeuDecoration.pressed(radius: 14),
+                      child: TextField(
+                        controller: _otpLengthController,
+                        keyboardType: TextInputType.number,
+                        style: const TextStyle(color: NeuColors.textPrimary),
+                        decoration: _neuInputDecoration('Longueur du code OTP'),
                       ),
                     ),
                     const SizedBox(height: 16),
-                    TextField(
-                      controller: _expiryMinutesController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Expiration (minutes)',
-                        border: OutlineInputBorder(),
+                    Container(
+                      decoration: NeuDecoration.pressed(radius: 14),
+                      child: TextField(
+                        controller: _expiryMinutesController,
+                        keyboardType: TextInputType.number,
+                        style: const TextStyle(color: NeuColors.textPrimary),
+                        decoration: _neuInputDecoration('Expiration (minutes)'),
                       ),
                     ),
                     const SizedBox(height: 16),
-                    TextField(
-                      controller: _maxAttemptsController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Tentatives max',
-                        border: OutlineInputBorder(),
+                    Container(
+                      decoration: NeuDecoration.pressed(radius: 14),
+                      child: TextField(
+                        controller: _maxAttemptsController,
+                        keyboardType: TextInputType.number,
+                        style: const TextStyle(color: NeuColors.textPrimary),
+                        decoration: _neuInputDecoration('Tentatives max'),
                       ),
                     ),
                     const SizedBox(height: 16),
-                    TextField(
-                      controller: _cooldownController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Cooldown renvoi (secondes)',
-                        border: OutlineInputBorder(),
+                    Container(
+                      decoration: NeuDecoration.pressed(radius: 14),
+                      child: TextField(
+                        controller: _cooldownController,
+                        keyboardType: TextInputType.number,
+                        style: const TextStyle(color: NeuColors.textPrimary),
+                        decoration: _neuInputDecoration('Cooldown renvoi (secondes)'),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -293,7 +339,7 @@ class _ConfigManagementScreenState extends State<ConfigManagementScreen> {
                       icon: const Icon(Icons.save),
                       label: const Text('Sauvegarder OTP Config'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFF5722),
+                        backgroundColor: NeuColors.accent,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.all(16),
                       ),

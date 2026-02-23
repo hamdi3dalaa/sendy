@@ -13,6 +13,7 @@ import 'dish_promotions_screen.dart';
 import '../../providers/client_provider.dart';
 import '../../models/order_model.dart';
 import '../../providers/order_provider.dart';
+import '../../theme/neumorphic_theme.dart';
 
 class RestaurantHomeScreen extends StatefulWidget {
   const RestaurantHomeScreen({Key? key}) : super(key: key);
@@ -45,7 +46,7 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
       // Load menu and orders in parallel
       await Future.wait([
         menuProvider.loadMenuItems(authProvider.currentUser!.uid),
-        // ✅ Load restaurant orders
+        // Load restaurant orders
         _loadRestaurantOrders(orderProvider, authProvider.currentUser!.uid),
       ]).then((_) {
         if (mounted) {
@@ -173,9 +174,12 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
         authProvider.currentUser?.restaurantName ?? 'Restaurant';
 
     return Scaffold(
+      backgroundColor: NeuColors.background,
       appBar: AppBar(
         title: Text(restaurantName),
-        backgroundColor: const Color(0xFFFF5722),
+        backgroundColor: NeuColors.accent,
+        foregroundColor: Colors.white,
+        elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -207,14 +211,14 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
         child: menuProvider.isLoading && !_isInitialized
             ? const Center(
                 child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF5722)),
+                  valueColor: AlwaysStoppedAnimation<Color>(NeuColors.accent),
                 ),
               )
             : _buildContent(context, l10n, restaurantName, menuProvider),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _navigateToMenuManagement,
-        backgroundColor: const Color(0xFFFF5722),
+        backgroundColor: NeuColors.accent,
         icon: const Icon(Icons.menu_book),
         label: Text(l10n.manageMenu),
       ),
@@ -264,27 +268,26 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                                 placeholder: (_, __) => Container(
                                   width: 100,
                                   height: 100,
-                                  color: Colors.grey[200],
+                                  color: NeuColors.background,
                                   child: const CircularProgressIndicator(),
                                 ),
                                 errorWidget: (_, __, ___) => Container(
                                   width: 100,
                                   height: 100,
-                                  color: Colors.grey[200],
+                                  color: NeuColors.background,
                                   child: const Icon(Icons.restaurant,
-                                      size: 50, color: Color(0xFFFF5722)),
+                                      size: 50, color: NeuColors.accent),
                                 ),
                               )
                             : Container(
                                 width: 100,
                                 height: 100,
                                 decoration: BoxDecoration(
-                                  color:
-                                      const Color(0xFFFF5722).withOpacity(0.1),
+                                  color: NeuColors.accent.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(50),
                                 ),
                                 child: const Icon(Icons.restaurant,
-                                    size: 50, color: Color(0xFFFF5722)),
+                                    size: 50, color: NeuColors.accent),
                               ),
                       ),
                       Positioned(
@@ -293,7 +296,7 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                         child: Container(
                           padding: const EdgeInsets.all(6),
                           decoration: const BoxDecoration(
-                            color: Color(0xFFFF5722),
+                            color: NeuColors.accent,
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(Icons.camera_alt,
@@ -324,13 +327,15 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                 const SizedBox(height: 20),
                 Text(
                   restaurantName,
-                  style: Theme.of(context).textTheme.headlineMedium,
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        color: NeuColors.textPrimary,
+                      ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 10),
-                Text(
-                  l10n.restaurantSpace,
-                  style: const TextStyle(fontSize: 18, color: Colors.grey),
+                const Text(
+                  'Espace Restaurant',
+                  style: TextStyle(fontSize: 18, color: NeuColors.textSecondary),
                 ),
               ],
             ),
@@ -338,11 +343,8 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
           const SizedBox(height: 30),
 
           // Menu Statistics Card
-          Card(
-            elevation: 4,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+          Container(
+            decoration: NeuDecoration.raised(),
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -352,7 +354,7 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                     children: [
                       const Icon(
                         Icons.menu_book,
-                        color: Color(0xFFFF5722),
+                        color: NeuColors.accent,
                         size: 28,
                       ),
                       const SizedBox(width: 12),
@@ -360,6 +362,7 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                         l10n.myMenu,
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.bold,
+                              color: NeuColors.textPrimary,
                             ),
                       ),
                       const Spacer(),
@@ -370,13 +373,13 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFF5722).withOpacity(0.1),
+                            color: NeuColors.accent.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
                             '$totalItems plat${totalItems > 1 ? 's' : ''}',
                             style: const TextStyle(
-                              color: Color(0xFFFF5722),
+                              color: NeuColors.accent,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -393,7 +396,7 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                         _buildStatColumn(
                           label: l10n.approvedItems,
                           count: approvedCount,
-                          color: Colors.green,
+                          color: NeuColors.success,
                           icon: Icons.check_circle,
                         ),
                         _buildStatColumn(
@@ -405,7 +408,7 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                         _buildStatColumn(
                           label: l10n.rejectedItems,
                           count: rejectedCount,
-                          color: Colors.red,
+                          color: NeuColors.error,
                           icon: Icons.cancel,
                         ),
                       ],
@@ -420,13 +423,13 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                           Icon(
                             Icons.visibility,
                             size: 20,
-                            color: Colors.green[700],
+                            color: NeuColors.success,
                           ),
                           const SizedBox(width: 8),
                           Text(
                             '$availableCount/$approvedCount plat${approvedCount > 1 ? 's' : ''} disponible${availableCount > 1 ? 's' : ''}',
-                            style: TextStyle(
-                              color: Colors.green[700],
+                            style: const TextStyle(
+                              color: NeuColors.success,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -441,25 +444,25 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 20),
                         child: Column(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.restaurant_menu,
                               size: 60,
-                              color: Colors.grey[400],
+                              color: NeuColors.textHint,
                             ),
                             const SizedBox(height: 12),
                             Text(
                               l10n.noMenuItems,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 16,
-                                color: Colors.grey[600],
+                                color: NeuColors.textSecondary,
                               ),
                             ),
                             const SizedBox(height: 8),
                             Text(
                               l10n.startAddingDishes,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 14,
-                                color: Colors.grey[500],
+                                color: NeuColors.textHint,
                               ),
                             ),
                           ],
@@ -477,7 +480,7 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                       totalItems > 0 ? l10n.manageMyMenu : l10n.createMenu,
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFF5722),
+                      backgroundColor: NeuColors.accent,
                       foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 48),
                       shape: RoundedRectangleBorder(
@@ -548,137 +551,83 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
           const SizedBox(height: 20),
 
           // Invoice History Card
-          Card(
-            elevation: 4,
-            shape: RoundedRectangleBorder(
+          Container(
+            decoration: NeuDecoration.raised(radius: 12),
+            child: Material(
+              color: Colors.transparent,
               borderRadius: BorderRadius.circular(12),
-            ),
-            child: ListTile(
-              leading: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.receipt_long, color: Colors.green),
-              ),
-              title: Text(
-                l10n.invoiceHistory,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              subtitle: Text(l10n.ordersSummary),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const InvoiceHistoryScreen(),
+              clipBehavior: Clip.antiAlias,
+              child: ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: NeuColors.success.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                );
-              },
+                  child: const Icon(Icons.receipt_long, color: NeuColors.success),
+                ),
+                title: Text(
+                  l10n.invoiceHistory,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: NeuColors.textPrimary),
+                ),
+                subtitle: Text(l10n.ordersSummary,
+                    style: const TextStyle(color: NeuColors.textSecondary)),
+                trailing: const Icon(Icons.arrow_forward_ios,
+                    size: 16, color: NeuColors.textHint),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const InvoiceHistoryScreen(),
+                    ),
+                  );
+                },
+              ),
             ),
           ),
           const SizedBox(height: 16),
 
           // Dish Promotions Card
-          Card(
-            elevation: 4,
-            shape: RoundedRectangleBorder(
+          Container(
+            decoration: NeuDecoration.raised(radius: 12),
+            child: Material(
+              color: Colors.transparent,
               borderRadius: BorderRadius.circular(12),
-            ),
-            child: ListTile(
-              leading: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.local_offer, color: Colors.orange),
-              ),
-              title: Text(
-                l10n.dishPromotions,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              subtitle: Text(l10n.managePromotions),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const DishPromotionsScreen(),
+              clipBehavior: Clip.antiAlias,
+              child: ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: NeuColors.accent.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                );
-              },
+                  child: const Icon(Icons.local_offer, color: NeuColors.accent),
+                ),
+                title: Text(
+                  l10n.dishPromotions,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: NeuColors.textPrimary),
+                ),
+                subtitle: Text(l10n.managePromotions,
+                    style: const TextStyle(color: NeuColors.textSecondary)),
+                trailing: const Icon(Icons.arrow_forward_ios,
+                    size: 16, color: NeuColors.textHint),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const DishPromotionsScreen(),
+                    ),
+                  );
+                },
+              ),
             ),
           ),
           const SizedBox(height: 20),
           _buildOrdersSection(context, l10n, authProvider.currentUser!.uid),
-
-          // Orders Section (placeholder)
-          // Card(
-          //   elevation: 4,
-          //   shape: RoundedRectangleBorder(
-          //     borderRadius: BorderRadius.circular(12),
-          //   ),
-          //   child: Padding(
-          //     padding: const EdgeInsets.all(20),
-          //     child: Column(
-          //       crossAxisAlignment: CrossAxisAlignment.start,
-          //       children: [
-          //         Row(
-          //           children: [
-          //             const Icon(
-          //               Icons.shopping_bag,
-          //               color: Color(0xFFFF5722),
-          //               size: 28,
-          //             ),
-          //             const SizedBox(width: 12),
-          //             Text(
-          //               l10n.ordersSection,
-          //               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-          //                     fontWeight: FontWeight.bold,
-          //                   ),
-          //             ),
-          //           ],
-          //         ),
-          //         const Divider(height: 24),
-          //         Row(
-          //           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          //           children: [
-          //             _buildStatColumn(
-          //               icon: Icons.pending,
-          //               label: 'En attente',
-          //               count: 0,
-          //               color: Colors.orange,
-          //             ),
-          //             _buildStatColumn(
-          //               icon: Icons.check_circle,
-          //               label: 'Acceptées',
-          //               count: 0,
-          //               color: Colors.green,
-          //             ),
-          //             _buildStatColumn(
-          //               icon: Icons.local_shipping,
-          //               label: 'En livraison',
-          //               count: 0,
-          //               color: Colors.blue,
-          //             ),
-          //           ],
-          //         ),
-          //         const SizedBox(height: 16),
-          //         Center(
-          //           child: Text(
-          //             'Aucune commande active',
-          //             style: TextStyle(
-          //               fontSize: 14,
-          //               color: Colors.grey[600],
-          //             ),
-          //           ),
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          // ),
         ],
       ),
     );
@@ -686,11 +635,8 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
 
   Widget _buildOrdersSection(
       BuildContext context, AppLocalizations l10n, String restaurantId) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+    return Container(
+      decoration: NeuDecoration.raised(radius: 12),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -700,7 +646,7 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
               children: [
                 const Icon(
                   Icons.shopping_bag,
-                  color: Color(0xFFFF5722),
+                  color: NeuColors.accent,
                   size: 28,
                 ),
                 const SizedBox(width: 12),
@@ -708,13 +654,14 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                   l10n.ordersSection,
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
+                        color: NeuColors.textPrimary,
                       ),
                 ),
               ],
             ),
             const Divider(height: 24),
 
-            // ✅ Use StreamBuilder to get real-time order counts
+            // Use StreamBuilder to get real-time order counts
             StreamBuilder<List<OrderModel>>(
               stream: context.read<OrderProvider>().getOrdersForUser(
                     restaurantId,
@@ -727,7 +674,7 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                       padding: EdgeInsets.all(20.0),
                       child: CircularProgressIndicator(
                         valueColor:
-                            AlwaysStoppedAnimation<Color>(Color(0xFFFF5722)),
+                            AlwaysStoppedAnimation<Color>(NeuColors.accent),
                       ),
                     ),
                   );
@@ -739,7 +686,7 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                       padding: const EdgeInsets.all(20.0),
                       child: Text(
                         'Erreur: ${snapshot.error}',
-                        style: const TextStyle(color: Colors.red),
+                        style: const TextStyle(color: NeuColors.error),
                       ),
                     ),
                   );
@@ -772,7 +719,7 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                           icon: Icons.check_circle,
                           label: 'Acceptées',
                           count: acceptedCount,
-                          color: Colors.green,
+                          color: NeuColors.success,
                         ),
                         _buildStatColumn(
                           icon: Icons.local_shipping,
@@ -784,12 +731,12 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                     ),
                     const SizedBox(height: 16),
                     if (orders.isEmpty)
-                      Center(
+                      const Center(
                         child: Text(
                           'Aucune commande active',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey[600],
+                            color: NeuColors.textSecondary,
                           ),
                         ),
                       )
@@ -797,9 +744,9 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                       Center(
                         child: Text(
                           '${orders.length} commande${orders.length > 1 ? 's' : ''} au total',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 14,
-                            color: Colors.grey[700],
+                            color: NeuColors.textPrimary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -856,7 +803,7 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
         SnackBar(
           content:
               Text(success ? l10n.imageUploadSuccess : l10n.imageUploadError),
-          backgroundColor: success ? Colors.green : Colors.red,
+          backgroundColor: success ? NeuColors.success : NeuColors.error,
         ),
       );
     }
@@ -886,6 +833,7 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
           style: const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w500,
+            color: NeuColors.textSecondary,
           ),
           textAlign: TextAlign.center,
         ),

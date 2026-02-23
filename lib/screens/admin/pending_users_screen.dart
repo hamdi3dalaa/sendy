@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../providers/admin_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/user_model.dart';
+import '../../theme/neumorphic_theme.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class PendingUsersScreen extends StatelessWidget {
@@ -20,13 +21,16 @@ class PendingUsersScreen extends StatelessWidget {
         : adminProvider.pendingRestaurants;
 
     return Scaffold(
+      backgroundColor: NeuColors.background,
       appBar: AppBar(
         title: Text(
           userType == UserType.delivery
               ? 'Livreurs en attente'
               : 'Restaurants en attente',
         ),
-        backgroundColor: const Color(0xFFFF5722),
+        backgroundColor: NeuColors.accent,
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: users.isEmpty
           ? Center(
@@ -38,14 +42,14 @@ class PendingUsersScreen extends StatelessWidget {
                         ? Icons.delivery_dining
                         : Icons.restaurant,
                     size: 80,
-                    color: Colors.grey[400],
+                    color: NeuColors.textHint,
                   ),
                   const SizedBox(height: 16),
-                  Text(
+                  const Text(
                     'Aucune demande en attente',
                     style: TextStyle(
                       fontSize: 18,
-                      color: Colors.grey[600],
+                      color: NeuColors.textSecondary,
                     ),
                   ),
                 ],
@@ -71,207 +75,205 @@ class _UserApprovalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Header
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color:
-                  (userType == UserType.delivery ? Colors.orange : Colors.green)
-                      .withOpacity(0.1),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
+      decoration: NeuDecoration.raised(),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Header
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color:
+                    (userType == UserType.delivery ? Colors.orange : Colors.green)
+                        .withOpacity(0.1),
               ),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  userType == UserType.delivery
-                      ? Icons.delivery_dining
-                      : Icons.restaurant,
-                  color: userType == UserType.delivery
-                      ? Colors.orange
-                      : Colors.green,
-                  size: 32,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        userType == UserType.delivery
-                            ? (user.name ?? 'Sans nom')
-                            : (user.restaurantName ?? user.name ?? 'Sans nom'),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        user.phoneNumber,
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
+              child: Row(
+                children: [
+                  Icon(
+                    userType == UserType.delivery
+                        ? Icons.delivery_dining
+                        : Icons.restaurant,
+                    color: userType == UserType.delivery
+                        ? Colors.orange
+                        : Colors.green,
+                    size: 32,
                   ),
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Text(
-                    'EN ATTENTE',
-                    style: TextStyle(
-                      color: Colors.orange,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          userType == UserType.delivery
+                              ? (user.name ?? 'Sans nom')
+                              : (user.restaurantName ?? user.name ?? 'Sans nom'),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: NeuColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          user.phoneNumber,
+                          style: const TextStyle(
+                            color: NeuColors.textSecondary,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ],
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Text(
+                      'EN ATTENTE',
+                      style: TextStyle(
+                        color: Colors.orange,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
 
-          // ID Card Image
-          if (user.idCardUrl != null) ...[
+            // ID Card Image
+            if (user.idCardUrl != null) ...[
+              const Divider(height: 1),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Piece d\'identite',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: NeuColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    GestureDetector(
+                      onTap: () => _showFullImage(context, user.idCardUrl!),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: CachedNetworkImage(
+                          imageUrl: user.idCardUrl!,
+                          height: 200,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Container(
+                            height: 200,
+                            color: NeuColors.background,
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            height: 200,
+                            color: NeuColors.background,
+                            child: const Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.error, size: 50, color: NeuColors.error),
+                                SizedBox(height: 8),
+                                Text('Erreur de chargement'),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.zoom_in, size: 16, color: NeuColors.textSecondary),
+                        SizedBox(width: 4),
+                        Text(
+                          'Toucher pour agrandir',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: NeuColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+
+            // Additional Info
             const Divider(height: 1),
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Pièce d\'identité',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                  _buildInfoRow(Icons.calendar_today, 'Inscrit le',
+                      _formatDate(user.createdAt)),
+                  if (user.name != null && userType == UserType.delivery)
+                    _buildInfoRow(Icons.person, 'Nom', user.name!),
+                  if (user.location != null)
+                    _buildInfoRow(
+                      Icons.location_on,
+                      'Localisation',
+                      'Lat: ${user.location!['latitude']?.toStringAsFixed(4)}, '
+                          'Lng: ${user.location!['longitude']?.toStringAsFixed(4)}',
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  GestureDetector(
-                    onTap: () => _showFullImage(context, user.idCardUrl!),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: CachedNetworkImage(
-                        imageUrl: user.idCardUrl!,
-                        height: 200,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(
-                          height: 200,
-                          color: Colors.grey[200],
-                          child: const Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                        ),
-                        errorWidget: (context, url, error) => Container(
-                          height: 200,
-                          color: Colors.grey[200],
-                          child: const Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.error, size: 50, color: Colors.red),
-                              SizedBox(height: 8),
-                              Text('Erreur de chargement'),
-                            ],
-                          ),
-                        ),
+                ],
+              ),
+            ),
+
+            // Action Buttons
+            const Divider(height: 1),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => _showRejectDialog(context, user),
+                      icon: const Icon(Icons.close),
+                      label: const Text('Rejeter'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.red,
+                        side: const BorderSide(color: Colors.red),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.zoom_in, size: 16, color: Colors.grey[600]),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Toucher pour agrandir',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => _approveUser(context, user),
+                      icon: const Icon(Icons.check),
+                      label: const Text('Approuver'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
-                    ],
+                    ),
                   ),
                 ],
               ),
             ),
           ],
-
-          // Additional Info
-          const Divider(height: 1),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildInfoRow(Icons.calendar_today, 'Inscrit le',
-                    _formatDate(user.createdAt)),
-                if (user.name != null && userType == UserType.delivery)
-                  _buildInfoRow(Icons.person, 'Nom', user.name!),
-                if (user.location != null)
-                  _buildInfoRow(
-                    Icons.location_on,
-                    'Localisation',
-                    'Lat: ${user.location!['latitude']?.toStringAsFixed(4)}, '
-                        'Lng: ${user.location!['longitude']?.toStringAsFixed(4)}',
-                  ),
-              ],
-            ),
-          ),
-
-          // Action Buttons
-          const Divider(height: 1),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => _showRejectDialog(context, user),
-                    icon: const Icon(Icons.close),
-                    label: const Text('Rejeter'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.red,
-                      side: const BorderSide(color: Colors.red),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => _approveUser(context, user),
-                    icon: const Icon(Icons.check),
-                    label: const Text('Approuver'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -281,18 +283,19 @@ class _UserApprovalCard extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         children: [
-          Icon(icon, size: 18, color: Colors.grey[600]),
+          Icon(icon, size: 18, color: NeuColors.textSecondary),
           const SizedBox(width: 8),
           Text(
             '$label: ',
             style: const TextStyle(
               fontWeight: FontWeight.w500,
+              color: NeuColors.textPrimary,
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: TextStyle(color: Colors.grey[700]),
+              style: const TextStyle(color: NeuColors.textSecondary),
             ),
           ),
         ],
@@ -313,8 +316,10 @@ class _UserApprovalCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             AppBar(
-              title: const Text('Pièce d\'identité'),
-              backgroundColor: const Color(0xFFFF5722),
+              title: const Text('Piece d\'identite'),
+              backgroundColor: NeuColors.accent,
+              foregroundColor: Colors.white,
+              elevation: 0,
               leading: IconButton(
                 icon: const Icon(Icons.close),
                 onPressed: () => Navigator.pop(context),
@@ -332,7 +337,7 @@ class _UserApprovalCard extends StatelessWidget {
                     child: CircularProgressIndicator(),
                   ),
                   errorWidget: (context, url, error) => const Center(
-                    child: Icon(Icons.error, size: 50, color: Colors.red),
+                    child: Icon(Icons.error, size: 50, color: NeuColors.error),
                   ),
                 ),
               ),
@@ -382,7 +387,7 @@ class _UserApprovalCard extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '${userType == UserType.delivery ? 'Livreur' : 'Restaurant'} approuvé avec succès',
+              '${userType == UserType.delivery ? 'Livreur' : 'Restaurant'} approuve avec succes',
             ),
             backgroundColor: Colors.green,
           ),
@@ -448,7 +453,7 @@ class _UserApprovalCard extends StatelessWidget {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      '${userType == UserType.delivery ? 'Livreur' : 'Restaurant'} rejeté',
+                      '${userType == UserType.delivery ? 'Livreur' : 'Restaurant'} rejete',
                     ),
                     backgroundColor: Colors.orange,
                   ),

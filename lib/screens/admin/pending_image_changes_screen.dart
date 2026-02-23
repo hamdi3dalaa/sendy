@@ -6,6 +6,7 @@ import 'package:sendy/l10n/app_localizations.dart';
 import '../../providers/admin_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/user_model.dart';
+import '../../theme/neumorphic_theme.dart';
 
 class PendingImageChangesScreen extends StatefulWidget {
   const PendingImageChangesScreen({Key? key}) : super(key: key);
@@ -31,9 +32,12 @@ class _PendingImageChangesScreenState extends State<PendingImageChangesScreen> {
     final authProvider = Provider.of<AuthProvider>(context);
 
     return Scaffold(
+      backgroundColor: NeuColors.background,
       appBar: AppBar(
         title: Text(l10n.pendingImageChanges),
-        backgroundColor: const Color(0xFFFF5722),
+        backgroundColor: NeuColors.accent,
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: adminProvider.isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -42,14 +46,14 @@ class _PendingImageChangesScreenState extends State<PendingImageChangesScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.image_not_supported,
-                          size: 80, color: Colors.grey[400]),
+                      const Icon(Icons.image_not_supported,
+                          size: 80, color: NeuColors.textHint),
                       const SizedBox(height: 16),
                       Text(
                         l10n.noProfileImage,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16,
-                          color: Colors.grey[600],
+                          color: NeuColors.textSecondary,
                         ),
                       ),
                     ],
@@ -83,10 +87,9 @@ class _PendingImageChangesScreenState extends State<PendingImageChangesScreen> {
         ? (user.restaurantName ?? l10n.restaurant)
         : l10n.deliveryPerson;
 
-    return Card(
-      elevation: 3,
+    return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      decoration: NeuDecoration.raised(),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -97,7 +100,7 @@ class _PendingImageChangesScreenState extends State<PendingImageChangesScreen> {
               children: [
                 Icon(
                   isRestaurant ? Icons.restaurant : Icons.delivery_dining,
-                  color: const Color(0xFFFF5722),
+                  color: NeuColors.accent,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -109,11 +112,12 @@ class _PendingImageChangesScreenState extends State<PendingImageChangesScreen> {
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
+                          color: NeuColors.textPrimary,
                         ),
                       ),
                       Text(
                         user.phoneNumber,
-                        style: TextStyle(color: Colors.grey[600]),
+                        style: const TextStyle(color: NeuColors.textSecondary),
                       ),
                     ],
                   ),
@@ -131,7 +135,7 @@ class _PendingImageChangesScreenState extends State<PendingImageChangesScreen> {
                     children: [
                       Text(
                         l10n.currentImage,
-                        style: const TextStyle(fontWeight: FontWeight.w500),
+                        style: const TextStyle(fontWeight: FontWeight.w500, color: NeuColors.textPrimary),
                       ),
                       const SizedBox(height: 8),
                       ClipRRect(
@@ -150,22 +154,22 @@ class _PendingImageChangesScreenState extends State<PendingImageChangesScreen> {
                             : Container(
                                 height: 120,
                                 width: 120,
-                                color: Colors.grey[200],
-                                child: Icon(Icons.person,
-                                    size: 60, color: Colors.grey[400]),
+                                color: NeuColors.background,
+                                child: const Icon(Icons.person,
+                                    size: 60, color: NeuColors.textHint),
                               ),
                       ),
                     ],
                   ),
                 ),
-                const Icon(Icons.arrow_forward, color: Colors.grey),
+                const Icon(Icons.arrow_forward, color: NeuColors.textHint),
                 // New image
                 Expanded(
                   child: Column(
                     children: [
                       Text(
                         l10n.newImage,
-                        style: const TextStyle(fontWeight: FontWeight.w500),
+                        style: const TextStyle(fontWeight: FontWeight.w500, color: NeuColors.textPrimary),
                       ),
                       const SizedBox(height: 8),
                       ClipRRect(
@@ -184,7 +188,7 @@ class _PendingImageChangesScreenState extends State<PendingImageChangesScreen> {
                             : Container(
                                 height: 120,
                                 width: 120,
-                                color: Colors.grey[200],
+                                color: NeuColors.background,
                                 child: const Icon(Icons.image, size: 60),
                               ),
                       ),

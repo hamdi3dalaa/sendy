@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../models/order_model.dart';
 import '../../providers/order_provider.dart';
+import '../../theme/neumorphic_theme.dart';
 
 class DeliveryActiveOrderScreen extends StatefulWidget {
   final OrderModel order;
@@ -220,7 +221,7 @@ class _DeliveryActiveOrderScreenState extends State<DeliveryActiveOrderScreen> {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+            style: ElevatedButton.styleFrom(backgroundColor: NeuColors.success),
             child: Text(l10n.markAsDelivered),
           ),
         ],
@@ -238,7 +239,7 @@ class _DeliveryActiveOrderScreenState extends State<DeliveryActiveOrderScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.deliveryCompleted),
-            backgroundColor: Colors.green,
+            backgroundColor: NeuColors.success,
           ),
         );
         Navigator.pop(context);
@@ -249,7 +250,7 @@ class _DeliveryActiveOrderScreenState extends State<DeliveryActiveOrderScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('${l10n.error}: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: NeuColors.error,
           ),
         );
       }
@@ -284,10 +285,12 @@ class _DeliveryActiveOrderScreenState extends State<DeliveryActiveOrderScreen> {
     }
 
     return Scaffold(
+      backgroundColor: NeuColors.background,
       appBar: AppBar(
         title: Text(l10n.activeDelivery),
-        backgroundColor: const Color(0xFFFF5722),
+        backgroundColor: NeuColors.accent,
         foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: Stack(
         children: [
@@ -320,13 +323,18 @@ class _DeliveryActiveOrderScreenState extends State<DeliveryActiveOrderScreen> {
       bottom: 0,
       child: Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
+          color: NeuColors.background,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.15),
-              blurRadius: 10,
-              offset: const Offset(0, -2),
+              color: NeuColors.darkShadow.withOpacity(0.3),
+              blurRadius: 12,
+              offset: const Offset(0, -4),
+            ),
+            BoxShadow(
+              color: NeuColors.lightShadow.withOpacity(0.8),
+              blurRadius: 6,
+              offset: const Offset(0, -1),
             ),
           ],
         ),
@@ -340,7 +348,7 @@ class _DeliveryActiveOrderScreenState extends State<DeliveryActiveOrderScreen> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  color: NeuColors.textHint,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -353,11 +361,11 @@ class _DeliveryActiveOrderScreenState extends State<DeliveryActiveOrderScreen> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFF5722).withOpacity(0.1),
+                    color: NeuColors.accent.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(Icons.delivery_dining,
-                      color: Color(0xFFFF5722), size: 28),
+                      color: NeuColors.accent, size: 28),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -369,19 +377,24 @@ class _DeliveryActiveOrderScreenState extends State<DeliveryActiveOrderScreen> {
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
+                          color: NeuColors.textPrimary,
                         ),
                       ),
                       if (widget.order.clientName != null)
                         Text(
                           widget.order.clientName!,
-                          style:
-                              TextStyle(color: Colors.grey[600], fontSize: 13),
+                          style: const TextStyle(
+                            color: NeuColors.textSecondary,
+                            fontSize: 13,
+                          ),
                         ),
                       if (_currentLatLng != null)
                         Text(
                           l10n.arrivingIn(etaMinutes.toString()),
-                          style:
-                              TextStyle(color: Colors.green[700], fontSize: 13),
+                          style: const TextStyle(
+                            color: NeuColors.success,
+                            fontSize: 13,
+                          ),
                         ),
                     ],
                   ),
@@ -394,7 +407,7 @@ class _DeliveryActiveOrderScreenState extends State<DeliveryActiveOrderScreen> {
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
-                        color: Colors.green,
+                        color: NeuColors.success,
                       ),
                     ),
                   ],
@@ -408,12 +421,15 @@ class _DeliveryActiveOrderScreenState extends State<DeliveryActiveOrderScreen> {
               const SizedBox(height: 10),
               Row(
                 children: [
-                  Icon(Icons.location_on, size: 18, color: Colors.red[400]),
+                  const Icon(Icons.location_on, size: 18, color: NeuColors.error),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       widget.order.deliveryAddress!,
-                      style: const TextStyle(fontSize: 13),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: NeuColors.textPrimary,
+                      ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -429,17 +445,24 @@ class _DeliveryActiveOrderScreenState extends State<DeliveryActiveOrderScreen> {
               children: [
                 // Call client button
                 Expanded(
-                  child: OutlinedButton.icon(
+                  child: NeuButton(
+                    isAccent: false,
+                    radius: 10,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     onPressed: _callClient,
-                    icon: const Icon(Icons.phone, size: 18),
-                    label: Text(l10n.callClient),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFFFF5722),
-                      side: const BorderSide(color: Color(0xFFFF5722)),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.phone, size: 18, color: NeuColors.accent),
+                        const SizedBox(width: 6),
+                        Text(
+                          l10n.callClient,
+                          style: const TextStyle(
+                            color: NeuColors.accent,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -447,25 +470,49 @@ class _DeliveryActiveOrderScreenState extends State<DeliveryActiveOrderScreen> {
                 // Complete delivery button
                 Expanded(
                   flex: 2,
-                  child: ElevatedButton.icon(
-                    onPressed: _isCompleting ? null : _completeDelivery,
-                    icon: _isCompleting
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : const Icon(Icons.check_circle, size: 20),
-                    label: Text(l10n.markAsDelivered),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
+                  child: GestureDetector(
+                    onTap: _isCompleting ? null : _completeDelivery,
+                    child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [NeuColors.success, Color(0xFF00D2A0)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
                         borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: NeuColors.success.withOpacity(0.3),
+                            offset: const Offset(0, 4),
+                            blurRadius: 10,
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (_isCompleting)
+                            const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          else
+                            const Icon(Icons.check_circle, size: 20, color: Colors.white),
+                          const SizedBox(width: 6),
+                          Text(
+                            l10n.markAsDelivered,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),

@@ -8,6 +8,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/order_provider.dart';
 import '../../models/order_model.dart';
 import '../../models/user_model.dart';
+import '../../theme/neumorphic_theme.dart';
 import 'delivery_active_order_screen.dart';
 
 class AvailableOrdersScreen extends StatefulWidget {
@@ -72,10 +73,12 @@ class _AvailableOrdersScreenState extends State<AvailableOrdersScreen> {
     final currentUser = authProvider.currentUser;
 
     return Scaffold(
+      backgroundColor: NeuColors.background,
       appBar: AppBar(
         title: Text(l10n.availableOrders),
-        backgroundColor: const Color(0xFFFF5722),
+        backgroundColor: NeuColors.accent,
         foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _firestore
@@ -85,12 +88,19 @@ class _AvailableOrdersScreenState extends State<AvailableOrdersScreen> {
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(NeuColors.accent),
+              ),
+            );
           }
 
           if (snapshot.hasError) {
             return Center(
-              child: Text('${l10n.error}: ${snapshot.error}'),
+              child: Text(
+                '${l10n.error}: ${snapshot.error}',
+                style: const TextStyle(color: NeuColors.textSecondary),
+              ),
             );
           }
 
@@ -114,16 +124,19 @@ class _AvailableOrdersScreenState extends State<AvailableOrdersScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.delivery_dining,
-                          size: 80, color: Colors.grey[400]),
+                          size: 80, color: NeuColors.textHint),
                       const SizedBox(height: 16),
                       Text(
                         l10n.noAvailableOrders,
-                        style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: NeuColors.textSecondary,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         l10n.ordersWillAppearHere,
-                        style: TextStyle(color: Colors.grey[500]),
+                        style: const TextStyle(color: NeuColors.textHint),
                       ),
                     ],
                   ),
@@ -136,17 +149,20 @@ class _AvailableOrdersScreenState extends State<AvailableOrdersScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.location_off,
-                          size: 80, color: Colors.grey[400]),
+                          size: 80, color: NeuColors.textHint),
                       const SizedBox(height: 16),
                       Text(
                         l10n.noOrdersInYourCity,
-                        style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: NeuColors.textSecondary,
+                        ),
                       ),
                       if (deliveryCity.isNotEmpty) ...[
                         const SizedBox(height: 8),
                         Text(
                           '${l10n.cityLabel}: ${currentUser?.city}',
-                          style: TextStyle(color: Colors.grey[500]),
+                          style: const TextStyle(color: NeuColors.textHint),
                         ),
                       ],
                     ],
@@ -179,11 +195,9 @@ class _AvailableOrdersScreenState extends State<AvailableOrdersScreen> {
         final restaurantAddress =
             _restaurantAddresses[order.restaurantId] ?? '';
 
-        return Card(
-          elevation: 3,
+        return Container(
           margin: const EdgeInsets.only(bottom: 16),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          decoration: NeuDecoration.raised(radius: 16),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -195,11 +209,11 @@ class _AvailableOrdersScreenState extends State<AvailableOrdersScreen> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFF5722).withOpacity(0.1),
+                        color: NeuColors.accent.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(Icons.restaurant,
-                          color: Color(0xFFFF5722)),
+                          color: NeuColors.accent),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -211,18 +225,21 @@ class _AvailableOrdersScreenState extends State<AvailableOrdersScreen> {
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
+                              color: NeuColors.textPrimary,
                             ),
                           ),
                           if (restaurantCity.isNotEmpty)
                             Row(
                               children: [
                                 const Icon(Icons.location_city,
-                                    size: 14, color: Colors.grey),
+                                    size: 14, color: NeuColors.textHint),
                                 const SizedBox(width: 4),
                                 Text(
                                   restaurantCity,
-                                  style: TextStyle(
-                                      color: Colors.grey[600], fontSize: 13),
+                                  style: const TextStyle(
+                                    color: NeuColors.textSecondary,
+                                    fontSize: 13,
+                                  ),
                                 ),
                               ],
                             ),
@@ -230,13 +247,15 @@ class _AvailableOrdersScreenState extends State<AvailableOrdersScreen> {
                             Row(
                               children: [
                                 const Icon(Icons.pin_drop,
-                                    size: 14, color: Colors.grey),
+                                    size: 14, color: NeuColors.textHint),
                                 const SizedBox(width: 4),
                                 Expanded(
                                   child: Text(
                                     restaurantAddress,
-                                    style: TextStyle(
-                                        color: Colors.grey[600], fontSize: 12),
+                                    style: const TextStyle(
+                                      color: NeuColors.textSecondary,
+                                      fontSize: 12,
+                                    ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -254,19 +273,21 @@ class _AvailableOrdersScreenState extends State<AvailableOrdersScreen> {
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFFFF5722),
+                            color: NeuColors.accent,
                           ),
                         ),
                         Text(
                           '${l10n.deliveryFee}: ${order.deliveryFee.toStringAsFixed(0)} ${l10n.dhs}',
-                          style: TextStyle(
-                              fontSize: 12, color: Colors.green[700]),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: NeuColors.success,
+                          ),
                         ),
                       ],
                     ),
                   ],
                 ),
-                const Divider(height: 24),
+                const Divider(height: 24, color: NeuColors.textHint),
 
                 // Order items
                 ...order.items.map((item) => Padding(
@@ -277,13 +298,18 @@ class _AvailableOrdersScreenState extends State<AvailableOrdersScreen> {
                             '${item.quantity}x',
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFFFF5722)),
+                                color: NeuColors.accent),
                           ),
                           const SizedBox(width: 8),
-                          Expanded(child: Text(item.name)),
+                          Expanded(
+                            child: Text(
+                              item.name,
+                              style: const TextStyle(color: NeuColors.textPrimary),
+                            ),
+                          ),
                           Text(
                             '${(item.price * item.quantity).toStringAsFixed(2)} ${l10n.dhs}',
-                            style: TextStyle(color: Colors.grey[600]),
+                            style: const TextStyle(color: NeuColors.textSecondary),
                           ),
                         ],
                       ),
@@ -321,7 +347,10 @@ class _AvailableOrdersScreenState extends State<AvailableOrdersScreen> {
                               const SizedBox(height: 2),
                               Text(
                                 order.clientComment!,
-                                style: const TextStyle(fontSize: 13),
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: NeuColors.textPrimary,
+                                ),
                               ),
                             ],
                           ),
@@ -337,13 +366,16 @@ class _AvailableOrdersScreenState extends State<AvailableOrdersScreen> {
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      Icon(Icons.location_on,
-                          size: 18, color: Colors.red[400]),
+                      const Icon(Icons.location_on,
+                          size: 18, color: NeuColors.error),
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
                           '${l10n.deliveryAddress}: ${order.deliveryAddress}',
-                          style: const TextStyle(fontSize: 13),
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: NeuColors.textPrimary,
+                          ),
                         ),
                       ),
                     ],
@@ -354,19 +386,23 @@ class _AvailableOrdersScreenState extends State<AvailableOrdersScreen> {
                 // Order time
                 Row(
                   children: [
-                    Icon(Icons.access_time, size: 16, color: Colors.grey[500]),
+                    const Icon(Icons.access_time, size: 16, color: NeuColors.textHint),
                     const SizedBox(width: 4),
                     Text(
                       DateFormat('dd/MM/yyyy HH:mm').format(order.createdAt),
-                      style:
-                          TextStyle(fontSize: 12, color: Colors.grey[500]),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: NeuColors.textHint,
+                      ),
                     ),
                     const Spacer(),
                     if (order.clientName != null)
                       Text(
                         order.clientName!,
-                        style: TextStyle(
-                            fontSize: 12, color: Colors.grey[600]),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: NeuColors.textSecondary,
+                        ),
                       ),
                   ],
                 ),
@@ -375,16 +411,39 @@ class _AvailableOrdersScreenState extends State<AvailableOrdersScreen> {
                 // Accept button
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: () => _acceptOrder(order, currentUser, l10n),
-                    icon: const Icon(Icons.check_circle),
-                    label: Text(l10n.acceptDelivery),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
+                  child: GestureDetector(
+                    onTap: () => _acceptOrder(order, currentUser, l10n),
+                    child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [NeuColors.success, Color(0xFF00D2A0)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: NeuColors.success.withOpacity(0.3),
+                            offset: const Offset(0, 4),
+                            blurRadius: 10,
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.check_circle, color: Colors.white),
+                          const SizedBox(width: 8),
+                          Text(
+                            l10n.acceptDelivery,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -413,7 +472,7 @@ class _AvailableOrdersScreenState extends State<AvailableOrdersScreen> {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+            style: ElevatedButton.styleFrom(backgroundColor: NeuColors.success),
             child: Text(l10n.acceptOrder),
           ),
         ],
@@ -431,7 +490,7 @@ class _AvailableOrdersScreenState extends State<AvailableOrdersScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.orderAcceptedSuccess),
-            backgroundColor: Colors.green,
+            backgroundColor: NeuColors.success,
           ),
         );
 
@@ -453,7 +512,7 @@ class _AvailableOrdersScreenState extends State<AvailableOrdersScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('${l10n.error}: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: NeuColors.error,
           ),
         );
       }

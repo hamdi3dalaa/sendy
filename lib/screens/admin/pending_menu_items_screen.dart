@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../providers/admin_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/menu_item_model.dart';
+import '../../theme/neumorphic_theme.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:sendy/l10n/app_localizations.dart';
 
@@ -42,21 +43,24 @@ class _PendingMenuItemsScreenState extends State<PendingMenuItemsScreen> {
     final items = adminProvider.pendingMenuItems;
 
     return Scaffold(
+      backgroundColor: NeuColors.background,
       appBar: AppBar(
         title: Text(l10n.pendingDishes),
-        backgroundColor: const Color(0xFFFF5722),
+        backgroundColor: NeuColors.accent,
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: items.isEmpty
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.restaurant_menu,
-                      size: 80, color: Colors.grey[400]),
+                  const Icon(Icons.restaurant_menu,
+                      size: 80, color: NeuColors.textHint),
                   const SizedBox(height: 16),
                   Text(
                     l10n.noPendingDishes,
-                    style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                    style: const TextStyle(fontSize: 18, color: NeuColors.textSecondary),
                   ),
                 ],
               ),
@@ -89,246 +93,243 @@ class _MenuItemApprovalCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Header with restaurant info
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.purple.withOpacity(0.1),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
+      decoration: NeuDecoration.raised(),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Header with restaurant info
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.purple.withOpacity(0.1),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.restaurant, color: Colors.purple, size: 28),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          restaurantName,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: NeuColors.textSecondary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          menuItem.name,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: NeuColors.textPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      l10n.pendingStatusLabel,
+                      style: const TextStyle(
+                        color: Colors.orange,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            child: Row(
-              children: [
-                const Icon(Icons.restaurant, color: Colors.purple, size: 28),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+
+            // Menu Item Image
+            if (menuItem.imageUrl != null) ...[
+              const Divider(height: 1),
+              GestureDetector(
+                onTap: () =>
+                    _showFullImage(context, menuItem.imageUrl!, menuItem.name),
+                child: AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: CachedNetworkImage(
+                    imageUrl: menuItem.imageUrl!,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
+                      color: NeuColors.background,
+                      child: const Center(child: CircularProgressIndicator()),
+                    ),
+                    errorWidget: (context, url, error) => Container(
+                      color: NeuColors.background,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.error, size: 50, color: NeuColors.error),
+                          const SizedBox(height: 8),
+                          Text(l10n.imageLoadError),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.zoom_in, size: 16, color: NeuColors.textSecondary),
+                    const SizedBox(width: 4),
+                    Text(
+                      l10n.tapToEnlarge,
+                      style: const TextStyle(fontSize: 12, color: NeuColors.textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+            ] else ...[
+              Container(
+                height: 200,
+                color: NeuColors.background,
+                child: const Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.image_not_supported,
+                        size: 60, color: NeuColors.textHint),
+                    SizedBox(height: 8),
+                    Text(
+                      'Pas d\'image',
+                      style: TextStyle(color: NeuColors.textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+
+            // Item Details
+            const Divider(height: 1),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Description
+                  Text(
+                    l10n.description,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: NeuColors.textPrimary),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    menuItem.description,
+                    style: const TextStyle(color: NeuColors.textSecondary),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Info Grid
+                  Row(
                     children: [
-                      Text(
-                        restaurantName,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.w500,
+                      Expanded(
+                        child: _buildInfoCard(
+                          l10n.price,
+                          '${menuItem.price.toStringAsFixed(2)} ${l10n.dhs}',
+                          Icons.euro,
+                          Colors.green,
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        menuItem.name,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildInfoCard(
+                          l10n.category,
+                          menuItem.category,
+                          Icons.category,
+                          Colors.blue,
                         ),
                       ),
                     ],
                   ),
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    l10n.pendingStatusLabel,
-                    style: const TextStyle(
-                      color: Colors.orange,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Menu Item Image
-          if (menuItem.imageUrl != null) ...[
-            const Divider(height: 1),
-            GestureDetector(
-              onTap: () =>
-                  _showFullImage(context, menuItem.imageUrl!, menuItem.name),
-              child: AspectRatio(
-                aspectRatio: 16 / 9,
-                child: CachedNetworkImage(
-                  imageUrl: menuItem.imageUrl!,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => Container(
-                    color: Colors.grey[200],
-                    child: const Center(child: CircularProgressIndicator()),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    color: Colors.grey[200],
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.error, size: 50, color: Colors.red),
-                        const SizedBox(height: 8),
-                        Text(l10n.imageLoadError),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.zoom_in, size: 16, color: Colors.grey[600]),
-                  const SizedBox(width: 4),
-                  Text(
-                    l10n.tapToEnlarge,
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  const SizedBox(height: 12),
+                  _buildInfoRow(
+                    Icons.calendar_today,
+                    l10n.createdOn,
+                    _formatDate(menuItem.createdAt),
                   ),
                 ],
               ),
             ),
-          ] else ...[
-            Container(
-              height: 200,
-              color: Colors.grey[200],
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.image_not_supported,
-                      size: 60, color: Colors.grey[400]),
-                  const SizedBox(height: 8),
-                  Text(
-                    l10n.noImage,
-                    style: TextStyle(color: Colors.grey[600]),
-                  ),
-                ],
-              ),
-            ),
-          ],
 
-          // Item Details
-          const Divider(height: 1),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Description
-                Text(
-                  l10n.description,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            // Warning if no image
+            if (menuItem.imageUrl == null) ...[
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange[50],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.orange[200]!),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  menuItem.description,
-                  style: TextStyle(color: Colors.grey[700]),
-                ),
-                const SizedBox(height: 16),
-
-                // Info Grid
-                Row(
+                child: Row(
                   children: [
-                    Expanded(
-                      child: _buildInfoCard(
-                        l10n.price,
-                        '${menuItem.price.toStringAsFixed(2)} ${l10n.dhs}',
-                        Icons.euro,
-                        Colors.green,
-                      ),
-                    ),
+                    Icon(Icons.warning_amber, color: Colors.orange[700]),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: _buildInfoCard(
-                        l10n.category,
-                        menuItem.category,
-                        Icons.category,
-                        Colors.blue,
+                      child: Text(
+                        l10n.noImageWarning,
+                        style: const TextStyle(fontSize: 12),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
-                _buildInfoRow(
-                  Icons.calendar_today,
-                  l10n.createdOn,
-                  _formatDate(menuItem.createdAt),
-                ),
-              ],
-            ),
-          ),
-
-          // Warning if no image
-          if (menuItem.imageUrl == null) ...[
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.orange[50],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.orange[200]!),
               ),
+              const SizedBox(height: 16),
+            ],
+
+            // Action Buttons
+            const Divider(height: 1),
+            Padding(
+              padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  Icon(Icons.warning_amber, color: Colors.orange[700]),
-                  const SizedBox(width: 12),
                   Expanded(
-                    child: Text(
-                      l10n.noImageWarning,
-                      style: const TextStyle(fontSize: 12),
+                    child: OutlinedButton.icon(
+                      onPressed: () => _showRejectDialog(context),
+                      icon: const Icon(Icons.close),
+                      label: Text(l10n.reject),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.red,
+                        side: const BorderSide(color: Colors.red),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => _approveMenuItem(context),
+                      icon: const Icon(Icons.check),
+                      label: Text(l10n.approve),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
           ],
-
-          // Action Buttons
-          const Divider(height: 1),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => _showRejectDialog(context),
-                    icon: const Icon(Icons.close),
-                    label: Text(l10n.reject),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.red,
-                      side: const BorderSide(color: Colors.red),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => _approveMenuItem(context),
-                    icon: const Icon(Icons.check),
-                    label: Text(l10n.approve),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -337,20 +338,16 @@ class _MenuItemApprovalCard extends StatelessWidget {
       String label, String value, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
-      ),
+      decoration: NeuDecoration.raised(radius: 8),
       child: Column(
         children: [
           Icon(icon, color: color, size: 24),
           const SizedBox(height: 8),
           Text(
             label,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 12,
-              color: Colors.grey[600],
+              color: NeuColors.textSecondary,
             ),
           ),
           const SizedBox(height: 4),
@@ -372,16 +369,16 @@ class _MenuItemApprovalCard extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         children: [
-          Icon(icon, size: 18, color: Colors.grey[600]),
+          Icon(icon, size: 18, color: NeuColors.textSecondary),
           const SizedBox(width: 8),
           Text(
             '$label: ',
-            style: const TextStyle(fontWeight: FontWeight.w500),
+            style: const TextStyle(fontWeight: FontWeight.w500, color: NeuColors.textPrimary),
           ),
           Expanded(
             child: Text(
               value,
-              style: TextStyle(color: Colors.grey[700]),
+              style: const TextStyle(color: NeuColors.textSecondary),
             ),
           ),
         ],
@@ -390,7 +387,7 @@ class _MenuItemApprovalCard extends StatelessWidget {
   }
 
   String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year} à ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+    return '${date.day}/${date.month}/${date.year} a ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
   }
 
   void _showFullImage(BuildContext context, String imageUrl, String title) {
@@ -402,7 +399,9 @@ class _MenuItemApprovalCard extends StatelessWidget {
           children: [
             AppBar(
               title: Text(title),
-              backgroundColor: const Color(0xFFFF5722),
+              backgroundColor: NeuColors.accent,
+              foregroundColor: Colors.white,
+              elevation: 0,
               leading: IconButton(
                 icon: const Icon(Icons.close),
                 onPressed: () => Navigator.pop(context),
@@ -420,7 +419,7 @@ class _MenuItemApprovalCard extends StatelessWidget {
                     child: CircularProgressIndicator(),
                   ),
                   errorWidget: (context, url, error) => const Center(
-                    child: Icon(Icons.error, size: 50, color: Colors.red),
+                    child: Icon(Icons.error, size: 50, color: NeuColors.error),
                   ),
                 ),
               ),
@@ -501,7 +500,7 @@ class _MenuItemApprovalCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               restaurantName,
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
+              style: const TextStyle(fontSize: 12, color: NeuColors.textSecondary),
             ),
             const SizedBox(height: 16),
             TextField(

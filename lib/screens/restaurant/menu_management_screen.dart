@@ -7,6 +7,7 @@ import '../../providers/auth_provider.dart';
 import '../../models/menu_item_model.dart';
 import 'add_menu_item_screen.dart';
 import 'edit_menu_item_screen.dart';
+import '../../theme/neumorphic_theme.dart';
 
 class MenuManagementScreen extends StatefulWidget {
   const MenuManagementScreen({Key? key}) : super(key: key);
@@ -40,12 +41,19 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
     final menuProvider = Provider.of<MenuProvider>(context);
 
     return Scaffold(
+      backgroundColor: NeuColors.background,
       appBar: AppBar(
         title: Text(l10n.menuManagement),
-        backgroundColor: const Color(0xFFFF5722),
+        backgroundColor: NeuColors.accent,
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: menuProvider.isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(NeuColors.accent),
+              ),
+            )
           : RefreshIndicator(
               onRefresh: _loadMenu,
               child: _buildMenuList(menuProvider, authProvider),
@@ -64,7 +72,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
         },
         icon: const Icon(Icons.add),
         label: Text(l10n.addDish),
-        backgroundColor: const Color(0xFFFF5722),
+        backgroundColor: NeuColors.accent,
       ),
     );
   }
@@ -76,16 +84,18 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.restaurant_menu, size: 80, color: Colors.grey[400]),
+            const Icon(Icons.restaurant_menu,
+                size: 80, color: NeuColors.textHint),
             const SizedBox(height: 16),
             Text(
               l10n.noDishesInMenu,
-              style: const TextStyle(fontSize: 18, color: Colors.grey),
+              style:
+                  const TextStyle(fontSize: 18, color: NeuColors.textSecondary),
             ),
             const SizedBox(height: 8),
             Text(
               l10n.addFirstDish,
-              style: const TextStyle(color: Colors.grey),
+              style: const TextStyle(color: NeuColors.textHint),
             ),
           ],
         ),
@@ -97,9 +107,9 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
       child: Column(
         children: [
           TabBar(
-            labelColor: const Color(0xFFFF5722),
-            unselectedLabelColor: Colors.grey,
-            indicatorColor: const Color(0xFFFF5722),
+            labelColor: NeuColors.accent,
+            unselectedLabelColor: NeuColors.textHint,
+            indicatorColor: NeuColors.accent,
             tabs: [
               Tab(text: l10n.approvedItems),
               Tab(text: l10n.pendingItems),
@@ -126,7 +136,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
       return Center(
         child: Text(
           l10n.noDishesInCategory,
-          style: const TextStyle(color: Colors.grey),
+          style: const TextStyle(color: NeuColors.textHint),
         ),
       );
     }
@@ -143,9 +153,9 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
 
   Widget _buildMenuItem(MenuItem item, AuthProvider authProvider) {
     final l10n = AppLocalizations.of(context)!;
-    return Card(
+    return Container(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-      elevation: 2,
+      decoration: NeuDecoration.raised(radius: 12),
       child: Column(
         children: [
           ListTile(
@@ -161,8 +171,9 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                         return Container(
                           width: 60,
                           height: 60,
-                          color: Colors.grey[300],
-                          child: const Icon(Icons.restaurant),
+                          color: NeuColors.background,
+                          child: const Icon(Icons.restaurant,
+                              color: NeuColors.textHint),
                         );
                       },
                     ),
@@ -171,14 +182,16 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                     width: 60,
                     height: 60,
                     decoration: BoxDecoration(
-                      color: Colors.grey[300],
+                      color: NeuColors.background,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.restaurant, size: 30),
+                    child: const Icon(Icons.restaurant,
+                        size: 30, color: NeuColors.textHint),
                   ),
             title: Text(
               item.name,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold, color: NeuColors.textPrimary),
             ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,13 +200,14 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                   item.description,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: NeuColors.textSecondary),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   '${item.price.toStringAsFixed(2)} ${l10n.dhs}',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFFFF5722),
+                    color: NeuColors.accent,
                   ),
                 ),
                 if (item.status == MenuItemStatus.rejected &&
@@ -203,7 +217,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                     child: Text(
                       '${l10n.reason}: ${item.rejectionReason}',
                       style: const TextStyle(
-                        color: Colors.red,
+                        color: NeuColors.error,
                         fontSize: 12,
                       ),
                     ),
@@ -220,10 +234,12 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                 children: [
                   Row(
                     children: [
-                      Text(l10n.available),
+                      Text(l10n.available,
+                          style:
+                              const TextStyle(color: NeuColors.textSecondary)),
                       Switch(
                         value: item.isAvailable,
-                        activeColor: const Color(0xFFFF5722),
+                        activeColor: NeuColors.accent,
                         onChanged: (value) {
                           context.read<MenuProvider>().toggleAvailability(
                                 item.id,
@@ -252,7 +268,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                         },
                       ),
                       IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
+                        icon: const Icon(Icons.delete, color: NeuColors.error),
                         onPressed: () => _confirmDelete(item, authProvider),
                       ),
                     ],
@@ -267,7 +283,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
+                    icon: const Icon(Icons.delete, color: NeuColors.error),
                     onPressed: () => _confirmDelete(item, authProvider),
                   ),
                 ],
@@ -285,7 +301,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
 
     switch (status) {
       case MenuItemStatus.approved:
-        color = Colors.green;
+        color = NeuColors.success;
         text = l10n.approved;
         icon = Icons.check_circle;
         break;
@@ -295,7 +311,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
         icon = Icons.pending;
         break;
       case MenuItemStatus.rejected:
-        color = Colors.red;
+        color = NeuColors.error;
         text = l10n.rejected;
         icon = Icons.cancel;
         break;
@@ -341,7 +357,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
             onPressed: () => Navigator.pop(context, true),
             child: const Text(
               'Supprimer',
-              style: TextStyle(color: Colors.red),
+              style: TextStyle(color: NeuColors.error),
             ),
           ),
         ],

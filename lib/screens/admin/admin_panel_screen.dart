@@ -6,6 +6,7 @@ import '../../providers/admin_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/order_provider.dart';
 import '../../models/settlement_model.dart';
+import '../../theme/neumorphic_theme.dart';
 import 'pending_users_screen.dart';
 import 'pending_menu_items_screen.dart';
 import 'pending_image_changes_screen.dart';
@@ -46,9 +47,12 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
+      backgroundColor: NeuColors.background,
       appBar: AppBar(
         title: Text(l10n.adminPanel),
-        backgroundColor: const Color(0xFFFF5722),
+        backgroundColor: NeuColors.accent,
+        foregroundColor: Colors.white,
+        elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -73,8 +77,22 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Header
-                    Card(
-                      color: const Color(0xFFFF5722),
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [NeuColors.accent, NeuColors.accentLight],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: NeuColors.accent.withOpacity(0.3),
+                            offset: const Offset(0, 4),
+                            blurRadius: 10,
+                          ),
+                        ],
+                      ),
                       child: Padding(
                         padding: const EdgeInsets.all(20),
                         child: Column(
@@ -146,6 +164,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                               const Icon(Icons.fastfood, color: Colors.purple),
                           title: Text(
                             '${adminProvider.pendingMenuItems.length} ${l10n.dishesToValidate}',
+                            style: const TextStyle(color: NeuColors.textPrimary),
                           ),
                           trailing:
                               const Icon(Icons.arrow_forward_ios, size: 16),
@@ -259,7 +278,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                       title: l10n.appConfig,
                       subtitle: l10n.appConfigSubtitle,
                       icon: Icons.settings,
-                      iconColor: const Color(0xFFFF5722),
+                      iconColor: NeuColors.accent,
                       onTap: () {
                         Navigator.push(
                           context,
@@ -332,8 +351,8 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
     required int count,
     required List<Widget> children,
   }) {
-    return Card(
-      elevation: 2,
+    return Container(
+      decoration: NeuDecoration.raised(),
       child: Column(
         children: [
           Padding(
@@ -348,6 +367,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
+                      color: NeuColors.textPrimary,
                     ),
                   ),
                 ),
@@ -385,7 +405,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
   ) {
     return ListTile(
       leading: Icon(icon, color: color),
-      title: Text(title),
+      title: Text(title, style: const TextStyle(color: NeuColors.textPrimary)),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -418,24 +438,29 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
     required Color iconColor,
     required VoidCallback onTap,
   }) {
-    return Card(
-      elevation: 2,
-      child: ListTile(
-        leading: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: iconColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
+    return Container(
+      decoration: NeuDecoration.raised(),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        clipBehavior: Clip.antiAlias,
+        child: ListTile(
+          leading: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: iconColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: iconColor),
           ),
-          child: Icon(icon, color: iconColor),
+          title: Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.bold, color: NeuColors.textPrimary),
+          ),
+          subtitle: Text(subtitle, style: const TextStyle(color: NeuColors.textSecondary)),
+          trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+          onTap: onTap,
         ),
-        title: Text(
-          title,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        subtitle: Text(subtitle),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-        onTap: onTap,
       ),
     );
   }
@@ -446,30 +471,28 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
     IconData icon,
     Color color,
   ) {
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Icon(icon, color: color, size: 32),
-            const SizedBox(height: 8),
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
+    return Container(
+      decoration: NeuDecoration.raised(),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 32),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: color,
             ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: const TextStyle(fontSize: 12),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 12, color: NeuColors.textSecondary),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }

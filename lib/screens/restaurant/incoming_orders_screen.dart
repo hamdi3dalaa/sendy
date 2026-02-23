@@ -8,6 +8,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/order_provider.dart';
 import '../../models/order_model.dart';
 import '../../models/user_model.dart';
+import '../../theme/neumorphic_theme.dart';
 
 class IncomingOrdersScreen extends StatelessWidget {
   const IncomingOrdersScreen({Key? key}) : super(key: key);
@@ -19,14 +20,19 @@ class IncomingOrdersScreen extends StatelessWidget {
     final currentUser = authProvider.currentUser;
 
     if (currentUser == null) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+          child: CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation<Color>(NeuColors.accent),
+      ));
     }
 
     return Scaffold(
+      backgroundColor: NeuColors.background,
       appBar: AppBar(
         title: Text(l10n.incomingOrders),
-        backgroundColor: const Color(0xFFFF5722),
+        backgroundColor: NeuColors.accent,
         foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
@@ -39,7 +45,10 @@ class IncomingOrdersScreen extends StatelessWidget {
         ]).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+                child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(NeuColors.accent),
+            ));
           }
 
           if (snapshot.hasError) {
@@ -66,16 +75,17 @@ class IncomingOrdersScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.inbox, size: 80, color: Colors.grey[400]),
+                  const Icon(Icons.inbox, size: 80, color: NeuColors.textHint),
                   const SizedBox(height: 16),
                   Text(
                     l10n.noIncomingOrders,
-                    style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                    style: const TextStyle(
+                        fontSize: 18, color: NeuColors.textSecondary),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     l10n.ordersWillAppearHere,
-                    style: TextStyle(color: Colors.grey[500]),
+                    style: const TextStyle(color: NeuColors.textHint),
                   ),
                 ],
               ),
@@ -108,7 +118,7 @@ class _OrderCard extends StatelessWidget {
       case OrderStatus.inProgress:
         return Colors.purple;
       default:
-        return Colors.grey;
+        return NeuColors.textHint;
     }
   }
 
@@ -130,10 +140,10 @@ class _OrderCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final statusColor = _statusColor();
 
-    return Card(
-      elevation: 3,
+    return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      decoration: NeuDecoration.raised(radius: 12),
+      clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
           // Status bar
@@ -159,7 +169,8 @@ class _OrderCard extends StatelessWidget {
                 const Spacer(),
                 Text(
                   DateFormat('dd/MM HH:mm').format(order.createdAt),
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  style: const TextStyle(
+                      fontSize: 12, color: NeuColors.textSecondary),
                 ),
               ],
             ),
@@ -172,17 +183,21 @@ class _OrderCard extends StatelessWidget {
                 // Client info
                 Row(
                   children: [
-                    const Icon(Icons.person, size: 18, color: Colors.grey),
+                    const Icon(Icons.person,
+                        size: 18, color: NeuColors.textHint),
                     const SizedBox(width: 8),
                     Text(
                       order.clientName ?? l10n.client,
-                      style: const TextStyle(fontWeight: FontWeight.w500),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: NeuColors.textPrimary),
                     ),
                     if (order.clientPhone != null) ...[
                       const SizedBox(width: 8),
                       Text(
                         order.clientPhone!,
-                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                        style: const TextStyle(
+                            fontSize: 12, color: NeuColors.textSecondary),
                       ),
                     ],
                   ],
@@ -198,13 +213,17 @@ class _OrderCard extends StatelessWidget {
                             '${item.quantity}x',
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFFFF5722)),
+                                color: NeuColors.accent),
                           ),
                           const SizedBox(width: 8),
-                          Expanded(child: Text(item.name)),
+                          Expanded(
+                              child: Text(item.name,
+                                  style: const TextStyle(
+                                      color: NeuColors.textPrimary))),
                           Text(
                             '${(item.price * item.quantity).toStringAsFixed(2)} ${l10n.dhs}',
-                            style: TextStyle(color: Colors.grey[600]),
+                            style: const TextStyle(
+                                color: NeuColors.textSecondary),
                           ),
                         ],
                       ),
@@ -216,16 +235,18 @@ class _OrderCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      l10n.total,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    const Text(
+                      'Total',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: NeuColors.textPrimary),
                     ),
                     Text(
                       '${order.total.toStringAsFixed(2)} ${l10n.dhs}',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFFFF5722),
+                        color: NeuColors.accent,
                       ),
                     ),
                   ],
@@ -252,7 +273,8 @@ class _OrderCard extends StatelessWidget {
                         Expanded(
                           child: Text(
                             order.clientComment!,
-                            style: const TextStyle(fontSize: 13),
+                            style: const TextStyle(
+                                fontSize: 13, color: NeuColors.textPrimary),
                           ),
                         ),
                       ],
@@ -267,13 +289,13 @@ class _OrderCard extends StatelessWidget {
                   Row(
                     children: [
                       Icon(Icons.location_on,
-                          size: 16, color: Colors.red[400]),
+                          size: 16, color: NeuColors.error),
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
                           order.deliveryAddress!,
-                          style: TextStyle(
-                              fontSize: 12, color: Colors.grey[600]),
+                          style: const TextStyle(
+                              fontSize: 12, color: NeuColors.textSecondary),
                         ),
                       ),
                     ],
@@ -291,8 +313,8 @@ class _OrderCard extends StatelessWidget {
                           icon: const Icon(Icons.close, size: 18),
                           label: Text(l10n.reject),
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.red,
-                            side: const BorderSide(color: Colors.red),
+                            foregroundColor: NeuColors.error,
+                            side: const BorderSide(color: NeuColors.error),
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -308,7 +330,7 @@ class _OrderCard extends StatelessWidget {
                           icon: const Icon(Icons.check_circle, size: 18),
                           label: Text(l10n.acceptOrder),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
+                            backgroundColor: NeuColors.success,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             shape: RoundedRectangleBorder(
@@ -342,7 +364,8 @@ class _OrderCard extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+            style:
+                ElevatedButton.styleFrom(backgroundColor: NeuColors.success),
             child: Text(l10n.acceptOrder),
           ),
         ],
@@ -359,7 +382,7 @@ class _OrderCard extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.orderAcceptedByRestaurant),
-            backgroundColor: Colors.green,
+            backgroundColor: NeuColors.success,
           ),
         );
       }
@@ -368,7 +391,7 @@ class _OrderCard extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('${l10n.error}: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: NeuColors.error,
           ),
         );
       }
@@ -407,7 +430,8 @@ class _OrderCard extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style:
+                ElevatedButton.styleFrom(backgroundColor: NeuColors.error),
             child: Text(l10n.reject),
           ),
         ],
@@ -434,7 +458,7 @@ class _OrderCard extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('${l10n.error}: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: NeuColors.error,
           ),
         );
       }

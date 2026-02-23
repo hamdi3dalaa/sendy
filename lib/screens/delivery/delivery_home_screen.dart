@@ -10,6 +10,7 @@ import '../../providers/location_provider.dart';
 import '../../providers/order_provider.dart';
 import '../../models/order_model.dart';
 import '../../models/user_model.dart';
+import '../../theme/neumorphic_theme.dart';
 import 'delivery_active_order_screen.dart';
 import 'delivery_invoice_history_screen.dart';
 import 'settlement_upload_screen.dart';
@@ -57,9 +58,12 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
     final locationProvider = Provider.of<LocationProvider>(context);
 
     return Scaffold(
+      backgroundColor: NeuColors.background,
       appBar: AppBar(
         title: Text(l10n.deliveryPerson),
-        backgroundColor: const Color(0xFFFF5722),
+        backgroundColor: NeuColors.accent,
+        foregroundColor: Colors.white,
+        elevation: 0,
         actions: [
           // Language toggle
           TextButton(
@@ -100,12 +104,16 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF5722)),
+              valueColor: AlwaysStoppedAnimation<Color>(NeuColors.accent),
             ),
             const SizedBox(height: 20),
             Text(
               l10n.locationInitializing,
-              style: Theme.of(context).textTheme.titleMedium,
+              style: const TextStyle(
+                color: NeuColors.textPrimary,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
@@ -122,31 +130,33 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
               const Icon(
                 Icons.location_off,
                 size: 80,
-                color: Colors.red,
+                color: NeuColors.error,
               ),
               const SizedBox(height: 20),
               Text(
                 l10n.locationError,
-                style: Theme.of(context).textTheme.headlineSmall,
+                style: const TextStyle(
+                  color: NeuColors.textPrimary,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 10),
               Text(
                 locationProvider.error!,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.grey),
+                style: const TextStyle(color: NeuColors.textSecondary),
               ),
               const SizedBox(height: 30),
-              ElevatedButton.icon(
+              NeuButton(
                 onPressed: () => locationProvider.initializeLocation(),
-                icon: const Icon(Icons.refresh),
-                label: Text(l10n.retry),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF5722),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 30,
-                    vertical: 15,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.refresh, color: Colors.white),
+                    const SizedBox(width: 8),
+                    Text(l10n.retry),
+                  ],
                 ),
               ),
               const SizedBox(height: 10),
@@ -159,8 +169,11 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
                       locationProvider.openLocationSettings();
                     }
                   },
-                  icon: const Icon(Icons.settings),
-                  label: Text(l10n.openSettings),
+                  icon: const Icon(Icons.settings, color: NeuColors.accent),
+                  label: Text(
+                    l10n.openSettings,
+                    style: const TextStyle(color: NeuColors.accent),
+                  ),
                 ),
             ],
           ),
@@ -181,34 +194,39 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
               onTap: () => _uploadProfilePhoto(context, l10n),
               child: Stack(
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(50),
-                    child: authProvider.currentUser?.profileImageUrl != null
-                        ? CachedNetworkImage(
-                            imageUrl: authProvider.currentUser!.profileImageUrl!,
-                            width: 100,
-                            height: 100,
-                            fit: BoxFit.cover,
-                            placeholder: (_, __) => Container(
-                              width: 100, height: 100,
-                              color: Colors.grey[200],
-                              child: const CircularProgressIndicator(),
+                  Container(
+                    decoration: NeuDecoration.raised(radius: 50),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(50),
+                      child: authProvider.currentUser?.profileImageUrl != null
+                          ? CachedNetworkImage(
+                              imageUrl: authProvider.currentUser!.profileImageUrl!,
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
+                              placeholder: (_, __) => Container(
+                                width: 100, height: 100,
+                                color: NeuColors.background,
+                                child: const CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(NeuColors.accent),
+                                ),
+                              ),
+                              errorWidget: (_, __, ___) => Container(
+                                width: 100, height: 100,
+                                color: NeuColors.background,
+                                child: const Icon(Icons.delivery_dining, size: 50, color: NeuColors.accent),
+                              ),
+                            )
+                          : Container(
+                              width: 100,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                color: NeuColors.accent.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(50),
+                              ),
+                              child: const Icon(Icons.delivery_dining, size: 50, color: NeuColors.accent),
                             ),
-                            errorWidget: (_, __, ___) => Container(
-                              width: 100, height: 100,
-                              color: Colors.grey[200],
-                              child: const Icon(Icons.delivery_dining, size: 50, color: Color(0xFFFF5722)),
-                            ),
-                          )
-                        : Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFF5722).withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(50),
-                            ),
-                            child: const Icon(Icons.delivery_dining, size: 50, color: Color(0xFFFF5722)),
-                          ),
+                    ),
                   ),
                   Positioned(
                     bottom: 0,
@@ -216,7 +234,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: const BoxDecoration(
-                        color: Color(0xFFFF5722),
+                        color: NeuColors.accent,
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.camera_alt, size: 16, color: Colors.white),
@@ -244,7 +262,11 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
             const SizedBox(height: 20),
             Text(
               l10n.deliverySpace,
-              style: Theme.of(context).textTheme.headlineMedium,
+              style: const TextStyle(
+                color: NeuColors.textPrimary,
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 20),
 
@@ -252,23 +274,25 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
             _buildActiveDeliveryCard(context, l10n, authProvider),
 
             const SizedBox(height: 20),
-            Card(
-              elevation: 4,
+            NeuCard(
+              padding: EdgeInsets.zero,
               child: SwitchListTile(
                 title: Text(
                   _isAvailable ? l10n.available : l10n.unavailable,
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
+                    color: NeuColors.textPrimary,
                   ),
                 ),
                 subtitle: Text(
                   _isAvailable
                       ? l10n.canReceiveOrders
                       : l10n.activateToReceiveOrders,
+                  style: const TextStyle(color: NeuColors.textSecondary),
                 ),
                 value: _isAvailable,
-                activeColor: const Color(0xFFFF5722),
+                activeColor: NeuColors.accent,
                 onChanged: locationProvider.currentPosition == null
                     ? null
                     : (value) {
@@ -285,40 +309,47 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
             ),
             const SizedBox(height: 20),
             if (locationProvider.currentPosition != null)
-              Card(
-                elevation: 4,
+              NeuCard(
+                padding: EdgeInsets.zero,
                 child: ListTile(
                   leading: const Icon(
                     Icons.location_on,
-                    color: Color(0xFFFF5722),
+                    color: NeuColors.accent,
                   ),
-                  title: Text(l10n.currentPosition),
+                  title: Text(
+                    l10n.currentPosition,
+                    style: const TextStyle(color: NeuColors.textPrimary),
+                  ),
                   subtitle: Text(
                     'Lat: ${locationProvider.currentPosition!.latitude.toStringAsFixed(4)}\n'
                     'Lng: ${locationProvider.currentPosition!.longitude.toStringAsFixed(4)}',
+                    style: const TextStyle(color: NeuColors.textSecondary),
                   ),
                   trailing: IconButton(
-                    icon: const Icon(Icons.refresh),
+                    icon: const Icon(Icons.refresh, color: NeuColors.accent),
                     onPressed: () => locationProvider.initializeLocation(),
                     tooltip: l10n.refresh,
                   ),
                 ),
               )
             else
-              Card(
-                elevation: 4,
-                color: Colors.orange.shade50,
+              NeuCard(
+                padding: EdgeInsets.zero,
                 child: ListTile(
                   leading: const Icon(
                     Icons.location_searching,
                     color: Colors.orange,
                   ),
-                  title: Text(l10n.positionRequired),
+                  title: Text(
+                    l10n.positionRequired,
+                    style: const TextStyle(color: NeuColors.textPrimary),
+                  ),
                   subtitle: Text(
                     l10n.positionRequiredDescription,
+                    style: const TextStyle(color: NeuColors.textSecondary),
                   ),
                   trailing: IconButton(
-                    icon: const Icon(Icons.refresh),
+                    icon: const Icon(Icons.refresh, color: NeuColors.accent),
                     onPressed: () => locationProvider.initializeLocation(),
                   ),
                 ),
@@ -331,38 +362,44 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
             const SizedBox(height: 20),
 
             // Invoice History Card
-            Card(
-              elevation: 4,
+            NeuCard(
+              padding: EdgeInsets.zero,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DeliveryInvoiceHistoryScreen(),
+                  ),
+                );
+              },
               child: ListTile(
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
+                    color: NeuColors.success.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.receipt_long, color: Colors.green),
+                  child: const Icon(Icons.receipt_long, color: NeuColors.success),
                 ),
                 title: Text(
                   l10n.invoiceHistory,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: NeuColors.textPrimary,
+                  ),
                 ),
-                subtitle: Text(l10n.deliverySummary),
-                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const DeliveryInvoiceHistoryScreen(),
-                    ),
-                  );
-                },
+                subtitle: Text(
+                  l10n.deliverySummary,
+                  style: const TextStyle(color: NeuColors.textSecondary),
+                ),
+                trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: NeuColors.textHint),
               ),
             ),
 
             const SizedBox(height: 20),
             Text(
               l10n.orders,
-              style: const TextStyle(fontSize: 18, color: Colors.grey),
+              style: const TextStyle(fontSize: 18, color: NeuColors.textSecondary),
             ),
           ],
         ),
@@ -407,21 +444,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
           },
           child: Container(
             margin: const EdgeInsets.only(bottom: 4),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFFFF5722), Color(0xFFFF7043)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFFFF5722).withOpacity(0.4),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
+            decoration: NeuDecoration.accentRaised(),
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
@@ -500,121 +523,116 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
         final owedAmount = snapshot.data ?? 0.0;
         final isThresholdReached = owedAmount >= 100.0;
 
-        return Card(
-          elevation: 4,
-          color: isThresholdReached ? Colors.red[50] : null,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: isThresholdReached
-                ? BorderSide(color: Colors.red[300]!, width: 2)
-                : BorderSide.none,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: isThresholdReached
-                            ? Colors.red.withOpacity(0.1)
-                            : const Color(0xFFFF5722).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        Icons.account_balance_wallet,
-                        color: isThresholdReached
-                            ? Colors.red
-                            : const Color(0xFFFF5722),
-                        size: 28,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            l10n.serviceFeeBalance,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                            ),
-                          ),
-                          Text(
-                            l10n.amountOwedToSendy,
-                            style: TextStyle(
-                                fontSize: 12, color: Colors.grey[600]),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Text(
-                      '${owedAmount.toStringAsFixed(0)} ${l10n.dhs}',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 22,
-                        color: isThresholdReached
-                            ? Colors.red
-                            : const Color(0xFFFF5722),
-                      ),
-                    ),
-                  ],
-                ),
-                if (isThresholdReached) ...[
-                  const SizedBox(height: 12),
+        return Container(
+          decoration: isThresholdReached
+              ? NeuDecoration.raised(radius: 16, color: const Color(0xFFFDE8E8))
+              : NeuDecoration.raised(radius: 16),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Row(
+                children: [
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Colors.red[100],
-                      borderRadius: BorderRadius.circular(8),
+                      color: isThresholdReached
+                          ? NeuColors.error.withOpacity(0.1)
+                          : NeuColors.accent.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Row(
+                    child: Icon(
+                      Icons.account_balance_wallet,
+                      color: isThresholdReached
+                          ? NeuColors.error
+                          : NeuColors.accent,
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(Icons.warning_amber_rounded,
-                            color: Colors.red, size: 20),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            l10n.settlementRequired,
-                            style: TextStyle(
-                                fontSize: 12, color: Colors.red[800]),
+                        Text(
+                          l10n.serviceFeeBalance,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: NeuColors.textPrimary,
+                          ),
+                        ),
+                        Text(
+                          l10n.amountOwedToSendy,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: NeuColors.textSecondary,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SettlementUploadScreen(
-                              owedAmount: owedAmount,
-                            ),
-                          ),
-                        );
-                      },
-                      icon: const Icon(Icons.send, size: 18),
-                      label: Text(l10n.sendPayment),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                      ),
+                  Text(
+                    '${owedAmount.toStringAsFixed(0)} ${l10n.dhs}',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22,
+                      color: isThresholdReached
+                          ? NeuColors.error
+                          : NeuColors.accent,
                     ),
                   ),
                 ],
+              ),
+              if (isThresholdReached) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.red[100],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.warning_amber_rounded,
+                          color: NeuColors.error, size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          l10n.settlementRequired,
+                          style: TextStyle(
+                              fontSize: 12, color: Colors.red[800]),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: NeuButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SettlementUploadScreen(
+                            owedAmount: owedAmount,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.send, size: 18, color: Colors.white),
+                        const SizedBox(width: 8),
+                        Text(l10n.sendPayment),
+                      ],
+                    ),
+                  ),
+                ),
               ],
-            ),
+            ],
           ),
         );
       },
@@ -661,7 +679,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(success ? l10n.imageUploadSuccess : l10n.imageUploadError),
-          backgroundColor: success ? Colors.green : Colors.red,
+          backgroundColor: success ? NeuColors.success : NeuColors.error,
         ),
       );
     }

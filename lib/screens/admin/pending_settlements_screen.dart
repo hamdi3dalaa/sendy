@@ -7,6 +7,7 @@ import 'package:sendy/l10n/app_localizations.dart';
 import '../../providers/order_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/settlement_model.dart';
+import '../../theme/neumorphic_theme.dart';
 
 class PendingSettlementsScreen extends StatelessWidget {
   const PendingSettlementsScreen({Key? key}) : super(key: key);
@@ -16,17 +17,19 @@ class PendingSettlementsScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
+      backgroundColor: NeuColors.background,
       appBar: AppBar(
         title: Text(l10n.pendingSettlements),
-        backgroundColor: const Color(0xFFFF5722),
+        backgroundColor: NeuColors.accent,
         foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: StreamBuilder<List<SettlementModel>>(
         stream: context.read<OrderProvider>().getPendingSettlements(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-                child: CircularProgressIndicator(color: Color(0xFFFF5722)));
+                child: CircularProgressIndicator(color: NeuColors.accent));
           }
 
           final settlements = snapshot.data ?? [];
@@ -36,12 +39,12 @@ class PendingSettlementsScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.check_circle_outline,
-                      size: 80, color: Colors.grey[300]),
+                  const Icon(Icons.check_circle_outline,
+                      size: 80, color: NeuColors.textHint),
                   const SizedBox(height: 16),
                   Text(
                     l10n.noSettlementsPending,
-                    style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                    style: const TextStyle(fontSize: 18, color: NeuColors.textSecondary),
                   ),
                 ],
               ),
@@ -70,147 +73,148 @@ class _SettlementCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Header
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              color: Color(0xFFFF5722),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.person, color: Colors.white),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        settlement.deliveryPersonName,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+      decoration: NeuDecoration.raised(),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Header
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: NeuColors.accent,
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.person, color: Colors.white),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          settlement.deliveryPersonName,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
-                      ),
-                      Text(
-                        settlement.deliveryPersonPhone,
-                        style: const TextStyle(
-                            color: Colors.white70, fontSize: 13),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    '${settlement.amount.toStringAsFixed(0)} ${l10n.dhs}',
-                    style: const TextStyle(
-                      color: Color(0xFFFF5722),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                        Text(
+                          settlement.deliveryPersonPhone,
+                          style: const TextStyle(
+                              color: Colors.white70, fontSize: 13),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
-
-          // Date
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: [
-                Icon(Icons.calendar_today, size: 16, color: Colors.grey[600]),
-                const SizedBox(width: 6),
-                Text(
-                  DateFormat('dd/MM/yyyy HH:mm').format(settlement.createdAt),
-                  style: TextStyle(color: Colors.grey[600], fontSize: 13),
-                ),
-              ],
-            ),
-          ),
-
-          // Proof Image
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: GestureDetector(
-              onTap: () => _showFullImage(context, settlement.proofImageUrl),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: CachedNetworkImage(
-                  imageUrl: settlement.proofImageUrl,
-                  height: 200,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  placeholder: (_, __) => Container(
-                    height: 200,
-                    color: Colors.grey[200],
-                    child: const Center(child: CircularProgressIndicator()),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      '${settlement.amount.toStringAsFixed(0)} ${l10n.dhs}',
+                      style: const TextStyle(
+                        color: NeuColors.accent,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
                   ),
-                  errorWidget: (_, __, ___) => Container(
+                ],
+              ),
+            ),
+
+            // Date
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  const Icon(Icons.calendar_today, size: 16, color: NeuColors.textSecondary),
+                  const SizedBox(width: 6),
+                  Text(
+                    DateFormat('dd/MM/yyyy HH:mm').format(settlement.createdAt),
+                    style: const TextStyle(color: NeuColors.textSecondary, fontSize: 13),
+                  ),
+                ],
+              ),
+            ),
+
+            // Proof Image
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: GestureDetector(
+                onTap: () => _showFullImage(context, settlement.proofImageUrl),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: CachedNetworkImage(
+                    imageUrl: settlement.proofImageUrl,
                     height: 200,
-                    color: Colors.grey[200],
-                    child: const Icon(Icons.broken_image, size: 48),
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    placeholder: (_, __) => Container(
+                      height: 200,
+                      color: NeuColors.background,
+                      child: const Center(child: CircularProgressIndicator()),
+                    ),
+                    errorWidget: (_, __, ___) => Container(
+                      height: 200,
+                      color: NeuColors.background,
+                      child: const Icon(Icons.broken_image, size: 48),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
 
-          // Action buttons
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () =>
-                        _rejectSettlement(context, settlement, l10n),
-                    icon: const Icon(Icons.close, size: 18),
-                    label: Text(l10n.reject),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.red,
-                      side: const BorderSide(color: Colors.red),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8)),
+            // Action buttons
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () =>
+                          _rejectSettlement(context, settlement, l10n),
+                      icon: const Icon(Icons.close, size: 18),
+                      label: Text(l10n.reject),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.red,
+                        side: const BorderSide(color: Colors.red),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  flex: 2,
-                  child: ElevatedButton.icon(
-                    onPressed: () =>
-                        _approveSettlement(context, settlement, l10n),
-                    icon: const Icon(Icons.check, size: 18),
-                    label: Text(l10n.approve),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8)),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 2,
+                    child: ElevatedButton.icon(
+                      onPressed: () =>
+                          _approveSettlement(context, settlement, l10n),
+                      icon: const Icon(Icons.check, size: 18),
+                      label: Text(l10n.approve),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

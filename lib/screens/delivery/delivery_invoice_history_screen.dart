@@ -7,6 +7,7 @@ import 'package:sendy/l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/order_model.dart';
 import '../../services/invoice_service.dart';
+import '../../theme/neumorphic_theme.dart';
 
 class DeliveryInvoiceHistoryScreen extends StatefulWidget {
   const DeliveryInvoiceHistoryScreen({Key? key}) : super(key: key);
@@ -89,9 +90,12 @@ class _DeliveryInvoiceHistoryScreenState
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
+      backgroundColor: NeuColors.background,
       appBar: AppBar(
         title: Text(l10n.invoiceHistory),
-        backgroundColor: const Color(0xFFFF5722),
+        backgroundColor: NeuColors.accent,
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: Column(
         children: [
@@ -100,12 +104,7 @@ class _DeliveryInvoiceHistoryScreenState
             width: double.infinity,
             margin: const EdgeInsets.all(16),
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFFFF5722), Color(0xFFFF8A65)],
-              ),
-              borderRadius: BorderRadius.circular(16),
-            ),
+            decoration: NeuDecoration.accentRaised(),
             child: Row(
               children: [
                 Expanded(
@@ -166,9 +165,10 @@ class _DeliveryInvoiceHistoryScreenState
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                Text(l10n.period,
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(width: 12),
+                const Text(
+                  '',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 Expanded(
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
@@ -190,24 +190,29 @@ class _DeliveryInvoiceHistoryScreenState
           // Orders list
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(NeuColors.accent),
+                    ),
+                  )
                 : _orders.isEmpty
                     ? Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.receipt_long,
-                                size: 80, color: Colors.grey[400]),
+                            const Icon(Icons.receipt_long,
+                                size: 80, color: NeuColors.textHint),
                             const SizedBox(height: 16),
                             Text(l10n.noInvoices,
-                                style: TextStyle(
-                                    fontSize: 16, color: Colors.grey[600])),
+                                style: const TextStyle(
+                                    fontSize: 16, color: NeuColors.textSecondary)),
                             Text(l10n.invoicesWillAppear,
-                                style: TextStyle(color: Colors.grey[500])),
+                                style: const TextStyle(color: NeuColors.textHint)),
                           ],
                         ),
                       )
                     : RefreshIndicator(
+                        color: NeuColors.accent,
                         onRefresh: _loadOrders,
                         child: ListView.builder(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -226,49 +231,53 @@ class _DeliveryInvoiceHistoryScreenState
     final isSelected = _selectedPeriod == value;
     return Padding(
       padding: const EdgeInsets.only(right: 8),
-      child: ChoiceChip(
-        label: Text(label),
-        selected: isSelected,
-        selectedColor: const Color(0xFFFF5722),
-        labelStyle: TextStyle(
-          color: isSelected ? Colors.white : Colors.black87,
-        ),
-        onSelected: (selected) {
-          if (selected) {
-            setState(() => _selectedPeriod = value);
-            _loadOrders();
-          }
+      child: NeuChip(
+        label: label,
+        isSelected: isSelected,
+        onTap: () {
+          setState(() => _selectedPeriod = value);
+          _loadOrders();
         },
       ),
     );
   }
 
   Widget _buildDeliveryCard(OrderModel order, AppLocalizations l10n) {
-    return Card(
+    return NeuCard(
       margin: const EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.zero,
       child: ListTile(
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.green.withOpacity(0.1),
+            color: NeuColors.success.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: const Icon(Icons.delivery_dining, color: Colors.green),
+          child: const Icon(Icons.delivery_dining, color: NeuColors.success),
         ),
         title: Text(
           '${l10n.orderNumber} #${order.orderId.substring(0, 8).toUpperCase()}',
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: NeuColors.textPrimary,
+          ),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(DateFormat('dd/MM/yyyy HH:mm').format(order.createdAt)),
+            Text(
+              DateFormat('dd/MM/yyyy HH:mm').format(order.createdAt),
+              style: const TextStyle(color: NeuColors.textSecondary),
+            ),
             if (order.deliveryAddress != null)
               Text(
                 order.deliveryAddress!,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                style: const TextStyle(
+                  color: NeuColors.textSecondary,
+                  fontSize: 12,
+                ),
               ),
           ],
         ),
@@ -280,7 +289,7 @@ class _DeliveryInvoiceHistoryScreenState
               '${order.deliveryFee.toStringAsFixed(2)} ${l10n.dhs}',
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
-                color: Colors.green,
+                color: NeuColors.success,
                 fontSize: 16,
               ),
             ),
@@ -288,15 +297,15 @@ class _DeliveryInvoiceHistoryScreenState
             InkWell(
               onTap: () =>
                   InvoiceService.generateAndDownloadInvoice(order, l10n),
-              child: Row(
+              child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.download, size: 16, color: Colors.blue),
-                  const SizedBox(width: 4),
+                  Icon(Icons.download, size: 16, color: NeuColors.accent),
+                  SizedBox(width: 4),
                   Text(
-                    l10n.invoice,
-                    style: const TextStyle(
-                      color: Colors.blue,
+                    'PDF',
+                    style: TextStyle(
+                      color: NeuColors.accent,
                       fontSize: 12,
                     ),
                   ),

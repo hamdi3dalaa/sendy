@@ -7,6 +7,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/menu_provider.dart';
 import '../../providers/client_provider.dart';
 import '../../models/menu_item_model.dart';
+import '../../theme/neumorphic_theme.dart';
 
 class DishPromotionsScreen extends StatefulWidget {
   const DishPromotionsScreen({Key? key}) : super(key: key);
@@ -23,15 +24,18 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
     final restaurantId = authProvider.currentUser?.uid ?? '';
 
     return Scaffold(
+      backgroundColor: NeuColors.background,
       appBar: AppBar(
         title: Text(l10n.dishPromotions),
-        backgroundColor: const Color(0xFFFF5722),
+        backgroundColor: NeuColors.accent,
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddPromotionDialog(context, restaurantId),
         icon: const Icon(Icons.add),
         label: Text(l10n.addPromotion),
-        backgroundColor: const Color(0xFFFF5722),
+        backgroundColor: NeuColors.accent,
       ),
       body: StreamBuilder<List<DishPromotion>>(
         stream: context
@@ -39,7 +43,10 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
             .getRestaurantPromotions(restaurantId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+                child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(NeuColors.accent),
+            ));
           }
 
           final promotions = snapshot.data ?? [];
@@ -49,16 +56,16 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.local_offer,
-                      size: 64, color: Colors.grey[400]),
+                  const Icon(Icons.local_offer,
+                      size: 64, color: NeuColors.textHint),
                   const SizedBox(height: 16),
                   Text(l10n.noPromotions,
-                      style:
-                          const TextStyle(fontSize: 18, color: Colors.grey)),
+                      style: const TextStyle(
+                          fontSize: 18, color: NeuColors.textSecondary)),
                   const SizedBox(height: 8),
                   Text(l10n.addPromotionHint,
-                      style:
-                          TextStyle(fontSize: 14, color: Colors.grey[500]),
+                      style: const TextStyle(
+                          fontSize: 14, color: NeuColors.textHint),
                       textAlign: TextAlign.center),
                 ],
               ),
@@ -89,20 +96,19 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
     Color statusColor;
     String statusText;
     if (isExpired) {
-      statusColor = Colors.grey;
+      statusColor = NeuColors.textHint;
       statusText = l10n.expired;
     } else if (isUpcoming) {
       statusColor = Colors.blue;
       statusText = l10n.upcoming;
     } else {
-      statusColor = Colors.green;
+      statusColor = NeuColors.success;
       statusText = l10n.active;
     }
 
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      decoration: NeuDecoration.raised(radius: 12),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -119,7 +125,7 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
                     child: Banner(
                       message: '-${promo.discountPercent}%',
                       location: BannerLocation.topEnd,
-                      color: Colors.red,
+                      color: NeuColors.error,
                       textStyle: const TextStyle(
                         fontSize: 8,
                         fontWeight: FontWeight.bold,
@@ -134,17 +140,17 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
                               errorBuilder: (_, __, ___) => Container(
                                 width: 80,
                                 height: 80,
-                                color: Colors.grey[200],
+                                color: NeuColors.background,
                                 child: const Icon(Icons.fastfood,
-                                    color: Colors.grey),
+                                    color: NeuColors.textHint),
                               ),
                             )
                           : Container(
                               width: 80,
                               height: 80,
-                              color: Colors.grey[200],
-                              child:
-                                  const Icon(Icons.fastfood, color: Colors.grey),
+                              color: NeuColors.background,
+                              child: const Icon(Icons.fastfood,
+                                  color: NeuColors.textHint),
                             ),
                     ),
                   ),
@@ -156,7 +162,9 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
                     children: [
                       Text(promo.dishName,
                           style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16)),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: NeuColors.textPrimary)),
                       const SizedBox(height: 4),
                       Row(
                         children: [
@@ -164,7 +172,7 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
                             '${promo.originalPrice.toStringAsFixed(0)} ${l10n.dhs}',
                             style: const TextStyle(
                               decoration: TextDecoration.lineThrough,
-                              color: Colors.grey,
+                              color: NeuColors.textHint,
                               fontSize: 14,
                             ),
                           ),
@@ -172,7 +180,7 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
                           Text(
                             '${promo.promoPrice.toStringAsFixed(0)} ${l10n.dhs}',
                             style: const TextStyle(
-                              color: Color(0xFFFF5722),
+                              color: NeuColors.accent,
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
                             ),
@@ -182,7 +190,7 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color: Colors.red,
+                              color: NeuColors.error,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
@@ -218,7 +226,7 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
                     InkWell(
                       onTap: () => _confirmDelete(context, promo, l10n),
                       child: const Icon(Icons.delete_outline,
-                          color: Colors.red, size: 22),
+                          color: NeuColors.error, size: 22),
                     ),
                   ],
                 ),
@@ -229,11 +237,13 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
             const SizedBox(height: 8),
             Row(
               children: [
-                const Icon(Icons.schedule, size: 14, color: Colors.grey),
+                const Icon(Icons.schedule,
+                    size: 14, color: NeuColors.textHint),
                 const SizedBox(width: 4),
                 Text(
-                  '${dateFormat.format(promo.startDate)} → ${dateFormat.format(promo.endDate)}',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  '${dateFormat.format(promo.startDate)} -> ${dateFormat.format(promo.endDate)}',
+                  style: const TextStyle(
+                      fontSize: 12, color: NeuColors.textSecondary),
                 ),
               ],
             ),
@@ -263,7 +273,7 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
                   .deleteDishPromotion(promo.id);
             },
             child: Text(l10n.delete,
-                style: const TextStyle(color: Colors.red)),
+                style: const TextStyle(color: NeuColors.error)),
           ),
         ],
       ),
@@ -293,6 +303,7 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: NeuColors.background,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -317,7 +328,7 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
                         width: 40,
                         height: 4,
                         decoration: BoxDecoration(
-                          color: Colors.grey[300],
+                          color: NeuColors.textHint,
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -325,52 +336,96 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
                     const SizedBox(height: 16),
                     Text(l10n.addPromotion,
                         style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold)),
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: NeuColors.textPrimary)),
                     const SizedBox(height: 20),
 
                     // Select dish
                     Text(l10n.selectDish,
                         style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 14)),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: NeuColors.textPrimary)),
                     const SizedBox(height: 8),
-                    DropdownButtonFormField<MenuItem>(
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 10),
+                    Container(
+                      decoration: NeuDecoration.pressed(radius: 12),
+                      child: DropdownButtonFormField<MenuItem>(
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                                color: NeuColors.accent, width: 1.5),
+                          ),
+                          filled: true,
+                          fillColor: Colors.transparent,
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 10),
+                        ),
+                        hint: Text(l10n.selectDish,
+                            style:
+                                const TextStyle(color: NeuColors.textHint)),
+                        value: selectedItem,
+                        items: approvedItems.map((item) {
+                          return DropdownMenuItem(
+                            value: item,
+                            child: Text(
+                                '${item.name} - ${item.price.toStringAsFixed(0)} ${l10n.dhs}'),
+                          );
+                        }).toList(),
+                        onChanged: (item) {
+                          setModalState(() {
+                            selectedItem = item;
+                          });
+                        },
                       ),
-                      hint: Text(l10n.selectDish),
-                      value: selectedItem,
-                      items: approvedItems.map((item) {
-                        return DropdownMenuItem(
-                          value: item,
-                          child: Text(
-                              '${item.name} - ${item.price.toStringAsFixed(0)} ${l10n.dhs}'),
-                        );
-                      }).toList(),
-                      onChanged: (item) {
-                        setModalState(() {
-                          selectedItem = item;
-                        });
-                      },
                     ),
                     const SizedBox(height: 16),
 
                     // Promo price
                     Text(l10n.promoPrice,
                         style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 14)),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: NeuColors.textPrimary)),
                     const SizedBox(height: 8),
-                    TextField(
-                      controller: promoPriceController,
-                      keyboardType: TextInputType.number,
-                      onChanged: (_) => setModalState(() {}),
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                        hintText: l10n.promoPrice,
-                        suffixText: l10n.dhs,
+                    Container(
+                      decoration: NeuDecoration.pressed(radius: 12),
+                      child: TextField(
+                        controller: promoPriceController,
+                        keyboardType: TextInputType.number,
+                        onChanged: (_) => setModalState(() {}),
+                        style:
+                            const TextStyle(color: NeuColors.textPrimary),
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                                color: NeuColors.accent, width: 1.5),
+                          ),
+                          filled: true,
+                          fillColor: Colors.transparent,
+                          hintText: l10n.promoPrice,
+                          hintStyle:
+                              const TextStyle(color: NeuColors.textHint),
+                          suffixText: l10n.dhs,
+                        ),
                       ),
                     ),
                     if (selectedItem != null &&
@@ -382,19 +437,22 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
                         if (pp > 0 && pp < selectedItem!.price) {
                           final disc = ((1 - pp / selectedItem!.price) * 100)
                               .round();
-                          final discColor = disc >= 1 ? Colors.green : Colors.red;
+                          final discColor =
+                              disc >= 1 ? NeuColors.success : NeuColors.error;
                           return Container(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 8),
                             decoration: BoxDecoration(
                               color: discColor.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: discColor.withOpacity(0.3)),
+                              border:
+                                  Border.all(color: discColor.withOpacity(0.3)),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.discount, color: discColor, size: 20),
+                                Icon(Icons.discount,
+                                    color: discColor, size: 20),
                                 const SizedBox(width: 8),
                                 Text(
                                   '-$disc%',
@@ -406,7 +464,7 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  '${selectedItem!.price.toStringAsFixed(0)} → ${pp.toStringAsFixed(0)} ${l10n.dhs}',
+                                  '${selectedItem!.price.toStringAsFixed(0)} -> ${pp.toStringAsFixed(0)} ${l10n.dhs}',
                                   style: TextStyle(
                                     color: discColor,
                                     fontSize: 13,
@@ -424,7 +482,9 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
                     // Start date
                     Text(l10n.startDate,
                         style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 14)),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: NeuColors.textPrimary)),
                     const SizedBox(height: 8),
                     InkWell(
                       onTap: () async {
@@ -455,16 +515,15 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 12, vertical: 14),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey[400]!),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        decoration: NeuDecoration.pressed(radius: 12),
                         child: Row(
                           children: [
                             const Icon(Icons.calendar_today,
-                                size: 18, color: Color(0xFFFF5722)),
+                                size: 18, color: NeuColors.accent),
                             const SizedBox(width: 8),
-                            Text(dateFormat.format(startDate)),
+                            Text(dateFormat.format(startDate),
+                                style: const TextStyle(
+                                    color: NeuColors.textPrimary)),
                           ],
                         ),
                       ),
@@ -474,7 +533,9 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
                     // End date
                     Text(l10n.endDate,
                         style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 14)),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: NeuColors.textPrimary)),
                     const SizedBox(height: 8),
                     InkWell(
                       onTap: () async {
@@ -504,16 +565,15 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 12, vertical: 14),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey[400]!),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        decoration: NeuDecoration.pressed(radius: 12),
                         child: Row(
                           children: [
                             const Icon(Icons.calendar_today,
-                                size: 18, color: Color(0xFFFF5722)),
+                                size: 18, color: NeuColors.accent),
                             const SizedBox(width: 8),
-                            Text(dateFormat.format(endDate)),
+                            Text(dateFormat.format(endDate),
+                                style: const TextStyle(
+                                    color: NeuColors.textPrimary)),
                           ],
                         ),
                       ),
@@ -535,10 +595,13 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
                           return;
                         }
                         // Minimum 1% discount validation
-                        final discountPct = ((1 - promoPrice / selectedItem!.price) * 100).round();
+                        final discountPct =
+                            ((1 - promoPrice / selectedItem!.price) * 100)
+                                .round();
                         if (discountPct < 1) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(l10n.minimumDiscountError)),
+                            SnackBar(
+                                content: Text(l10n.minimumDiscountError)),
                           );
                           return;
                         }
@@ -578,7 +641,7 @@ class _DishPromotionsScreenState extends State<DishPromotionsScreen> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFF5722),
+                        backgroundColor: NeuColors.accent,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(

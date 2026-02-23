@@ -7,6 +7,7 @@ import '../../providers/menu_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/menu_item_model.dart';
 import 'package:sendy/l10n/app_localizations.dart';
+import '../../theme/neumorphic_theme.dart';
 
 class EditMenuItemScreen extends StatefulWidget {
   final MenuItem menuItem;
@@ -29,7 +30,7 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
   bool _isSubmitting = false;
 
   final List<String> _categories = [
-    'Entrée',
+    'Entree',
     'Plat principal',
     'Dessert',
     'Boisson',
@@ -140,7 +141,8 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
                 ? l10n.dishModifiedPending
                 : l10n.dishModifiedSuccess,
           ),
-          backgroundColor: _newImageFile != null ? Colors.orange : Colors.green,
+          backgroundColor:
+              _newImageFile != null ? Colors.orange : NeuColors.success,
         ),
       );
       Navigator.pop(context, true);
@@ -148,7 +150,7 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.modificationError),
-          backgroundColor: Colors.red,
+          backgroundColor: NeuColors.error,
         ),
       );
     }
@@ -158,9 +160,12 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
+      backgroundColor: NeuColors.background,
       appBar: AppBar(
         title: Text(l10n.editDish),
-        backgroundColor: const Color(0xFFFF5722),
+        backgroundColor: NeuColors.accent,
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -174,11 +179,7 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
                 onTap: _pickImage,
                 child: Container(
                   height: 200,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey[400]!),
-                  ),
+                  decoration: NeuDecoration.pressed(radius: 12),
                   child: _newImageFile != null
                       ? Stack(
                           children: [
@@ -232,7 +233,7 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Icon(
+                                          const Icon(
                                             Icons.edit,
                                             size: 40,
                                             color: Colors.white,
@@ -240,7 +241,7 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
                                           const SizedBox(height: 4),
                                           Text(
                                             l10n.changePhoto,
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                               color: Colors.white,
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -255,12 +256,13 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
                           : Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.add_a_photo,
-                                    size: 50, color: Colors.grey[600]),
+                                const Icon(Icons.add_a_photo,
+                                    size: 50, color: NeuColors.textHint),
                                 const SizedBox(height: 8),
                                 Text(
                                   l10n.addPhoto,
-                                  style: TextStyle(color: Colors.grey[600]),
+                                  style: const TextStyle(
+                                      color: NeuColors.textSecondary),
                                 ),
                               ],
                             ),
@@ -269,111 +271,226 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
               if (_newImageFile != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
-                  child: Card(
-                    color: Colors.orange[50],
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Text(
-                        l10n.newPhotoPending,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.orange[900],
-                        ),
-                        textAlign: TextAlign.center,
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.orange[50],
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.orange[200]!),
+                    ),
+                    child: Text(
+                      l10n.newPhotoPending,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.orange[900],
                       ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ),
               const SizedBox(height: 24),
 
               // Name
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: l10n.dishName,
-                  border: const OutlineInputBorder(),
-                  prefixIcon: const Icon(Icons.restaurant),
+              Container(
+                decoration: NeuDecoration.pressed(radius: 14),
+                child: TextFormField(
+                  controller: _nameController,
+                  style: const TextStyle(color: NeuColors.textPrimary),
+                  decoration: InputDecoration(
+                    labelText: l10n.dishName,
+                    labelStyle:
+                        const TextStyle(color: NeuColors.textSecondary),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(
+                          color: NeuColors.accent, width: 1.5),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(
+                          color: NeuColors.error, width: 1.5),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(
+                          color: NeuColors.error, width: 1.5),
+                    ),
+                    filled: true,
+                    fillColor: Colors.transparent,
+                    prefixIcon:
+                        const Icon(Icons.restaurant, color: NeuColors.accent),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return l10n.enterNameValidation;
+                    }
+                    if (value.trim().length < 3) {
+                      return l10n.nameTooShort;
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return l10n.enterNameValidation;
-                  }
-                  if (value.trim().length < 3) {
-                    return l10n.nameTooShort;
-                  }
-                  return null;
-                },
               ),
               const SizedBox(height: 16),
 
               // Description
-              TextFormField(
-                controller: _descriptionController,
-                decoration: InputDecoration(
-                  labelText: l10n.descriptionRequired,
-                  border: const OutlineInputBorder(),
-                  prefixIcon: const Icon(Icons.description),
+              Container(
+                decoration: NeuDecoration.pressed(radius: 14),
+                child: TextFormField(
+                  controller: _descriptionController,
+                  style: const TextStyle(color: NeuColors.textPrimary),
+                  decoration: InputDecoration(
+                    labelText: l10n.descriptionRequired,
+                    labelStyle:
+                        const TextStyle(color: NeuColors.textSecondary),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(
+                          color: NeuColors.accent, width: 1.5),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(
+                          color: NeuColors.error, width: 1.5),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(
+                          color: NeuColors.error, width: 1.5),
+                    ),
+                    filled: true,
+                    fillColor: Colors.transparent,
+                    prefixIcon: const Icon(Icons.description,
+                        color: NeuColors.accent),
+                  ),
+                  maxLines: 3,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return l10n.enterDescriptionValidation;
+                    }
+                    if (value.trim().length < 10) {
+                      return l10n.descriptionTooShort;
+                    }
+                    return null;
+                  },
                 ),
-                maxLines: 3,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return l10n.enterDescriptionValidation;
-                  }
-                  if (value.trim().length < 10) {
-                    return l10n.descriptionTooShort;
-                  }
-                  return null;
-                },
               ),
               const SizedBox(height: 16),
 
               // Category
-              DropdownButtonFormField<String>(
-                value: _selectedCategory,
-                decoration: InputDecoration(
-                  labelText: l10n.category,
-                  border: const OutlineInputBorder(),
-                  prefixIcon: const Icon(Icons.category),
+              Container(
+                decoration: NeuDecoration.pressed(radius: 14),
+                child: DropdownButtonFormField<String>(
+                  value: _selectedCategory,
+                  style: const TextStyle(color: NeuColors.textPrimary),
+                  decoration: InputDecoration(
+                    labelText: l10n.category,
+                    labelStyle:
+                        const TextStyle(color: NeuColors.textSecondary),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(
+                          color: NeuColors.accent, width: 1.5),
+                    ),
+                    filled: true,
+                    fillColor: Colors.transparent,
+                    prefixIcon:
+                        const Icon(Icons.category, color: NeuColors.accent),
+                  ),
+                  items: _categories.map((category) {
+                    return DropdownMenuItem(
+                      value: category,
+                      child: Text(category),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        _selectedCategory = value;
+                      });
+                    }
+                  },
                 ),
-                items: _categories.map((category) {
-                  return DropdownMenuItem(
-                    value: category,
-                    child: Text(category),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() {
-                      _selectedCategory = value;
-                    });
-                  }
-                },
               ),
               const SizedBox(height: 16),
 
               // Price
-              TextFormField(
-                controller: _priceController,
-                decoration: InputDecoration(
-                  labelText: l10n.priceRequired,
-                  border: const OutlineInputBorder(),
-                  prefixText: l10n.dhs,
+              Container(
+                decoration: NeuDecoration.pressed(radius: 14),
+                child: TextFormField(
+                  controller: _priceController,
+                  style: const TextStyle(color: NeuColors.textPrimary),
+                  decoration: InputDecoration(
+                    labelText: l10n.priceRequired,
+                    labelStyle:
+                        const TextStyle(color: NeuColors.textSecondary),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(
+                          color: NeuColors.accent, width: 1.5),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(
+                          color: NeuColors.error, width: 1.5),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(
+                          color: NeuColors.error, width: 1.5),
+                    ),
+                    filled: true,
+                    fillColor: Colors.transparent,
+                    prefixText: l10n.dhs,
+                  ),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return l10n.enterPriceValidation;
+                    }
+                    final price = double.tryParse(value.trim());
+                    if (price == null) {
+                      return l10n.invalidPrice;
+                    }
+                    if (price <= 0) {
+                      return l10n.pricePositive;
+                    }
+                    return null;
+                  },
                 ),
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return l10n.enterPriceValidation;
-                  }
-                  final price = double.tryParse(value.trim());
-                  if (price == null) {
-                    return l10n.invalidPrice;
-                  }
-                  if (price <= 0) {
-                    return l10n.pricePositive;
-                  }
-                  return null;
-                },
               ),
               const SizedBox(height: 24),
 
@@ -381,7 +498,7 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
               ElevatedButton(
                 onPressed: _isSubmitting ? null : _submitForm,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF5722),
+                  backgroundColor: NeuColors.accent,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(

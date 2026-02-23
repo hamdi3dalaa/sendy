@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sendy/l10n/app_localizations.dart';
 import '../../providers/order_provider.dart';
+import '../../theme/neumorphic_theme.dart';
 
 class DeliveryFeesScreen extends StatefulWidget {
   const DeliveryFeesScreen({Key? key}) : super(key: key);
@@ -26,41 +27,57 @@ class _DeliveryFeesScreenState extends State<DeliveryFeesScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
+      backgroundColor: NeuColors.background,
       appBar: AppBar(
         title: Text(l10n.deliveryFeesTitle),
-        backgroundColor: const Color(0xFFFF5722),
+        backgroundColor: NeuColors.accent,
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: Column(
         children: [
           // Search bar
           Padding(
             padding: const EdgeInsets.all(12),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: l10n.searchByNameOrPhone,
-                prefixIcon: const Icon(Icons.search, color: Color(0xFFFF5722)),
-                suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          _searchController.clear();
-                          setState(() => _searchQuery = '');
-                        },
-                      )
-                    : null,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+            child: Container(
+              decoration: NeuDecoration.pressed(radius: 14),
+              child: TextField(
+                controller: _searchController,
+                style: const TextStyle(color: NeuColors.textPrimary),
+                decoration: InputDecoration(
+                  hintText: l10n.searchByNameOrPhone,
+                  hintStyle: const TextStyle(color: NeuColors.textHint),
+                  prefixIcon: const Icon(Icons.search, color: NeuColors.accent),
+                  suffixIcon: _searchQuery.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() => _searchQuery = '');
+                          },
+                        )
+                      : null,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide:
+                        const BorderSide(color: NeuColors.accent, width: 1.5),
+                  ),
+                  filled: true,
+                  fillColor: Colors.transparent,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide:
-                      const BorderSide(color: Color(0xFFFF5722), width: 2),
-                ),
+                onChanged: (value) {
+                  setState(() => _searchQuery = value.toLowerCase());
+                },
               ),
-              onChanged: (value) {
-                setState(() => _searchQuery = value.toLowerCase());
-              },
             ),
           ),
 
@@ -81,11 +98,11 @@ class _DeliveryFeesScreenState extends State<DeliveryFeesScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Icon(Icons.delivery_dining,
-                            size: 64, color: Colors.grey),
+                            size: 64, color: NeuColors.textHint),
                         const SizedBox(height: 16),
                         Text(l10n.noDeliveryPersonsFound,
                             style: const TextStyle(
-                                fontSize: 16, color: Colors.grey)),
+                                fontSize: 16, color: NeuColors.textSecondary)),
                       ],
                     ),
                   );
@@ -122,10 +139,9 @@ class _DeliveryFeesScreenState extends State<DeliveryFeesScreen> {
                 return Column(
                   children: [
                     // Summary row
-                    Container(
+                    Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 10),
-                      color: Colors.grey[100],
                       child: Row(
                         children: [
                           _buildSummaryChip(
@@ -143,7 +159,7 @@ class _DeliveryFeesScreenState extends State<DeliveryFeesScreen> {
                           _buildSummaryChip(
                             l10n.totalOwed,
                             '${totalOwed.toStringAsFixed(0)} ${l10n.dhs}',
-                            const Color(0xFFFF5722),
+                            NeuColors.accent,
                           ),
                         ],
                       ),
@@ -154,7 +170,7 @@ class _DeliveryFeesScreenState extends State<DeliveryFeesScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 10),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFF5722).withOpacity(0.1),
+                        color: NeuColors.accent.withOpacity(0.1),
                       ),
                       child: Row(
                         children: [
@@ -164,21 +180,24 @@ class _DeliveryFeesScreenState extends State<DeliveryFeesScreen> {
                             child: Text(l10n.name,
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 13)),
+                                    fontSize: 13,
+                                    color: NeuColors.textPrimary)),
                           ),
                           Expanded(
                             flex: 3,
                             child: Text(l10n.phone,
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 13)),
+                                    fontSize: 13,
+                                    color: NeuColors.textPrimary)),
                           ),
                           Expanded(
                             flex: 2,
                             child: Text(l10n.amountDue,
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 13),
+                                    fontSize: 13,
+                                    color: NeuColors.textPrimary),
                                 textAlign: TextAlign.end),
                           ),
                           const SizedBox(width: 8),
@@ -226,6 +245,7 @@ class _DeliveryFeesScreenState extends State<DeliveryFeesScreen> {
                                         : '-',
                                     style: TextStyle(
                                       fontSize: 13,
+                                      color: NeuColors.textPrimary,
                                       fontWeight: isOverThreshold
                                           ? FontWeight.bold
                                           : FontWeight.normal,
@@ -239,7 +259,7 @@ class _DeliveryFeesScreenState extends State<DeliveryFeesScreen> {
                                   flex: 3,
                                   child: Text(
                                     person['phoneNumber'] ?? '-',
-                                    style: const TextStyle(fontSize: 13),
+                                    style: const TextStyle(fontSize: 13, color: NeuColors.textPrimary),
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
@@ -256,8 +276,8 @@ class _DeliveryFeesScreenState extends State<DeliveryFeesScreen> {
                                       color: isOverThreshold
                                           ? Colors.red
                                           : owedAmount > 0
-                                              ? const Color(0xFFFF5722)
-                                              : Colors.grey,
+                                              ? NeuColors.accent
+                                              : NeuColors.textHint,
                                     ),
                                   ),
                                 ),
@@ -283,10 +303,7 @@ class _DeliveryFeesScreenState extends State<DeliveryFeesScreen> {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(10),
-        ),
+        decoration: NeuDecoration.raised(radius: 10),
         child: Column(
           children: [
             Text(
