@@ -1,4 +1,6 @@
 // lib/screens/delivery/delivery_home_screen.dart
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sendy/l10n/app_localizations.dart';
@@ -404,6 +406,14 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
               setState(() {
                 _isMapExpanded = !_isMapExpanded;
               });
+              // Re-center camera when expanding
+              if (_isMapExpanded && _mapController != null) {
+                Future.delayed(const Duration(milliseconds: 450), () {
+                  _mapController?.animateCamera(
+                    CameraUpdate.newLatLng(latLng),
+                  );
+                });
+              }
             },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -458,10 +468,8 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
               ),
             ),
           ),
-          // Animated map container
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 400),
-            curve: Curves.easeInOut,
+          // Map container
+          SizedBox(
             height: _isMapExpanded ? 300 : 150,
             child: GoogleMap(
               initialCameraPosition: CameraPosition(
@@ -482,6 +490,12 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
               mapToolbarEnabled: false,
               compassEnabled: _isMapExpanded,
               liteModeEnabled: false,
+              // Required for GoogleMap inside a ScrollView
+              gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+                Factory<OneSequenceGestureRecognizer>(
+                  () => EagerGestureRecognizer(),
+                ),
+              },
               onMapCreated: (controller) {
                 _mapController = controller;
               },
