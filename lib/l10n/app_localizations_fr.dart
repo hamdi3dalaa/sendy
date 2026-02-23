@@ -1116,4 +1116,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get minimumDiscountError => 'La reduction doit etre d\'au moins 1%';
+
+  // Delivery map
+  @override
+  String get myPositionMap => 'Ma position sur la carte';
+  @override
+  String get tapToExpandMap => 'Appuyez pour agrandir';
+  @override
+  String get tapToShrinkMap => 'Appuyez pour réduire';
 }
