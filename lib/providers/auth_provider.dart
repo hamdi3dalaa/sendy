@@ -483,6 +483,42 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  /// Update restaurant availability status
+  Future<void> updateRestaurantAvailability(bool isAvailable) async {
+    final user = _auth.currentUser;
+    if (user == null || _currentUser == null) return;
+
+    try {
+      await _firestore.collection('users').doc(user.uid).update({
+        'isAvailable': isAvailable,
+      });
+      _currentUser = _currentUser!.copyWith(isAvailable: isAvailable);
+      notifyListeners();
+    } catch (e) {
+      print('Error updating availability: $e');
+    }
+  }
+
+  /// Update restaurant working hours
+  Future<void> updateRestaurantHours(String openTime, String closeTime) async {
+    final user = _auth.currentUser;
+    if (user == null || _currentUser == null) return;
+
+    try {
+      await _firestore.collection('users').doc(user.uid).update({
+        'openTime': openTime,
+        'closeTime': closeTime,
+      });
+      _currentUser = _currentUser!.copyWith(
+        openTime: openTime,
+        closeTime: closeTime,
+      );
+      notifyListeners();
+    } catch (e) {
+      print('Error updating hours: $e');
+    }
+  }
+
   Future<void> signOut() async {
     _currentUser = null;
     _currentPhoneNumber = null;

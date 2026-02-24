@@ -18,6 +18,8 @@ import 'screens/delivery/delivery_main_screen.dart';
 import 'screens/restaurant/restaurant_main_screen.dart';
 import 'screens/admin/admin_main_screen.dart';
 import 'screens/waiting_approval_screen.dart';
+import 'screens/restaurant/incoming_orders_screen.dart';
+import 'screens/delivery/available_orders_screen.dart';
 import 'services/notification_service.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'providers/client_provider.dart';
@@ -81,6 +83,7 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             title: 'Sendy',
             debugShowCheckedModeBanner: false,
+            navigatorKey: navigatorKey,
             locale: authProvider.locale,
             localizationsDelegates: const [
               AppLocalizations.delegate,
@@ -96,6 +99,10 @@ class MyApp extends StatelessWidget {
               primarySwatch: Colors.orange,
               fontFamily: 'Roboto',
             ),
+            routes: {
+              '/incoming-orders': (context) => const IncomingOrdersScreen(),
+              '/available-orders': (context) => const AvailableOrdersScreen(),
+            },
             home: const AuthWrapper(),
           );
         },

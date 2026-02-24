@@ -395,5 +395,13 @@
   "minimumDiscountError": "يجب أن يكون التخفيض 1% على الأقل",
   "myPositionMap": "موقعي على الخريطة",
   "tapToExpandMap": "اضغط للتكبير",
-  "tapToShrinkMap": "اضغط للتصغير"
+  "tapToShrinkMap": "اضغط للتصغير",
+  "restaurantOpen": "مفتوح",
+  "restaurantClosed": "مغلق",
+  "restaurantReceivingOrders": "تستقبل الطلبات",
+  "restaurantNotReceivingOrders": "لا تستقبل الطلبات",
+  "workingHours": "أوقات العمل",
+  "notConfigured": "غير محدد",
+  "openTime": "وقت الفتح",
+  "closeTime": "وقت الإغلاق"
 }

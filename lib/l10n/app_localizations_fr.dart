@@ -1124,4 +1124,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tapToExpandMap => 'Appuyez pour agrandir';
   @override
   String get tapToShrinkMap => 'Appuyez pour réduire';
+
+  // Restaurant availability
+  @override
+  String get restaurantOpen => 'Ouvert';
+  @override
+  String get restaurantClosed => 'Fermé';
+  @override
+  String get restaurantReceivingOrders => 'Vous recevez des commandes';
+  @override
+  String get restaurantNotReceivingOrders => 'Vous ne recevez pas de commandes';
+  @override
+  String get workingHours => 'Horaires d\'ouverture';
+  @override
+  String get notConfigured => 'Non configuré';
+  @override
+  String get openTime => 'Heure d\'ouverture';
+  @override
+  String get closeTime => 'Heure de fermeture';
 }

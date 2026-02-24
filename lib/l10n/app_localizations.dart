@@ -2070,6 +2070,16 @@ abstract class AppLocalizations {
   String get myPositionMap;
   String get tapToExpandMap;
   String get tapToShrinkMap;
+
+  // Restaurant availability
+  String get restaurantOpen;
+  String get restaurantClosed;
+  String get restaurantReceivingOrders;
+  String get restaurantNotReceivingOrders;
+  String get workingHours;
+  String get notConfigured;
+  String get openTime;
+  String get closeTime;
 }
 
 class _AppLocalizationsDelegate

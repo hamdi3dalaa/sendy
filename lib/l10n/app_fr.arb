@@ -395,5 +395,13 @@
   "minimumDiscountError": "La reduction doit etre d'au moins 1%",
   "myPositionMap": "Ma position sur la carte",
   "tapToExpandMap": "Appuyez pour agrandir",
-  "tapToShrinkMap": "Appuyez pour réduire"
+  "tapToShrinkMap": "Appuyez pour réduire",
+  "restaurantOpen": "Ouvert",
+  "restaurantClosed": "Fermé",
+  "restaurantReceivingOrders": "Vous recevez des commandes",
+  "restaurantNotReceivingOrders": "Vous ne recevez pas de commandes",
+  "workingHours": "Horaires d'ouverture",
+  "notConfigured": "Non configuré",
+  "openTime": "Heure d'ouverture",
+  "closeTime": "Heure de fermeture"
 }

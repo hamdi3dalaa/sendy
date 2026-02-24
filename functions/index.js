@@ -277,19 +277,43 @@ exports.resendWhatsAppOTP = functions.https.onCall(async (data, context) => {
 async function sendFCMNotification(fcmToken, title, body, data = {}) {
   if (!fcmToken) return;
 
+  const isOrderNotification = data.type === 'new_order';
+  const channelId = isOrderNotification ? 'sendy_orders' : 'sendy_channel';
+
   try {
+    // Ensure all data values are strings (FCM requirement)
+    const stringData = {};
+    for (const [key, value] of Object.entries(data)) {
+      stringData[key] = String(value);
+    }
+
     const message = {
       token: fcmToken,
       notification: {
         title: title,
         body: body,
       },
-      data: data,
+      data: stringData,
       android: {
+        priority: 'high',
         notification: {
-          channelId: 'sendy_channel',
-          priority: 'high',
+          channelId: channelId,
+          priority: isOrderNotification ? 'max' : 'high',
           sound: 'default',
+          defaultVibrateTimings: true,
+          defaultLightSettings: true,
+          visibility: 'public',
+        },
+      },
+      apns: {
+        payload: {
+          aps: {
+            sound: 'default',
+            badge: 1,
+          },
+        },
+        headers: {
+          'apns-priority': '10',
         },
       },
     };
@@ -313,13 +337,20 @@ exports.onNewOrder = functions.firestore
       const restaurantDoc = await db.collection('users').doc(orderData.restaurantId).get();
       if (restaurantDoc.exists) {
         const restaurant = restaurantDoc.data();
+
+        // Check if restaurant is available
+        if (restaurant.isAvailable === false) {
+          console.log(`⚠️ Restaurant ${orderData.restaurantId} is unavailable, order ${orderId} will still be created but restaurant is offline.`);
+        }
+
         if (restaurant.fcmToken) {
           const itemCount = orderData.items ? orderData.items.length : 0;
           const total = orderData.total || 0;
+          const clientName = orderData.clientName || '';
           await sendFCMNotification(
             restaurant.fcmToken,
-            'Nouvelle commande !',
-            `${itemCount} article(s) - ${total} DHs\n${orderData.clientComment || ''}`,
+            '🔔 Nouvelle commande !',
+            `${clientName ? clientName + ' - ' : ''}${itemCount} article(s) - ${total} DHs`,
             { orderId: orderId, type: 'new_order' }
           );
         }

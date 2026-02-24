@@ -21,6 +21,10 @@ class UserModel {
   final String? profileImageUrl;
   final String? pendingProfileImageUrl;
   final bool hasPendingImageChange;
+  // Restaurant availability
+  final bool isAvailable;
+  final String? openTime;  // "HH:mm" format
+  final String? closeTime; // "HH:mm" format
 
   UserModel({
     required this.uid,
@@ -38,6 +42,9 @@ class UserModel {
     this.profileImageUrl,
     this.pendingProfileImageUrl,
     this.hasPendingImageChange = false,
+    this.isAvailable = true,
+    this.openTime,
+    this.closeTime,
   });
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
@@ -63,6 +70,9 @@ class UserModel {
       profileImageUrl: map['profileImageUrl'],
       pendingProfileImageUrl: map['pendingProfileImageUrl'],
       hasPendingImageChange: map['hasPendingImageChange'] ?? false,
+      isAvailable: map['isAvailable'] ?? true,
+      openTime: map['openTime'],
+      closeTime: map['closeTime'],
     );
   }
 
@@ -83,6 +93,9 @@ class UserModel {
       'profileImageUrl': profileImageUrl,
       'pendingProfileImageUrl': pendingProfileImageUrl,
       'hasPendingImageChange': hasPendingImageChange,
+      'isAvailable': isAvailable,
+      'openTime': openTime,
+      'closeTime': closeTime,
     };
   }
 
@@ -102,6 +115,9 @@ class UserModel {
     String? profileImageUrl,
     String? pendingProfileImageUrl,
     bool? hasPendingImageChange,
+    bool? isAvailable,
+    String? openTime,
+    String? closeTime,
   }) {
     return UserModel(
       uid: uid ?? this.uid,
@@ -119,6 +135,9 @@ class UserModel {
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       pendingProfileImageUrl: pendingProfileImageUrl ?? this.pendingProfileImageUrl,
       hasPendingImageChange: hasPendingImageChange ?? this.hasPendingImageChange,
+      isAvailable: isAvailable ?? this.isAvailable,
+      openTime: openTime ?? this.openTime,
+      closeTime: closeTime ?? this.closeTime,
     );
   }
 
@@ -172,6 +191,9 @@ class RestaurantUser extends UserModel {
     super.profileImageUrl,
     super.pendingProfileImageUrl,
     super.hasPendingImageChange,
+    super.isAvailable,
+    super.openTime,
+    super.closeTime,
   }) : super(userType: UserType.restaurant);
 
   factory RestaurantUser.fromUserModel(UserModel user) {
@@ -190,6 +212,9 @@ class RestaurantUser extends UserModel {
       profileImageUrl: user.profileImageUrl,
       pendingProfileImageUrl: user.pendingProfileImageUrl,
       hasPendingImageChange: user.hasPendingImageChange,
+      isAvailable: user.isAvailable,
+      openTime: user.openTime,
+      closeTime: user.closeTime,
     );
   }
 
@@ -223,6 +248,31 @@ class RestaurantUser extends UserModel {
       restaurantName!.isNotEmpty &&
       restaurantAddress != null &&
       restaurantAddress!.isNotEmpty;
+
+  /// Whether the restaurant has set working hours
+  bool get hasWorkingHours =>
+      openTime != null && openTime!.isNotEmpty &&
+      closeTime != null && closeTime!.isNotEmpty;
+
+  /// Whether the restaurant is currently within working hours
+  bool get isWithinWorkingHours {
+    if (!hasWorkingHours) return true; // No hours set = always open
+    final now = DateTime.now();
+    final nowMinutes = now.hour * 60 + now.minute;
+    final openParts = openTime!.split(':');
+    final closeParts = closeTime!.split(':');
+    final openMinutes = int.parse(openParts[0]) * 60 + int.parse(openParts[1]);
+    final closeMinutes = int.parse(closeParts[0]) * 60 + int.parse(closeParts[1]);
+    if (closeMinutes > openMinutes) {
+      return nowMinutes >= openMinutes && nowMinutes <= closeMinutes;
+    } else {
+      // Overnight (e.g., 22:00 - 02:00)
+      return nowMinutes >= openMinutes || nowMinutes <= closeMinutes;
+    }
+  }
+
+  /// Whether the restaurant is effectively open (available + within hours)
+  bool get isOpen => isAvailable && isWithinWorkingHours;
 }
 
 /// Delivery-specific user model with delivery fields

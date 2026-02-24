@@ -1113,4 +1113,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tapToExpandMap => 'اضغط للتكبير';
   @override
   String get tapToShrinkMap => 'اضغط للتصغير';
+
+  // Restaurant availability
+  @override
+  String get restaurantOpen => 'مفتوح';
+  @override
+  String get restaurantClosed => 'مغلق';
+  @override
+  String get restaurantReceivingOrders => 'تستقبل الطلبات';
+  @override
+  String get restaurantNotReceivingOrders => 'لا تستقبل الطلبات';
+  @override
+  String get workingHours => 'أوقات العمل';
+  @override
+  String get notConfigured => 'غير محدد';
+  @override
+  String get openTime => 'وقت الفتح';
+  @override
+  String get closeTime => 'وقت الإغلاق';
 }

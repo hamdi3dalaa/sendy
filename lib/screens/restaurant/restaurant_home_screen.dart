@@ -340,7 +340,15 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 20),
+
+          // Availability Toggle Card
+          _buildAvailabilityCard(context, l10n, authProvider),
+          const SizedBox(height: 16),
+
+          // Working Hours Card
+          _buildWorkingHoursCard(context, l10n, authProvider),
+          const SizedBox(height: 20),
 
           // Menu Statistics Card
           Container(
@@ -633,6 +641,136 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
     );
   }
 
+  Widget _buildAvailabilityCard(
+    BuildContext context,
+    AppLocalizations l10n,
+    AuthProvider authProvider,
+  ) {
+    final isAvailable = authProvider.currentUser?.isAvailable ?? true;
+
+    return Container(
+      decoration: NeuDecoration.raised(radius: 12),
+      child: SwitchListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        secondary: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: isAvailable
+                ? NeuColors.success.withOpacity(0.1)
+                : NeuColors.error.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(
+            isAvailable ? Icons.store : Icons.store_outlined,
+            color: isAvailable ? NeuColors.success : NeuColors.error,
+          ),
+        ),
+        title: Text(
+          isAvailable ? l10n.restaurantOpen : l10n.restaurantClosed,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isAvailable ? NeuColors.success : NeuColors.error,
+          ),
+        ),
+        subtitle: Text(
+          isAvailable
+              ? l10n.restaurantReceivingOrders
+              : l10n.restaurantNotReceivingOrders,
+          style: const TextStyle(fontSize: 12, color: NeuColors.textSecondary),
+        ),
+        value: isAvailable,
+        activeColor: NeuColors.success,
+        onChanged: (value) {
+          authProvider.updateRestaurantAvailability(value);
+        },
+      ),
+    );
+  }
+
+  Widget _buildWorkingHoursCard(
+    BuildContext context,
+    AppLocalizations l10n,
+    AuthProvider authProvider,
+  ) {
+    final user = authProvider.currentUser;
+    final openTime = user?.openTime ?? '';
+    final closeTime = user?.closeTime ?? '';
+    final hasHours = openTime.isNotEmpty && closeTime.isNotEmpty;
+
+    return Container(
+      decoration: NeuDecoration.raised(radius: 12),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        clipBehavior: Clip.antiAlias,
+        child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          leading: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: NeuColors.accent.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(Icons.schedule, color: NeuColors.accent),
+          ),
+          title: Text(
+            l10n.workingHours,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: NeuColors.textPrimary,
+            ),
+          ),
+          subtitle: Text(
+            hasHours ? '$openTime - $closeTime' : l10n.notConfigured,
+            style: TextStyle(
+              fontSize: 13,
+              color: hasHours ? NeuColors.textPrimary : NeuColors.textHint,
+            ),
+          ),
+          trailing: const Icon(Icons.edit, size: 20, color: NeuColors.accent),
+          onTap: () => _showWorkingHoursDialog(context, l10n, authProvider),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showWorkingHoursDialog(
+    BuildContext context,
+    AppLocalizations l10n,
+    AuthProvider authProvider,
+  ) async {
+    final user = authProvider.currentUser;
+    TimeOfDay openTime = const TimeOfDay(hour: 8, minute: 0);
+    TimeOfDay closeTime = const TimeOfDay(hour: 22, minute: 0);
+
+    // Parse existing hours
+    if (user?.openTime != null && user!.openTime!.contains(':')) {
+      final parts = user.openTime!.split(':');
+      openTime = TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+    }
+    if (user?.closeTime != null && user!.closeTime!.contains(':')) {
+      final parts = user.closeTime!.split(':');
+      closeTime = TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+    }
+
+    final result = await showDialog<Map<String, TimeOfDay>>(
+      context: context,
+      builder: (ctx) => _WorkingHoursDialog(
+        initialOpen: openTime,
+        initialClose: closeTime,
+        l10n: l10n,
+      ),
+    );
+
+    if (result != null && mounted) {
+      final open = result['open']!;
+      final close = result['close']!;
+      final openStr = '${open.hour.toString().padLeft(2, '0')}:${open.minute.toString().padLeft(2, '0')}';
+      final closeStr = '${close.hour.toString().padLeft(2, '0')}:${close.minute.toString().padLeft(2, '0')}';
+      await authProvider.updateRestaurantHours(openStr, closeStr);
+    }
+  }
+
   Widget _buildOrdersSection(
       BuildContext context, AppLocalizations l10n, String restaurantId) {
     return Container(
@@ -836,6 +974,122 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
             color: NeuColors.textSecondary,
           ),
           textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+}
+
+/// Dialog for setting restaurant working hours
+class _WorkingHoursDialog extends StatefulWidget {
+  final TimeOfDay initialOpen;
+  final TimeOfDay initialClose;
+  final AppLocalizations l10n;
+
+  const _WorkingHoursDialog({
+    required this.initialOpen,
+    required this.initialClose,
+    required this.l10n,
+  });
+
+  @override
+  State<_WorkingHoursDialog> createState() => _WorkingHoursDialogState();
+}
+
+class _WorkingHoursDialogState extends State<_WorkingHoursDialog> {
+  late TimeOfDay _openTime;
+  late TimeOfDay _closeTime;
+
+  @override
+  void initState() {
+    super.initState();
+    _openTime = widget.initialOpen;
+    _closeTime = widget.initialClose;
+  }
+
+  String _formatTime(TimeOfDay time) {
+    return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = widget.l10n;
+
+    return AlertDialog(
+      title: Text(l10n.workingHours),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Open time
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.login, color: NeuColors.success),
+            title: Text(l10n.openTime),
+            trailing: TextButton(
+              onPressed: () async {
+                final picked = await showTimePicker(
+                  context: context,
+                  initialTime: _openTime,
+                );
+                if (picked != null) {
+                  setState(() => _openTime = picked);
+                }
+              },
+              child: Text(
+                _formatTime(_openTime),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: NeuColors.accent,
+                ),
+              ),
+            ),
+          ),
+          const Divider(),
+          // Close time
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.logout, color: NeuColors.error),
+            title: Text(l10n.closeTime),
+            trailing: TextButton(
+              onPressed: () async {
+                final picked = await showTimePicker(
+                  context: context,
+                  initialTime: _closeTime,
+                );
+                if (picked != null) {
+                  setState(() => _closeTime = picked);
+                }
+              },
+              child: Text(
+                _formatTime(_closeTime),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: NeuColors.accent,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.cancel),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.pop(context, {
+              'open': _openTime,
+              'close': _closeTime,
+            });
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: NeuColors.accent,
+            foregroundColor: Colors.white,
+          ),
+          child: Text(l10n.save),
         ),
       ],
     );
