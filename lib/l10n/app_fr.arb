@@ -403,5 +403,18 @@
   "workingHours": "Horaires d'ouverture",
   "notConfigured": "Non configuré",
   "openTime": "Heure d'ouverture",
-  "closeTime": "Heure de fermeture"
+  "closeTime": "Heure de fermeture",
+  "aiAnalyzePhoto": "Analyser avec IA",
+  "aiGeneratePhoto": "Générer avec IA",
+  "aiCustomPrompt": "Décrire l'image souhaitée",
+  "aiPromptHint": "Ex: Un tajine marocain avec des légumes colorés...",
+  "aiSuggestions": "Conseils IA",
+  "aiAnalysisError": "Erreur lors de l'analyse. Vérifiez la configuration OpenAI.",
+  "aiGenerationError": "Erreur lors de la génération. Vérifiez la configuration OpenAI.",
+  "aiNeedDishName": "Entrez d'abord le nom du plat",
+  "aiGenerateLogo": "Générer un logo IA",
+  "aiAnalyzeLogo": "Analyser le logo",
+  "aiLogoPromptDescription": "Décrivez le style de logo souhaité pour votre restaurant",
+  "aiLogoPromptHint": "Ex: Logo moderne avec une tagine, couleurs chaudes...",
+  "generate": "Générer"
 }

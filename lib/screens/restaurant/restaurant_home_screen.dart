@@ -7,6 +7,7 @@ import 'dart:io';
 import '../../providers/auth_provider.dart';
 import '../../providers/menu_provider.dart';
 import '../../models/user_model.dart';
+import '../../services/ai_image_service.dart';
 import 'menu_management_screen.dart';
 import 'invoice_history_screen.dart';
 import 'dish_promotions_screen.dart';
@@ -25,6 +26,9 @@ class RestaurantHomeScreen extends StatefulWidget {
 class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
   bool _isInitialized = false;
   bool _isLoggingOut = false;
+  bool _isAiLogoAnalyzing = false;
+  bool _isAiLogoGenerating = false;
+  String? _aiLogoSuggestions;
 
   @override
   void initState() {
@@ -340,7 +344,44 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
+
+          // AI Logo buttons
+          _buildAiLogoButtons(context, l10n, authProvider),
+
+          // AI Logo suggestions
+          if (_aiLogoSuggestions != null) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF3E8FF),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFD8B4FE)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.auto_fix_high, size: 18, color: Color(0xFF7C3AED)),
+                      const SizedBox(width: 8),
+                      Text(l10n.aiSuggestions, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF7C3AED))),
+                      const Spacer(),
+                      GestureDetector(
+                        onTap: () => setState(() => _aiLogoSuggestions = null),
+                        child: const Icon(Icons.close, size: 18, color: Color(0xFF7C3AED)),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(_aiLogoSuggestions!, style: const TextStyle(fontSize: 13, color: NeuColors.textPrimary)),
+                ],
+              ),
+            ),
+          ],
+
+          const SizedBox(height: 16),
 
           // Availability Toggle Card
           _buildAvailabilityCard(context, l10n, authProvider),
@@ -639,6 +680,183 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildAiLogoButtons(
+    BuildContext context,
+    AppLocalizations l10n,
+    AuthProvider authProvider,
+  ) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Generate logo with AI
+        _isAiLogoGenerating
+            ? const SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF7C3AED)),
+                ),
+              )
+            : TextButton.icon(
+                onPressed: () => _generateLogoWithAi(context, l10n, authProvider),
+                icon: const Icon(Icons.auto_awesome, size: 16, color: Color(0xFF7C3AED)),
+                label: Text(
+                  l10n.aiGenerateLogo,
+                  style: const TextStyle(fontSize: 12, color: Color(0xFF7C3AED)),
+                ),
+              ),
+        // Analyze logo (only if has image)
+        if (authProvider.currentUser?.profileImageUrl != null) ...[
+          const SizedBox(width: 8),
+          _isAiLogoAnalyzing
+              ? const SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF7C3AED)),
+                  ),
+                )
+              : TextButton.icon(
+                  onPressed: () => _analyzeLogoWithAi(context, l10n, authProvider),
+                  icon: const Icon(Icons.auto_fix_high, size: 16, color: Color(0xFF7C3AED)),
+                  label: Text(
+                    l10n.aiAnalyzeLogo,
+                    style: const TextStyle(fontSize: 12, color: Color(0xFF7C3AED)),
+                  ),
+                ),
+        ],
+      ],
+    );
+  }
+
+  Future<void> _analyzeLogoWithAi(
+    BuildContext context,
+    AppLocalizations l10n,
+    AuthProvider authProvider,
+  ) async {
+    final imageUrl = authProvider.currentUser?.profileImageUrl;
+    if (imageUrl == null) return;
+
+    setState(() {
+      _isAiLogoAnalyzing = true;
+      _aiLogoSuggestions = null;
+    });
+
+    try {
+      // Download the image to a temp file for analysis
+      final httpClient = await HttpClient().getUrl(Uri.parse(imageUrl));
+      final response = await httpClient.close();
+      final dir = await Directory.systemTemp.createTemp();
+      final file = File('${dir.path}/logo_temp.jpg');
+      await response.pipe(file.openWrite());
+
+      final locale = Localizations.localeOf(context).languageCode;
+      final restaurantName = authProvider.currentUser?.restaurantName ?? '';
+
+      final result = await AiImageService().analyzeLogoPhoto(
+        file,
+        restaurantName,
+        language: locale,
+      );
+
+      if (mounted) {
+        setState(() {
+          _isAiLogoAnalyzing = false;
+          _aiLogoSuggestions = result ?? l10n.aiAnalysisError;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isAiLogoAnalyzing = false;
+          _aiLogoSuggestions = l10n.aiAnalysisError;
+        });
+      }
+    }
+  }
+
+  Future<void> _generateLogoWithAi(
+    BuildContext context,
+    AppLocalizations l10n,
+    AuthProvider authProvider,
+  ) async {
+    final promptController = TextEditingController();
+    final restaurantName = authProvider.currentUser?.restaurantName ?? '';
+
+    final prompt = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.aiGenerateLogo),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              l10n.aiLogoPromptDescription,
+              style: const TextStyle(fontSize: 13, color: NeuColors.textSecondary),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: promptController,
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintText: l10n.aiLogoPromptHint,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, promptController.text.trim()),
+            style: ElevatedButton.styleFrom(backgroundColor: NeuColors.accent),
+            child: Text(l10n.generate),
+          ),
+        ],
+      ),
+    );
+
+    if (prompt == null || prompt.isEmpty) return;
+
+    setState(() => _isAiLogoGenerating = true);
+
+    final generatedFile = await AiImageService().generateLogoImage(
+      restaurantName,
+      prompt,
+    );
+
+    if (mounted) {
+      setState(() => _isAiLogoGenerating = false);
+
+      if (generatedFile != null) {
+        // Upload the generated logo
+        final success = await authProvider.uploadProfileImage(generatedFile);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(success ? l10n.imageUploadSuccess : l10n.imageUploadError),
+              backgroundColor: success ? NeuColors.success : NeuColors.error,
+            ),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.aiGenerationError),
+            backgroundColor: NeuColors.error,
+          ),
+        );
+      }
+    }
   }
 
   Widget _buildAvailabilityCard(

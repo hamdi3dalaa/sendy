@@ -2080,6 +2080,21 @@ abstract class AppLocalizations {
   String get notConfigured;
   String get openTime;
   String get closeTime;
+
+  // AI Image features
+  String get aiAnalyzePhoto;
+  String get aiGeneratePhoto;
+  String get aiCustomPrompt;
+  String get aiPromptHint;
+  String get aiSuggestions;
+  String get aiAnalysisError;
+  String get aiGenerationError;
+  String get aiNeedDishName;
+  String get aiGenerateLogo;
+  String get aiAnalyzeLogo;
+  String get aiLogoPromptDescription;
+  String get aiLogoPromptHint;
+  String get generate;
 }
 
 class _AppLocalizationsDelegate

@@ -403,5 +403,18 @@
   "workingHours": "أوقات العمل",
   "notConfigured": "غير محدد",
   "openTime": "وقت الفتح",
-  "closeTime": "وقت الإغلاق"
+  "closeTime": "وقت الإغلاق",
+  "aiAnalyzePhoto": "تحليل بالذكاء الاصطناعي",
+  "aiGeneratePhoto": "إنشاء بالذكاء الاصطناعي",
+  "aiCustomPrompt": "وصف الصورة المطلوبة",
+  "aiPromptHint": "مثال: طاجين مغربي مع خضروات ملونة...",
+  "aiSuggestions": "نصائح الذكاء الاصطناعي",
+  "aiAnalysisError": "خطأ في التحليل. تحقق من إعدادات OpenAI.",
+  "aiGenerationError": "خطأ في الإنشاء. تحقق من إعدادات OpenAI.",
+  "aiNeedDishName": "أدخل اسم الطبق أولاً",
+  "aiGenerateLogo": "إنشاء شعار بالذكاء الاصطناعي",
+  "aiAnalyzeLogo": "تحليل الشعار",
+  "aiLogoPromptDescription": "صف أسلوب الشعار المطلوب لمطعمك",
+  "aiLogoPromptHint": "مثال: شعار حديث مع طاجين، ألوان دافئة...",
+  "generate": "إنشاء"
 }

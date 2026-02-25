@@ -1131,4 +1131,32 @@ class AppLocalizationsAr extends AppLocalizations {
   String get openTime => 'وقت الفتح';
   @override
   String get closeTime => 'وقت الإغلاق';
+
+  // AI Image features
+  @override
+  String get aiAnalyzePhoto => 'تحليل بالذكاء الاصطناعي';
+  @override
+  String get aiGeneratePhoto => 'إنشاء بالذكاء الاصطناعي';
+  @override
+  String get aiCustomPrompt => 'وصف الصورة المطلوبة';
+  @override
+  String get aiPromptHint => 'مثال: طاجين مغربي مع خضروات ملونة...';
+  @override
+  String get aiSuggestions => 'نصائح الذكاء الاصطناعي';
+  @override
+  String get aiAnalysisError => 'خطأ في التحليل. تحقق من إعدادات OpenAI.';
+  @override
+  String get aiGenerationError => 'خطأ في الإنشاء. تحقق من إعدادات OpenAI.';
+  @override
+  String get aiNeedDishName => 'أدخل اسم الطبق أولاً';
+  @override
+  String get aiGenerateLogo => 'إنشاء شعار بالذكاء الاصطناعي';
+  @override
+  String get aiAnalyzeLogo => 'تحليل الشعار';
+  @override
+  String get aiLogoPromptDescription => 'صف أسلوب الشعار المطلوب لمطعمك';
+  @override
+  String get aiLogoPromptHint => 'مثال: شعار حديث مع طاجين، ألوان دافئة...';
+  @override
+  String get generate => 'إنشاء';
 }

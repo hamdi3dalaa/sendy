@@ -1142,4 +1142,32 @@ class AppLocalizationsFr extends AppLocalizations {
   String get openTime => 'Heure d\'ouverture';
   @override
   String get closeTime => 'Heure de fermeture';
+
+  // AI Image features
+  @override
+  String get aiAnalyzePhoto => 'Analyser avec IA';
+  @override
+  String get aiGeneratePhoto => 'Générer avec IA';
+  @override
+  String get aiCustomPrompt => 'Décrire l\'image souhaitée';
+  @override
+  String get aiPromptHint => 'Ex: Un tajine marocain avec des légumes colorés...';
+  @override
+  String get aiSuggestions => 'Conseils IA';
+  @override
+  String get aiAnalysisError => 'Erreur lors de l\'analyse. Vérifiez la configuration OpenAI.';
+  @override
+  String get aiGenerationError => 'Erreur lors de la génération. Vérifiez la configuration OpenAI.';
+  @override
+  String get aiNeedDishName => 'Entrez d\'abord le nom du plat';
+  @override
+  String get aiGenerateLogo => 'Générer un logo IA';
+  @override
+  String get aiAnalyzeLogo => 'Analyser le logo';
+  @override
+  String get aiLogoPromptDescription => 'Décrivez le style de logo souhaité pour votre restaurant';
+  @override
+  String get aiLogoPromptHint => 'Ex: Logo moderne avec une tagine, couleurs chaudes...';
+  @override
+  String get generate => 'Générer';
 }

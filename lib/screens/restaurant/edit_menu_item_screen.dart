@@ -8,6 +8,7 @@ import '../../providers/auth_provider.dart';
 import '../../models/menu_item_model.dart';
 import 'package:sendy/l10n/app_localizations.dart';
 import '../../theme/neumorphic_theme.dart';
+import '../../services/ai_image_service.dart';
 
 class EditMenuItemScreen extends StatefulWidget {
   final MenuItem menuItem;
@@ -28,6 +29,9 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
   late String _selectedCategory;
   File? _newImageFile;
   bool _isSubmitting = false;
+  bool _isAiAnalyzing = false;
+  bool _isAiGenerating = false;
+  String? _aiSuggestions;
 
   final List<String> _categories = [
     'Entree',
@@ -95,7 +99,116 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
     if (pickedFile != null) {
       setState(() {
         _newImageFile = File(pickedFile.path);
+        _aiSuggestions = null;
       });
+    }
+  }
+
+  Future<void> _analyzeWithAi() async {
+    if (_newImageFile == null) return;
+    final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context).languageCode;
+
+    setState(() {
+      _isAiAnalyzing = true;
+      _aiSuggestions = null;
+    });
+
+    final result = await AiImageService().analyzeDishPhoto(
+      _newImageFile!,
+      _nameController.text.trim(),
+      language: locale,
+    );
+
+    if (mounted) {
+      setState(() {
+        _isAiAnalyzing = false;
+        _aiSuggestions = result ?? l10n.aiAnalysisError;
+      });
+    }
+  }
+
+  Future<void> _generateWithAi() async {
+    final l10n = AppLocalizations.of(context)!;
+    final dishName = _nameController.text.trim();
+    final description = _descriptionController.text.trim();
+
+    if (dishName.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.aiNeedDishName), backgroundColor: Colors.orange),
+      );
+      return;
+    }
+
+    setState(() => _isAiGenerating = true);
+
+    final result = await AiImageService().generateDishImage(
+      dishName,
+      description.isNotEmpty ? description : dishName,
+    );
+
+    if (mounted) {
+      setState(() {
+        _isAiGenerating = false;
+        if (result != null) {
+          _newImageFile = result;
+          _aiSuggestions = null;
+        }
+      });
+      if (result == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.aiGenerationError), backgroundColor: NeuColors.error),
+        );
+      }
+    }
+  }
+
+  Future<void> _generateFromPrompt() async {
+    final l10n = AppLocalizations.of(context)!;
+    final promptController = TextEditingController();
+
+    final prompt = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.aiCustomPrompt),
+        content: TextField(
+          controller: promptController,
+          maxLines: 3,
+          decoration: InputDecoration(
+            hintText: l10n.aiPromptHint,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, promptController.text.trim()),
+            style: ElevatedButton.styleFrom(backgroundColor: NeuColors.accent),
+            child: Text(l10n.generate),
+          ),
+        ],
+      ),
+    );
+
+    if (prompt == null || prompt.isEmpty) return;
+
+    setState(() => _isAiGenerating = true);
+
+    final result = await AiImageService().generateFromPrompt(prompt);
+
+    if (mounted) {
+      setState(() {
+        _isAiGenerating = false;
+        if (result != null) {
+          _newImageFile = result;
+          _aiSuggestions = null;
+        }
+      });
+      if (result == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.aiGenerationError), backgroundColor: NeuColors.error),
+        );
+      }
     }
   }
 
@@ -288,6 +401,85 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
                     ),
                   ),
                 ),
+              const SizedBox(height: 12),
+
+              // AI Image buttons row
+              Row(
+                children: [
+                  if (_newImageFile != null)
+                    Expanded(
+                      child: _isAiAnalyzing
+                          ? const Center(child: SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF7C3AED)))))
+                          : OutlinedButton.icon(
+                              onPressed: _analyzeWithAi,
+                              icon: const Icon(Icons.auto_fix_high, size: 18, color: Color(0xFF7C3AED)),
+                              label: Text(l10n.aiAnalyzePhoto, style: const TextStyle(fontSize: 12, color: Color(0xFF7C3AED))),
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: Color(0xFF7C3AED)),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              ),
+                            ),
+                    ),
+                  if (_newImageFile != null) const SizedBox(width: 8),
+                  Expanded(
+                    child: _isAiGenerating
+                        ? const Center(child: SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF7C3AED)))))
+                        : OutlinedButton.icon(
+                            onPressed: _generateWithAi,
+                            icon: const Icon(Icons.auto_awesome, size: 18, color: Color(0xFF7C3AED)),
+                            label: Text(l10n.aiGeneratePhoto, style: const TextStyle(fontSize: 12, color: Color(0xFF7C3AED))),
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Color(0xFF7C3AED)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                          ),
+                  ),
+                  const SizedBox(width: 8),
+                  if (!_isAiGenerating)
+                    IconButton(
+                      onPressed: _generateFromPrompt,
+                      icon: const Icon(Icons.edit_note, color: Color(0xFF7C3AED)),
+                      tooltip: l10n.aiCustomPrompt,
+                      style: IconButton.styleFrom(
+                        side: const BorderSide(color: Color(0xFF7C3AED)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                    ),
+                ],
+              ),
+
+              // AI Suggestions
+              if (_aiSuggestions != null) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF3E8FF),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFD8B4FE)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.auto_fix_high, size: 18, color: Color(0xFF7C3AED)),
+                          const SizedBox(width: 8),
+                          Text(l10n.aiSuggestions, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF7C3AED))),
+                          const Spacer(),
+                          GestureDetector(
+                            onTap: () => setState(() => _aiSuggestions = null),
+                            child: const Icon(Icons.close, size: 18, color: Color(0xFF7C3AED)),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(_aiSuggestions!, style: const TextStyle(fontSize: 13, color: NeuColors.textPrimary)),
+                    ],
+                  ),
+                ),
+              ],
+
               const SizedBox(height: 24),
 
               // Name
