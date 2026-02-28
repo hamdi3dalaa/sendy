@@ -5,6 +5,7 @@ import 'dart:async';
 import '../models/order_model.dart';
 import '../models/settlement_model.dart';
 import '../services/notification_service.dart';
+import '../services/ai_recommendation_service.dart';
 import '../models/user_model.dart';
 
 class OrderProvider with ChangeNotifier {
@@ -124,6 +125,9 @@ class OrderProvider with ChangeNotifier {
 
       await _notificationService.sendNotificationToRestaurant(
           order.restaurantId, 'Nouvelle commande!');
+
+      // Clear AI recommendation cache so next visit gets fresh suggestions
+      AiRecommendationService().clearCache();
     } catch (e) {
       rethrow;
     }

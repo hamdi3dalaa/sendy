@@ -2109,6 +2109,15 @@ abstract class AppLocalizations {
   String get privacyPolicy;
   String get termsOfService;
   String get appVersion;
+
+  // AI Food Recommendations
+  String get aiRecommendations;
+  String get aiRecommendationsSubtitle;
+  String get basedOnYourTastes;
+  String get noRecommendationsYet;
+  String get orderToGetRecommendations;
+  String get loadingRecommendations;
+  String get viewDish;
 }
 
 class _AppLocalizationsDelegate

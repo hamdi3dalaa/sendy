@@ -1183,4 +1183,20 @@ class AppLocalizationsAr extends AppLocalizations {
   String get termsOfService => 'شروط الاستخدام';
   @override
   String get appVersion => 'إصدار التطبيق';
+
+  // AI Food Recommendations
+  @override
+  String get aiRecommendations => 'اقتراحات لك';
+  @override
+  String get aiRecommendationsSubtitle => 'بناءً على طلباتك السابقة';
+  @override
+  String get basedOnYourTastes => 'حسب ذوقك';
+  @override
+  String get noRecommendationsYet => 'لا توجد اقتراحات بعد';
+  @override
+  String get orderToGetRecommendations => 'اطلب للحصول على اقتراحات مخصصة';
+  @override
+  String get loadingRecommendations => 'تحليل ذوقك...';
+  @override
+  String get viewDish => 'عرض';
 }

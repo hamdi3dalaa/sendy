@@ -2,10 +2,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sendy/l10n/app_localizations.dart';
 import '../../providers/client_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../theme/neumorphic_theme.dart';
+import '../../services/ai_recommendation_service.dart';
 import 'restaurant_menu_screen.dart';
 
 class RestaurantsListScreen extends StatefulWidget {
@@ -19,6 +21,12 @@ class _RestaurantsListScreenState extends State<RestaurantsListScreen> {
   String _searchQuery = '';
   String _selectedCategory = '';
   bool _hasLoaded = false;
+
+  // AI Recommendations
+  final AiRecommendationService _aiService = AiRecommendationService();
+  List<AiRecommendation> _recommendations = [];
+  bool _isLoadingRecommendations = false;
+  bool _hasLoadedRecommendations = false;
 
   @override
   void initState() {
@@ -203,7 +211,18 @@ class _RestaurantsListScreenState extends State<RestaurantsListScreen> {
                   child: ListView(
                     padding: const EdgeInsets.all(16),
                     children: [
-                      // Promotions section at the top
+                      // AI Recommendations section
+                      if (_searchQuery.isEmpty) ...[
+                        if (_isLoadingRecommendations) ...[
+                          _buildRecommendationsLoading(l10n),
+                          const SizedBox(height: 16),
+                        ] else if (_recommendations.isNotEmpty) ...[
+                          _buildRecommendationsSection(l10n),
+                          const SizedBox(height: 16),
+                        ],
+                      ],
+
+                      // Promotions section
                       if (promotions.isNotEmpty && _searchQuery.isEmpty) ...[
                         Row(
                           children: [
@@ -278,6 +297,153 @@ class _RestaurantsListScreenState extends State<RestaurantsListScreen> {
       clientProvider.loadDishPromotions(customerCity: customerCity),
       clientProvider.refreshCartPromotions(),
     ]);
+    // Load AI recommendations after restaurants load
+    _loadRecommendations();
+  }
+
+  Future<void> _loadRecommendations() async {
+    final authProvider = context.read<AuthProvider>();
+    final userId = authProvider.currentUser?.uid;
+    if (userId == null || _hasLoadedRecommendations) return;
+
+    setState(() => _isLoadingRecommendations = true);
+
+    try {
+      // Get all available menu items across restaurants
+      final menuSnapshot = await FirebaseFirestore.instance
+          .collection('menuItems')
+          .where('status', isEqualTo: 'approved')
+          .where('isAvailable', isEqualTo: true)
+          .limit(60)
+          .get();
+
+      final availableItems = menuSnapshot.docs.map((doc) {
+        final data = doc.data();
+        return {
+          'id': doc.id,
+          'name': data['name'] ?? '',
+          'category': data['category'] ?? '',
+          'price': data['price'] ?? 0,
+          'restaurantId': data['restaurantId'] ?? '',
+        };
+      }).toList();
+
+      if (availableItems.isEmpty) return;
+
+      final language = authProvider.locale.languageCode;
+      final recs = await _aiService.getRecommendations(
+        userId: userId,
+        availableMenuItems: availableItems,
+        language: language,
+      );
+
+      if (mounted) {
+        setState(() {
+          _recommendations = recs;
+          _hasLoadedRecommendations = true;
+        });
+      }
+    } catch (e) {
+      print('Error loading recommendations: $e');
+    } finally {
+      if (mounted) setState(() => _isLoadingRecommendations = false);
+    }
+  }
+
+  Widget _buildRecommendationsLoading(AppLocalizations l10n) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: NeuDecoration.raised(radius: 16),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.purple.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(Icons.auto_awesome, color: Colors.purple, size: 24),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.aiRecommendations,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: NeuColors.textPrimary)),
+                const SizedBox(height: 4),
+                Text(l10n.loadingRecommendations,
+                    style: const TextStyle(
+                        fontSize: 12, color: NeuColors.textSecondary)),
+              ],
+            ),
+          ),
+          const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+                strokeWidth: 2, color: Colors.purple),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRecommendationsSection(AppLocalizations l10n) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Icon(Icons.auto_awesome, color: Colors.purple, size: 22),
+            const SizedBox(width: 6),
+            Text(
+              l10n.aiRecommendations,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: NeuColors.textPrimary,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.purple.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                'IA',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.purple.shade700,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(
+          l10n.aiRecommendationsSubtitle,
+          style: const TextStyle(fontSize: 12, color: NeuColors.textSecondary),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 130,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: _recommendations.length,
+            itemBuilder: (context, index) {
+              final rec = _recommendations[index];
+              return _RecommendationCard(recommendation: rec);
+            },
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildInitialState(AppLocalizations l10n) {
@@ -767,6 +933,103 @@ class _RestaurantCard extends StatelessWidget {
               : 'R',
           style: const TextStyle(
               fontSize: 60, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+      ),
+    );
+  }
+}
+
+class _RecommendationCard extends StatelessWidget {
+  final AiRecommendation recommendation;
+
+  const _RecommendationCard({required this.recommendation});
+
+  IconData _getCategoryIcon(String? category) {
+    final cat = (category ?? '').toLowerCase();
+    if (cat.contains('pizza')) return Icons.local_pizza;
+    if (cat.contains('burger') || cat.contains('fast')) return Icons.lunch_dining;
+    if (cat.contains('sushi')) return Icons.set_meal;
+    if (cat.contains('chicken') || cat.contains('poulet')) return Icons.kebab_dining;
+    if (cat.contains('tacos')) return Icons.takeout_dining;
+    if (cat.contains('dessert') || cat.contains('patisserie')) return Icons.cake;
+    if (cat.contains('marocain') || cat.contains('moroccan') || cat.contains('مغربي')) return Icons.restaurant;
+    return Icons.restaurant_menu;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 240,
+      margin: const EdgeInsets.only(right: 12),
+      decoration: NeuDecoration.raised(radius: 14),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.purple.shade300, Colors.deepPurple.shade400],
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    _getCategoryIcon(recommendation.category),
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    recommendation.dishName,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: NeuColors.textPrimary,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Expanded(
+              child: Text(
+                recommendation.reason,
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: NeuColors.textSecondary,
+                  height: 1.3,
+                ),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            if (recommendation.category != null) ...[
+              const SizedBox(height: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.purple.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  recommendation.category!,
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Colors.purple.shade600,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ],
         ),
       ),
     );

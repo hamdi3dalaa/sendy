@@ -1194,4 +1194,20 @@ class AppLocalizationsFr extends AppLocalizations {
   String get termsOfService => 'Conditions d\'utilisation';
   @override
   String get appVersion => 'Version de l\'application';
+
+  // AI Food Recommendations
+  @override
+  String get aiRecommendations => 'Suggestions pour vous';
+  @override
+  String get aiRecommendationsSubtitle => 'Basees sur vos commandes precedentes';
+  @override
+  String get basedOnYourTastes => 'Selon vos gouts';
+  @override
+  String get noRecommendationsYet => 'Pas encore de suggestions';
+  @override
+  String get orderToGetRecommendations => 'Commandez pour recevoir des suggestions personnalisees';
+  @override
+  String get loadingRecommendations => 'Analyse de vos gouts...';
+  @override
+  String get viewDish => 'Voir';
 }
