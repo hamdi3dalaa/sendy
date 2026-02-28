@@ -1170,4 +1170,28 @@ class AppLocalizationsFr extends AppLocalizations {
   String get aiLogoPromptHint => 'Ex: Logo moderne avec une tagine, couleurs chaudes...';
   @override
   String get generate => 'Générer';
+
+  // Account deletion
+  @override
+  String get deleteAccount => 'Supprimer mon compte';
+  @override
+  String get deleteAccountConfirm => 'Confirmer la suppression du compte';
+  @override
+  String get deleteAccountWarning => 'Cette action est irréversible. Toutes vos données seront définitivement supprimées, y compris votre profil, vos commandes et vos adresses enregistrées.';
+  @override
+  String get accountDeleted => 'Compte supprimé avec succès';
+  @override
+  String get deleteAccountError => 'Erreur lors de la suppression du compte';
+  @override
+  String get typeDeleteToConfirm => 'Tapez SUPPRIMER pour confirmer';
+  @override
+  String get deleteWord => 'SUPPRIMER';
+
+  // Privacy & Terms
+  @override
+  String get privacyPolicy => 'Politique de confidentialité';
+  @override
+  String get termsOfService => 'Conditions d\'utilisation';
+  @override
+  String get appVersion => 'Version de l\'application';
 }

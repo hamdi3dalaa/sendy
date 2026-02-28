@@ -1159,4 +1159,28 @@ class AppLocalizationsAr extends AppLocalizations {
   String get aiLogoPromptHint => 'مثال: شعار حديث مع طاجين، ألوان دافئة...';
   @override
   String get generate => 'إنشاء';
+
+  // Account deletion
+  @override
+  String get deleteAccount => 'حذف حسابي';
+  @override
+  String get deleteAccountConfirm => 'تأكيد حذف الحساب';
+  @override
+  String get deleteAccountWarning => 'هذا الإجراء لا يمكن التراجع عنه. سيتم حذف جميع بياناتك نهائياً، بما في ذلك ملفك الشخصي وطلباتك وعناوينك المحفوظة.';
+  @override
+  String get accountDeleted => 'تم حذف الحساب بنجاح';
+  @override
+  String get deleteAccountError => 'خطأ أثناء حذف الحساب';
+  @override
+  String get typeDeleteToConfirm => 'اكتب حذف للتأكيد';
+  @override
+  String get deleteWord => 'حذف';
+
+  // Privacy & Terms
+  @override
+  String get privacyPolicy => 'سياسة الخصوصية';
+  @override
+  String get termsOfService => 'شروط الاستخدام';
+  @override
+  String get appVersion => 'إصدار التطبيق';
 }

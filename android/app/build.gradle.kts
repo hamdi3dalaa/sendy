@@ -8,32 +8,50 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Load local.properties for API keys
+val localProperties = java.util.Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use { localProperties.load(it) }
+}
+
 android {
-    namespace = "com.example.sendy"
-    compileSdk = 36  // Updated
+    namespace = "com.sendy.delivery"
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17  // Updated from 11
-        targetCompatibility = JavaVersion.VERSION_17  // Updated from 11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
         isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
-        jvmTarget = "17"  // Updated from 11
+        jvmTarget = "17"
     }
 
     defaultConfig {
-        applicationId = "com.example.sendy"
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        applicationId = "com.sendy.delivery"
+        minSdk = 23  // Explicit minimum for Google Play compliance
+        targetSdk = 35  // Google Play requires targetSdk 35+ for new apps in 2025+
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        // Pass Maps API key from local.properties to manifest
+        manifestPlaceholders["MAPS_API_KEY"] = localProperties.getProperty("MAPS_API_KEY", "")
     }
 
     buildTypes {
         release {
+            // TODO: Create a release keystore and configure signing before publishing
+            // See: https://docs.flutter.dev/deployment/android#signing-the-app
             signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 }

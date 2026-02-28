@@ -2095,6 +2095,20 @@ abstract class AppLocalizations {
   String get aiLogoPromptDescription;
   String get aiLogoPromptHint;
   String get generate;
+
+  // Account deletion (App Store & Google Play requirement)
+  String get deleteAccount;
+  String get deleteAccountConfirm;
+  String get deleteAccountWarning;
+  String get accountDeleted;
+  String get deleteAccountError;
+  String get typeDeleteToConfirm;
+  String get deleteWord;
+
+  // Privacy & Terms (Store requirement)
+  String get privacyPolicy;
+  String get termsOfService;
+  String get appVersion;
 }
 
 class _AppLocalizationsDelegate

@@ -53,7 +53,8 @@ void main() async {
   WidgetsBinding.instance.addPostFrameCallback((_) async {
     try {
       await FirebaseAppCheck.instance.activate(
-        androidProvider: AndroidProvider.debug,
+        androidProvider: AndroidProvider.playIntegrity,
+        appleProvider: AppleProvider.deviceCheck,
       );
 
       await NotificationService().initialize();

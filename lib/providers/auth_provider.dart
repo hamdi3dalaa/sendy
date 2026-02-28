@@ -519,6 +519,77 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  /// Delete user account and all associated data
+  /// Required by App Store and Google Play Store policies
+  Future<void> deleteAccount() async {
+    final user = _auth.currentUser;
+    if (user == null) throw Exception('Not authenticated');
+
+    final uid = user.uid;
+
+    try {
+      // 1. Delete user's Firestore document
+      await _firestore.collection('users').doc(uid).delete();
+
+      // 2. Delete user's orders
+      final orders = await _firestore
+          .collection('orders')
+          .where('clientId', isEqualTo: uid)
+          .get();
+      for (final doc in orders.docs) {
+        await doc.reference.delete();
+      }
+
+      // 3. Delete user's menu items (if restaurant)
+      final menuItems = await _firestore
+          .collection('menuItems')
+          .where('restaurantId', isEqualTo: uid)
+          .get();
+      for (final doc in menuItems.docs) {
+        await doc.reference.delete();
+      }
+
+      // 4. Delete user's reviews
+      final reviews = await _firestore
+          .collection('reviews')
+          .where('userId', isEqualTo: uid)
+          .get();
+      for (final doc in reviews.docs) {
+        await doc.reference.delete();
+      }
+
+      // 5. Delete stored files (profile images, ID cards)
+      try {
+        final profileRef = FirebaseStorage.instance.ref().child('profile_images/$uid');
+        final profileList = await profileRef.listAll();
+        for (final item in profileList.items) {
+          await item.delete();
+        }
+      } catch (_) {}
+
+      try {
+        final idRef = FirebaseStorage.instance.ref().child('id_cards/$uid');
+        final idList = await idRef.listAll();
+        for (final item in idList.items) {
+          await item.delete();
+        }
+      } catch (_) {}
+
+      // 6. Clear local state
+      _currentUser = null;
+      _currentPhoneNumber = null;
+      _verificationId = null;
+      _isNewUserRegistering = false;
+      notifyListeners();
+
+      // 7. Delete Firebase Auth account (must be last)
+      await user.delete();
+    } catch (e) {
+      print('Error deleting account: $e');
+      rethrow;
+    }
+  }
+
   Future<void> signOut() async {
     _currentUser = null;
     _currentPhoneNumber = null;

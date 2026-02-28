@@ -1,6 +1,7 @@
 // lib/screens/client/profile_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:sendy/l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/client_provider.dart';
@@ -93,6 +94,31 @@ class ProfileScreen extends StatelessWidget {
               title: l10n.settings,
               onTap: () {},
             ),
+            const SizedBox(height: 12),
+
+            // Privacy Policy
+            _buildNeuMenuTile(
+              icon: Icons.privacy_tip_rounded,
+              title: l10n.privacyPolicy,
+              onTap: () => _openUrl('https://sendy-fc0ed.web.app/privacy'),
+            ),
+            const SizedBox(height: 12),
+
+            // Terms of Service
+            _buildNeuMenuTile(
+              icon: Icons.description_rounded,
+              title: l10n.termsOfService,
+              onTap: () => _openUrl('https://sendy-fc0ed.web.app/terms'),
+            ),
+            const SizedBox(height: 12),
+
+            // App Version
+            _buildNeuMenuTile(
+              icon: Icons.info_outline_rounded,
+              title: l10n.appVersion,
+              subtitle: '1.0.0',
+              onTap: () {},
+            ),
             const SizedBox(height: 24),
 
             // Logout Button
@@ -126,6 +152,33 @@ class ProfileScreen extends StatelessWidget {
                       color: NeuColors.error,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
+                    )),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // Delete Account Button (Required by App Store & Google Play)
+            GestureDetector(
+              onTap: () => _confirmDeleteAccount(context, l10n, authProvider),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                decoration: BoxDecoration(
+                  color: NeuColors.background,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: Colors.red.withOpacity(0.3)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.delete_forever_rounded, color: Colors.red.shade400),
+                    const SizedBox(width: 8),
+                    Text(l10n.deleteAccount, style: TextStyle(
+                      color: Colors.red.shade400,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
                     )),
                   ],
                 ),
@@ -341,6 +394,13 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+  void _openUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
   void _confirmLogout(
       BuildContext context, AppLocalizations l10n, AuthProvider authProvider) {
     showDialog(
@@ -363,6 +423,90 @@ class ProfileScreen extends StatelessWidget {
             child: Text(l10n.logout, style: const TextStyle(color: NeuColors.error, fontWeight: FontWeight.bold)),
           ),
         ],
+      ),
+    );
+  }
+
+  void _confirmDeleteAccount(
+      BuildContext context, AppLocalizations l10n, AuthProvider authProvider) {
+    final confirmController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          backgroundColor: NeuColors.background,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Row(
+            children: [
+              const Icon(Icons.warning_rounded, color: Colors.red, size: 28),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(l10n.deleteAccountConfirm,
+                    style: const TextStyle(color: NeuColors.textPrimary, fontSize: 18)),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(l10n.deleteAccountWarning,
+                  style: const TextStyle(color: NeuColors.textSecondary, fontSize: 14)),
+              const SizedBox(height: 16),
+              TextField(
+                controller: confirmController,
+                decoration: InputDecoration(
+                  labelText: l10n.typeDeleteToConfirm,
+                  border: const OutlineInputBorder(),
+                ),
+                onChanged: (_) => setState(() {}),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                confirmController.dispose();
+                Navigator.pop(context);
+              },
+              child: Text(l10n.cancel, style: const TextStyle(color: NeuColors.textSecondary)),
+            ),
+            TextButton(
+              onPressed: confirmController.text.trim() == l10n.deleteWord
+                  ? () async {
+                      Navigator.pop(context);
+                      try {
+                        await authProvider.deleteAccount();
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(l10n.accountDeleted),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('${l10n.deleteAccountError}: $e'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      }
+                      confirmController.dispose();
+                    }
+                  : null,
+              child: Text(l10n.deleteAccount,
+                  style: TextStyle(
+                    color: confirmController.text.trim() == l10n.deleteWord
+                        ? Colors.red
+                        : Colors.grey,
+                    fontWeight: FontWeight.bold,
+                  )),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -74,5 +74,14 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- Export Compliance: App uses standard HTTPS encryption only -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<!-- App Transport Security: Enforce HTTPS -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<false/>
+	</dict>
 </dict>
 </plist>
